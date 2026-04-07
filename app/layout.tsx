@@ -9,6 +9,9 @@ export const metadata: Metadata = {
   title: "Campus Connect — UMaT Student Marketplace",
   description:
     "Buy and sell goods or book campus services from fellow UMaT students. 100% free. No commission. No hidden fees.",
+  icons: {
+    icon: "/icon.png",
+  },
 }
 
 export default function RootLayout({
