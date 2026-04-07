@@ -74,7 +74,7 @@ export default function OfferServicePage() {
       .from('services')
       .insert({
         provider_id: user.id,
-        title: form.name.trim(),
+        name: form.name.trim(),
         description: form.description.trim(),
         category: form.category,
         rate: form.rate.trim(),

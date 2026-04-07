@@ -1,5 +1,5 @@
 -- ============================================================
--- Campus Connect — Supabase Schema
+-- Campus Connect — Supabase Schema (corrected)
 -- Run this in the Supabase SQL Editor
 -- ============================================================
 
@@ -9,7 +9,7 @@ create extension if not exists "uuid-ossp";
 -- ============================================================
 -- PROFILES
 -- ============================================================
-create table public.profiles (
+create table if not exists public.profiles (
   id uuid references auth.users on delete cascade primary key,
   email text not null,
   name text,
@@ -46,6 +46,7 @@ begin
 end;
 $$ language plpgsql security definer;
 
+drop trigger if exists on_auth_user_created on auth.users;
 create trigger on_auth_user_created
   after insert on auth.users
   for each row execute procedure public.handle_new_user();
@@ -53,7 +54,7 @@ create trigger on_auth_user_created
 -- ============================================================
 -- PRODUCTS (Goods for sale)
 -- ============================================================
-create table public.products (
+create table if not exists public.products (
   id uuid default uuid_generate_v4() primary key,
   seller_id uuid references public.profiles(id) on delete cascade not null,
   title text not null,
@@ -61,7 +62,8 @@ create table public.products (
   price numeric(10,2) not null check (price >= 0),
   condition text check (condition in ('New', 'Like New', 'Good', 'Fair')),
   category text check (category in ('Electronics', 'Clothing', 'Books', 'Furniture', 'Sports', 'Other')),
-  images text[] default '{}',
+  image_url text,
+  whatsapp text,
   status text default 'active' check (status in ('active', 'sold', 'paused', 'deleted')),
   views int default 0,
   location text,
@@ -72,18 +74,17 @@ create table public.products (
 -- ============================================================
 -- SERVICES
 -- ============================================================
-create table public.services (
+create table if not exists public.services (
   id uuid default uuid_generate_v4() primary key,
   provider_id uuid references public.profiles(id) on delete cascade not null,
   name text not null,
   description text,
   category text check (category in ('Barbing', 'Tutoring', 'Photography', 'Laundry', 'Tech Repair', 'Design', 'Other')),
-  rate_min numeric(10,2),
-  rate_max numeric(10,2),
-  rate_label text,
+  rate text,
   availability text,
   response_time text,
-  images text[] default '{}',
+  image_url text,
+  whatsapp text,
   status text default 'active' check (status in ('active', 'paused', 'deleted')),
   total_bookings int default 0,
   created_at timestamptz default now(),
@@ -93,7 +94,7 @@ create table public.services (
 -- ============================================================
 -- BOOKINGS
 -- ============================================================
-create table public.bookings (
+create table if not exists public.bookings (
   id uuid default uuid_generate_v4() primary key,
   service_id uuid references public.services(id) on delete cascade not null,
   buyer_id uuid references public.profiles(id) on delete cascade not null,
@@ -109,7 +110,7 @@ create table public.bookings (
 -- ============================================================
 -- MESSAGES
 -- ============================================================
-create table public.messages (
+create table if not exists public.messages (
   id uuid default uuid_generate_v4() primary key,
   sender_id uuid references public.profiles(id) on delete cascade not null,
   receiver_id uuid references public.profiles(id) on delete cascade not null,
@@ -143,7 +144,7 @@ order by
 -- ============================================================
 -- REVIEWS
 -- ============================================================
-create table public.reviews (
+create table if not exists public.reviews (
   id uuid default uuid_generate_v4() primary key,
   reviewer_id uuid references public.profiles(id) on delete cascade not null,
   target_id uuid references public.profiles(id) on delete cascade not null,
@@ -159,8 +160,6 @@ create table public.reviews (
 -- ============================================================
 -- ROW LEVEL SECURITY (RLS)
 -- ============================================================
-
--- Enable RLS on all tables
 alter table public.profiles enable row level security;
 alter table public.products enable row level security;
 alter table public.services enable row level security;
@@ -168,95 +167,132 @@ alter table public.bookings enable row level security;
 alter table public.messages enable row level security;
 alter table public.reviews enable row level security;
 
--- PROFILES: anyone can read, only owner can update
+-- Drop existing policies before recreating (idempotent)
+drop policy if exists "Public profiles are viewable by everyone" on public.profiles;
+drop policy if exists "Users can update own profile" on public.profiles;
+drop policy if exists "Active products are viewable by everyone" on public.products;
+drop policy if exists "Users can insert own products" on public.products;
+drop policy if exists "Sellers can update own products" on public.products;
+drop policy if exists "Sellers can delete own products" on public.products;
+drop policy if exists "Active services are viewable by everyone" on public.services;
+drop policy if exists "Providers can insert own services" on public.services;
+drop policy if exists "Providers can update own services" on public.services;
+drop policy if exists "Providers can delete own services" on public.services;
+drop policy if exists "Users can view own bookings" on public.bookings;
+drop policy if exists "Buyers can create bookings" on public.bookings;
+drop policy if exists "Participants can update booking status" on public.bookings;
+drop policy if exists "Users can view own messages" on public.messages;
+drop policy if exists "Authenticated users can send messages" on public.messages;
+drop policy if exists "Receiver can mark messages as read" on public.messages;
+drop policy if exists "Reviews are public" on public.reviews;
+drop policy if exists "Authenticated users can write reviews" on public.reviews;
+
+-- PROFILES
 create policy "Public profiles are viewable by everyone" on public.profiles
   for select using (true);
-
 create policy "Users can update own profile" on public.profiles
   for update using (auth.uid() = id);
 
--- PRODUCTS: anyone can read active listings
+-- PRODUCTS
 create policy "Active products are viewable by everyone" on public.products
   for select using (status != 'deleted');
-
 create policy "Users can insert own products" on public.products
   for insert with check (auth.uid() = seller_id);
-
 create policy "Sellers can update own products" on public.products
   for update using (auth.uid() = seller_id);
+create policy "Sellers can delete own products" on public.products
+  for delete using (auth.uid() = seller_id);
 
--- SERVICES: anyone can read active services
+-- SERVICES
 create policy "Active services are viewable by everyone" on public.services
   for select using (status != 'deleted');
-
 create policy "Providers can insert own services" on public.services
   for insert with check (auth.uid() = provider_id);
-
 create policy "Providers can update own services" on public.services
   for update using (auth.uid() = provider_id);
+create policy "Providers can delete own services" on public.services
+  for delete using (auth.uid() = provider_id);
 
--- BOOKINGS: buyer and provider can see their bookings
+-- BOOKINGS
 create policy "Users can view own bookings" on public.bookings
   for select using (auth.uid() = buyer_id or auth.uid() = provider_id);
-
 create policy "Buyers can create bookings" on public.bookings
   for insert with check (auth.uid() = buyer_id);
-
 create policy "Participants can update booking status" on public.bookings
   for update using (auth.uid() = buyer_id or auth.uid() = provider_id);
 
--- MESSAGES: only sender and receiver can see
+-- MESSAGES
 create policy "Users can view own messages" on public.messages
   for select using (auth.uid() = sender_id or auth.uid() = receiver_id);
-
 create policy "Authenticated users can send messages" on public.messages
   for insert with check (auth.uid() = sender_id);
-
 create policy "Receiver can mark messages as read" on public.messages
   for update using (auth.uid() = receiver_id);
 
--- REVIEWS: anyone can read, authenticated users can write
+-- REVIEWS
 create policy "Reviews are public" on public.reviews
   for select using (true);
-
 create policy "Authenticated users can write reviews" on public.reviews
   for insert with check (auth.uid() = reviewer_id);
 
 -- ============================================================
--- STORAGE BUCKETS (run separately in Supabase dashboard or via CLI)
+-- STORAGE BUCKETS
 -- ============================================================
--- insert into storage.buckets (id, name, public) values ('avatars', 'avatars', true);
--- insert into storage.buckets (id, name, public) values ('product-images', 'product-images', true);
--- insert into storage.buckets (id, name, public) values ('service-images', 'service-images', true);
+insert into storage.buckets (id, name, public) values ('avatars', 'avatars', true)
+  on conflict (id) do nothing;
+insert into storage.buckets (id, name, public) values ('product-images', 'product-images', true)
+  on conflict (id) do nothing;
+insert into storage.buckets (id, name, public) values ('service-images', 'service-images', true)
+  on conflict (id) do nothing;
 
 -- Storage RLS
--- create policy "Avatar images are publicly accessible" on storage.objects for select using (bucket_id = 'avatars');
--- create policy "Anyone can upload an avatar" on storage.objects for insert with check (bucket_id = 'avatars');
--- create policy "Product images are publicly accessible" on storage.objects for select using (bucket_id = 'product-images');
--- create policy "Authenticated users can upload product images" on storage.objects for insert with check (bucket_id = 'product-images' and auth.role() = 'authenticated');
+drop policy if exists "Avatar images are publicly accessible" on storage.objects;
+drop policy if exists "Users can upload their own avatar" on storage.objects;
+drop policy if exists "Users can update their own avatar" on storage.objects;
+drop policy if exists "Product images are publicly accessible" on storage.objects;
+drop policy if exists "Authenticated users can upload product images" on storage.objects;
+drop policy if exists "Service images are publicly accessible" on storage.objects;
+drop policy if exists "Authenticated users can upload service images" on storage.objects;
+
+create policy "Avatar images are publicly accessible" on storage.objects
+  for select using (bucket_id = 'avatars');
+create policy "Users can upload their own avatar" on storage.objects
+  for insert with check (bucket_id = 'avatars' and auth.role() = 'authenticated');
+create policy "Users can update their own avatar" on storage.objects
+  for update using (bucket_id = 'avatars' and auth.uid()::text = (storage.foldername(name))[1]);
+
+create policy "Product images are publicly accessible" on storage.objects
+  for select using (bucket_id = 'product-images');
+create policy "Authenticated users can upload product images" on storage.objects
+  for insert with check (bucket_id = 'product-images' and auth.role() = 'authenticated');
+
+create policy "Service images are publicly accessible" on storage.objects
+  for select using (bucket_id = 'service-images');
+create policy "Authenticated users can upload service images" on storage.objects
+  for insert with check (bucket_id = 'service-images' and auth.role() = 'authenticated');
 
 -- ============================================================
--- REALTIME (run these in the Supabase SQL Editor)
+-- REALTIME
 -- ============================================================
 alter publication supabase_realtime add table public.messages;
 alter publication supabase_realtime add table public.bookings;
 
 -- ============================================================
--- INDEXES for performance
+-- INDEXES
 -- ============================================================
-create index products_seller_id_idx on public.products(seller_id);
-create index products_category_idx on public.products(category);
-create index products_status_idx on public.products(status);
-create index services_provider_id_idx on public.services(provider_id);
-create index services_category_idx on public.services(category);
-create index messages_sender_id_idx on public.messages(sender_id);
-create index messages_receiver_id_idx on public.messages(receiver_id);
-create index messages_created_at_idx on public.messages(created_at desc);
-create index bookings_buyer_id_idx on public.bookings(buyer_id);
-create index bookings_provider_id_idx on public.bookings(provider_id);
+create index if not exists products_seller_id_idx on public.products(seller_id);
+create index if not exists products_category_idx on public.products(category);
+create index if not exists products_status_idx on public.products(status);
+create index if not exists services_provider_id_idx on public.services(provider_id);
+create index if not exists services_category_idx on public.services(category);
+create index if not exists messages_sender_id_idx on public.messages(sender_id);
+create index if not exists messages_receiver_id_idx on public.messages(receiver_id);
+create index if not exists messages_created_at_idx on public.messages(created_at desc);
+create index if not exists bookings_buyer_id_idx on public.bookings(buyer_id);
+create index if not exists bookings_provider_id_idx on public.bookings(provider_id);
 
 -- ============================================================
--- UPDATED_AT trigger function
+-- UPDATED_AT trigger
 -- ============================================================
 create or replace function public.handle_updated_at()
 returns trigger as $$
@@ -266,20 +302,22 @@ begin
 end;
 $$ language plpgsql;
 
+drop trigger if exists handle_updated_at on public.profiles;
+drop trigger if exists handle_updated_at on public.products;
+drop trigger if exists handle_updated_at on public.services;
+drop trigger if exists handle_updated_at on public.bookings;
+
 create trigger handle_updated_at before update on public.profiles
   for each row execute procedure public.handle_updated_at();
-
 create trigger handle_updated_at before update on public.products
   for each row execute procedure public.handle_updated_at();
-
 create trigger handle_updated_at before update on public.services
   for each row execute procedure public.handle_updated_at();
-
 create trigger handle_updated_at before update on public.bookings
   for each row execute procedure public.handle_updated_at();
 
 -- ============================================================
--- UPDATE PRODUCT VIEWS (increment safely)
+-- INCREMENT PRODUCT VIEWS
 -- ============================================================
 create or replace function public.increment_product_views(product_id uuid)
 returns void as $$

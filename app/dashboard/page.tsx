@@ -1,30 +1,93 @@
 "use client"
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { mockGoods, mockServices } from '@/lib/mockData'
 import { useAuth } from '@/context/AuthContext'
+import { supabase } from '@/lib/supabase'
+
+interface Listing {
+  id: string
+  title: string
+  price: number
+  image_url: string | null
+  views: number
+  status: string
+}
+
+interface Booking {
+  id: string
+  status: string
+  service: {
+    id: string
+    name: string
+    rate: string | null
+    image_url: string | null
+  } | null
+}
 
 export default function DashboardPage() {
   const { user, profile, loading, signOut } = useAuth()
   const router = useRouter()
+  const [myListings, setMyListings] = useState<Listing[]>([])
+  const [myBookings, setMyBookings] = useState<Booking[]>([])
+  const [unreadCount, setUnreadCount] = useState(0)
+  const [dataLoading, setDataLoading] = useState(true)
 
   useEffect(() => {
     if (!loading && !user) router.push('/auth/login?redirect=/dashboard')
   }, [user, loading, router])
 
-  const myListings = mockGoods.slice(0, 3)
-  const myBookings = mockServices.slice(0, 2)
+  useEffect(() => {
+    if (!user) return
+
+    const fetchDashboardData = async () => {
+      setDataLoading(true)
+
+      const [listingsRes, bookingsRes, unreadRes] = await Promise.all([
+        supabase
+          .from('products')
+          .select('id, title, price, image_url, views, status')
+          .eq('seller_id', user.id)
+          .neq('status', 'deleted')
+          .order('created_at', { ascending: false })
+          .limit(3),
+
+        supabase
+          .from('bookings')
+          .select(`
+            id, status,
+            service:services!service_id (id, name, rate, image_url)
+          `)
+          .eq('buyer_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(2),
+
+        supabase
+          .from('messages')
+          .select('id', { count: 'exact', head: true })
+          .eq('receiver_id', user.id)
+          .eq('is_read', false),
+      ])
+
+      setMyListings((listingsRes.data as Listing[]) ?? [])
+      setMyBookings((bookingsRes.data as Booking[]) ?? [])
+      setUnreadCount(unreadRes.count ?? 0)
+      setDataLoading(false)
+    }
+
+    fetchDashboardData()
+  }, [user])
+
+  const activeListings = myListings.filter(l => l.status === 'active').length
+  const firstName = profile?.name?.split(' ')[0] ?? 'there'
 
   const stats = [
-    { label: 'My Listings', value: '3', icon: '📦', color: '#5d3fd3', href: '/my-listings' },
-    { label: 'Active Bookings', value: '2', icon: '📅', color: '#1B5E20', href: '/services' },
-    { label: 'Unread Messages', value: '—', icon: '💬', color: '#ff3366', href: '/messages' },
-    { label: 'Profile Views', value: '—', icon: '👁', color: '#111', href: '/profile' },
+    { label: 'My Listings', value: dataLoading ? '—' : String(myListings.length), icon: '📦', color: '#5d3fd3', href: '/my-listings' },
+    { label: 'Active', value: dataLoading ? '—' : String(activeListings), icon: '✅', color: '#1B5E20', href: '/my-listings' },
+    { label: 'Unread Messages', value: dataLoading ? '—' : String(unreadCount), icon: '💬', color: '#ff3366', href: '/messages' },
+    { label: 'My Bookings', value: dataLoading ? '—' : String(myBookings.length), icon: '📅', color: '#111', href: '/services' },
   ]
-
-  const firstName = profile?.name?.split(' ')[0] ?? 'there'
 
   if (loading) {
     return (
@@ -94,29 +157,46 @@ export default function DashboardPage() {
               <Link href="/my-listings" style={{ color: '#a78bfa', fontSize: '12px', textDecoration: 'none', fontWeight: 700 }}>View All →</Link>
             </div>
             <div>
-              {myListings.map((listing, i) => (
-                <Link key={listing.id} href={`/goods/${listing.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                  <div style={{
-                    display: 'flex', gap: '12px', alignItems: 'center',
-                    padding: '14px 16px',
-                    borderBottom: i < myListings.length - 1 ? '1px solid #f0f0f0' : 'none',
-                    transition: '0.15s',
-                  }}
-                    onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = '#f8f8f8'}
-                    onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = 'transparent'}
-                  >
-                    <img src={listing.image} alt={listing.name} style={{ width: '52px', height: '52px', objectFit: 'cover', border: '1px solid #eee', flexShrink: 0 }} />
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontWeight: 700, fontSize: '13px', marginBottom: '2px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{listing.name}</div>
-                      <div style={{ color: '#5d3fd3', fontWeight: 700, fontFamily: '"Archivo Black"', fontSize: '14px' }}>GHS {listing.price}</div>
+              {dataLoading ? (
+                <div style={{ padding: '32px', textAlign: 'center', color: '#888', fontSize: '13px' }}>Loading...</div>
+              ) : myListings.length === 0 ? (
+                <div style={{ padding: '32px', textAlign: 'center', color: '#888', fontSize: '13px' }}>No listings yet.</div>
+              ) : (
+                myListings.map((listing, i) => (
+                  <Link key={listing.id} href={`/goods/${listing.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                    <div style={{
+                      display: 'flex', gap: '12px', alignItems: 'center',
+                      padding: '14px 16px',
+                      borderBottom: i < myListings.length - 1 ? '1px solid #f0f0f0' : 'none',
+                      transition: '0.15s',
+                    }}
+                      onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = '#f8f8f8'}
+                      onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = 'transparent'}
+                    >
+                      {listing.image_url ? (
+                        <img src={listing.image_url} alt={listing.title} style={{ width: '52px', height: '52px', objectFit: 'cover', border: '1px solid #eee', flexShrink: 0 }} />
+                      ) : (
+                        <div style={{ width: '52px', height: '52px', background: '#f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', flexShrink: 0 }}>📦</div>
+                      )}
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontWeight: 700, fontSize: '13px', marginBottom: '2px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{listing.title}</div>
+                        <div style={{ color: '#5d3fd3', fontWeight: 700, fontFamily: '"Archivo Black"', fontSize: '14px' }}>GHS {listing.price.toLocaleString()}</div>
+                      </div>
+                      <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                        <div style={{ fontSize: '11px', color: '#888' }}>{listing.views} views</div>
+                        <div style={{
+                          padding: '2px 8px', fontSize: '10px', fontWeight: 700, marginTop: '4px', border: '1px solid',
+                          background: listing.status === 'active' ? '#e8f5e9' : '#f0f0f0',
+                          color: listing.status === 'active' ? '#1B5E20' : '#888',
+                          borderColor: listing.status === 'active' ? '#86efac' : '#ddd',
+                        }}>
+                          {listing.status.toUpperCase()}
+                        </div>
+                      </div>
                     </div>
-                    <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                      <div style={{ fontSize: '11px', color: '#888' }}>{listing.views} views</div>
-                      <div style={{ background: '#e8f5e9', color: '#1B5E20', padding: '2px 8px', fontSize: '10px', fontWeight: 700, marginTop: '4px', border: '1px solid #86efac' }}>ACTIVE</div>
-                    </div>
-                  </div>
-                </Link>
-              ))}
+                  </Link>
+                ))
+              )}
             </div>
             <div style={{ padding: '12px 16px', borderTop: '1px solid #f0f0f0' }}>
               <Link href="/sell" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', padding: '10px', color: '#5d3fd3', fontWeight: 700, textDecoration: 'none', border: '2px dashed #5d3fd3', fontSize: '13px' }}>
@@ -132,28 +212,38 @@ export default function DashboardPage() {
               <Link href="/services" style={{ color: '#86efac', fontSize: '12px', textDecoration: 'none', fontWeight: 700 }}>Browse →</Link>
             </div>
             <div>
-              {myBookings.map((booking, i) => (
-                <Link key={booking.id} href={`/services/${booking.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                  <div style={{
-                    display: 'flex', gap: '12px', alignItems: 'center',
-                    padding: '14px 16px',
-                    borderBottom: i < myBookings.length - 1 ? '1px solid #f0f0f0' : 'none',
-                    transition: '0.15s',
-                  }}
-                    onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = '#f8f8f8'}
-                    onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = 'transparent'}
-                  >
-                    <img src={booking.image} alt={booking.name} style={{ width: '52px', height: '52px', objectFit: 'cover', border: '1px solid #eee', flexShrink: 0 }} />
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontWeight: 700, fontSize: '13px', marginBottom: '2px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{booking.name}</div>
-                      <div style={{ color: '#1B5E20', fontWeight: 700, fontFamily: '"Archivo Black"', fontSize: '14px' }}>{booking.rate}</div>
+              {dataLoading ? (
+                <div style={{ padding: '32px', textAlign: 'center', color: '#888', fontSize: '13px' }}>Loading...</div>
+              ) : myBookings.length === 0 ? (
+                <div style={{ padding: '32px', textAlign: 'center', color: '#888', fontSize: '13px' }}>No bookings yet.</div>
+              ) : (
+                myBookings.map((booking, i) => (
+                  <Link key={booking.id} href={booking.service ? `/services/${booking.service.id}` : '/services'} style={{ textDecoration: 'none', color: 'inherit' }}>
+                    <div style={{
+                      display: 'flex', gap: '12px', alignItems: 'center',
+                      padding: '14px 16px',
+                      borderBottom: i < myBookings.length - 1 ? '1px solid #f0f0f0' : 'none',
+                      transition: '0.15s',
+                    }}
+                      onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = '#f8f8f8'}
+                      onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = 'transparent'}
+                    >
+                      {booking.service?.image_url ? (
+                        <img src={booking.service.image_url} alt={booking.service.name} style={{ width: '52px', height: '52px', objectFit: 'cover', border: '1px solid #eee', flexShrink: 0 }} />
+                      ) : (
+                        <div style={{ width: '52px', height: '52px', background: '#f0fdf4', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', flexShrink: 0 }}>🛠️</div>
+                      )}
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontWeight: 700, fontSize: '13px', marginBottom: '2px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{booking.service?.name ?? 'Service'}</div>
+                        <div style={{ color: '#1B5E20', fontWeight: 700, fontFamily: '"Archivo Black"', fontSize: '14px' }}>{booking.service?.rate ?? '—'}</div>
+                      </div>
+                      <span style={{ background: '#e8f5e9', color: '#1B5E20', padding: '4px 10px', fontSize: '10px', fontWeight: 700, border: '1px solid #86efac', flexShrink: 0, textTransform: 'uppercase' }}>
+                        {booking.status}
+                      </span>
                     </div>
-                    <span style={{ background: '#e8f5e9', color: '#1B5E20', padding: '4px 10px', fontSize: '10px', fontWeight: 700, border: '1px solid #86efac', flexShrink: 0 }}>
-                      BOOKED
-                    </span>
-                  </div>
-                </Link>
-              ))}
+                  </Link>
+                ))
+              )}
             </div>
             <div style={{ padding: '12px 16px', borderTop: '1px solid #f0f0f0' }}>
               <Link href="/services" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', padding: '10px', color: '#1B5E20', fontWeight: 700, textDecoration: 'none', border: '2px dashed #1B5E20', fontSize: '13px' }}>
@@ -197,22 +287,24 @@ export default function DashboardPage() {
         </div>
 
         {/* Profile Setup Prompt */}
-        <div style={{ marginTop: '24px', padding: '20px 24px', background: '#fff', border: '2px solid #f59e0b', display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
-          <div style={{ fontSize: '32px' }}>⚡</div>
-          <div style={{ flex: 1 }}>
-            <div style={{ fontWeight: 700, fontSize: '15px', marginBottom: '4px' }}>Complete your profile to get more views</div>
-            <div style={{ color: '#888', fontSize: '13px' }}>Add a profile photo, bio, and phone number to build trust with buyers and sellers.</div>
+        {(!profile?.department || !profile?.phone) && (
+          <div style={{ marginTop: '24px', padding: '20px 24px', background: '#fff', border: '2px solid #f59e0b', display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
+            <div style={{ fontSize: '32px' }}>⚡</div>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontWeight: 700, fontSize: '15px', marginBottom: '4px' }}>Complete your profile to get more views</div>
+              <div style={{ color: '#888', fontSize: '13px' }}>Add a profile photo, bio, and phone number to build trust with buyers and sellers.</div>
+            </div>
+            <Link href="/profile" style={{
+              display: 'inline-block', padding: '10px 24px',
+              background: '#f59e0b', color: '#111',
+              fontFamily: '"Archivo Black", sans-serif', fontSize: '13px',
+              textDecoration: 'none', border: '2px solid #111',
+              boxShadow: '3px 3px 0 #111', whiteSpace: 'nowrap',
+            }}>
+              UPDATE PROFILE
+            </Link>
           </div>
-          <Link href="/profile" style={{
-            display: 'inline-block', padding: '10px 24px',
-            background: '#f59e0b', color: '#111',
-            fontFamily: '"Archivo Black", sans-serif', fontSize: '13px',
-            textDecoration: 'none', border: '2px solid #111',
-            boxShadow: '3px 3px 0 #111', whiteSpace: 'nowrap',
-          }}>
-            UPDATE PROFILE
-          </Link>
-        </div>
+        )}
       </div>
     </div>
   )

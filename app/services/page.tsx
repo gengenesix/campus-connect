@@ -1,21 +1,75 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import ServiceCard from "@/components/ServiceCard"
-import { mockServices } from "@/lib/mockData"
+import { supabase } from "@/lib/supabase"
+
+interface Service {
+  id: string
+  name: string
+  category: string
+  rate: string | null
+  availability: string | null
+  image_url: string | null
+  description: string
+  response_time: string | null
+  total_bookings: number
+  provider: {
+    name: string
+    avatar_url: string | null
+    rating: number
+  } | null
+}
 
 const CATEGORIES = ['Barbing', 'Tutoring', 'Photography', 'Laundry', 'Tech Repair', 'Design', 'Other'] as const
 
 export default function ServicesPage() {
+  const [services, setServices] = useState<Service[]>([])
+  const [loading, setLoading] = useState(true)
   const [category, setCategory] = useState('')
   const [search, setSearch] = useState('')
 
-  const filtered = mockServices.filter(s => {
+  useEffect(() => {
+    const fetchServices = async () => {
+      setLoading(true)
+      const { data } = await supabase
+        .from('services')
+        .select(`
+          id, name, category, rate, availability, image_url, description, response_time, total_bookings,
+          provider:profiles!provider_id (name, avatar_url, rating)
+        `)
+        .neq('status', 'deleted')
+        .order('total_bookings', { ascending: false })
+      setServices((data as Service[]) ?? [])
+      setLoading(false)
+    }
+    fetchServices()
+  }, [])
+
+  const filtered = services.filter(s => {
     if (category && s.category !== category) return false
-    if (search && !s.name.toLowerCase().includes(search.toLowerCase()) &&
-        !s.provider.toLowerCase().includes(search.toLowerCase())) return false
+    if (search) {
+      const q = search.toLowerCase()
+      if (!s.name.toLowerCase().includes(q) && !(s.provider?.name ?? '').toLowerCase().includes(q)) return false
+    }
     return true
   })
+
+  if (loading) {
+    return (
+      <div>
+        <div style={{ background: '#111', color: '#fff', padding: '36px 20px' }}>
+          <div className="container">
+            <h1 style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '48px', letterSpacing: '-1px' }}>CAMPUS SERVICES</h1>
+          </div>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '80px 0', gap: '12px' }}>
+          <div style={{ width: '10px', height: '10px', background: '#1B5E20', borderRadius: '50%', animation: 'pulse 1s infinite' }} />
+          <span style={{ color: '#888', fontWeight: 600 }}>Loading services...</span>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div>
@@ -26,7 +80,7 @@ export default function ServicesPage() {
             CAMPUS SERVICES
           </h1>
           <p style={{ color: '#666', fontSize: '15px' }}>
-            {mockServices.length} services from UMaT students · Book directly on campus
+            {services.length} service{services.length !== 1 ? 's' : ''} from UMaT students · Book directly on campus
           </p>
         </div>
       </div>
@@ -77,12 +131,20 @@ export default function ServicesPage() {
           <div style={{ textAlign: 'center', padding: '80px 20px' }}>
             <div style={{ fontSize: '48px', marginBottom: '16px' }}>🔍</div>
             <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '28px', marginBottom: '10px' }}>
-              NO SERVICES FOUND
+              {services.length === 0 ? 'NO SERVICES YET' : 'NO SERVICES FOUND'}
             </div>
-            <p style={{ color: '#666', marginBottom: '24px' }}>Try a different category or search term</p>
-            <button onClick={() => { setCategory(''); setSearch('') }} className="btn-primary" style={{ cursor: 'pointer' }}>
-              CLEAR FILTERS
-            </button>
+            <p style={{ color: '#666', marginBottom: '24px' }}>
+              {services.length === 0 ? 'Be the first to offer a service!' : 'Try a different category or search term'}
+            </p>
+            {services.length === 0 ? (
+              <a href="/offer-service" className="btn-primary" style={{ display: 'inline-block', textDecoration: 'none', padding: '14px 32px' }}>
+                OFFER A SERVICE →
+              </a>
+            ) : (
+              <button onClick={() => { setCategory(''); setSearch('') }} className="btn-primary" style={{ cursor: 'pointer' }}>
+                CLEAR FILTERS
+              </button>
+            )}
           </div>
         ) : (
           <>
@@ -92,7 +154,20 @@ export default function ServicesPage() {
             </p>
             <div className="product-grid">
               {filtered.map(service => (
-                <ServiceCard key={service.id} service={service} />
+                <ServiceCard key={service.id} service={{
+                  id: service.id,
+                  name: service.name,
+                  provider: service.provider?.name ?? 'UMaT Student',
+                  providerImage: service.provider?.avatar_url ?? '/placeholder-user.jpg',
+                  providerRating: service.provider?.rating ?? 5.0,
+                  category: service.category as any,
+                  rate: service.rate ?? 'Contact for pricing',
+                  description: service.description ?? '',
+                  availability: service.availability ?? 'Contact provider',
+                  image: service.image_url ?? '/placeholder.jpg',
+                  responseTime: service.response_time ?? 'Varies',
+                  bookings: service.total_bookings,
+                }} />
               ))}
             </div>
           </>

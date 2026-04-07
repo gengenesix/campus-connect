@@ -13,7 +13,7 @@ interface Message {
   content: string
   is_read: boolean
   created_at: string
-  listing_id?: string | null
+  product_id?: string | null
 }
 
 interface Conversation {
@@ -23,7 +23,6 @@ interface Conversation {
   last_message: string
   last_time: string
   unread: number
-  listing_title?: string | null
 }
 
 function timeAgo(dateStr: string) {
@@ -67,7 +66,7 @@ export default function MessagesPage() {
     // Get all messages involving current user
     const { data: msgs } = await supabase
       .from('messages')
-      .select('sender_id, receiver_id, content, is_read, created_at, listing_id')
+      .select('sender_id, receiver_id, content, is_read, created_at, product_id')
       .or(`sender_id.eq.${user.id},receiver_id.eq.${user.id}`)
       .order('created_at', { ascending: false })
 
@@ -75,7 +74,7 @@ export default function MessagesPage() {
 
     // Build conversation map
     const convMap = new Map<string, {
-      last_message: string; last_time: string; unread: number; listing_id?: string | null
+      last_message: string; last_time: string; unread: number
     }>()
 
     for (const msg of msgs) {
@@ -85,7 +84,6 @@ export default function MessagesPage() {
           last_message: msg.content,
           last_time: msg.created_at,
           unread: (!msg.is_read && msg.receiver_id === user.id) ? 1 : 0,
-          listing_id: msg.listing_id,
         })
       } else if (!msg.is_read && msg.receiver_id === user.id) {
         convMap.get(partnerId)!.unread++
@@ -113,7 +111,6 @@ export default function MessagesPage() {
         last_message: conv.last_message,
         last_time: conv.last_time,
         unread: conv.unread,
-        listing_title: null,
       }
     })
 
