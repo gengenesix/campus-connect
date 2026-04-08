@@ -14,10 +14,12 @@ interface Service {
   description: string
   response_time: string | null
   total_bookings: number
+  provider_id: string
   provider: {
     name: string
     avatar_url: string | null
     rating: number
+    is_verified: boolean
   } | null
 }
 
@@ -35,8 +37,8 @@ export default function ServicesPage() {
       const { data } = await supabase
         .from('services')
         .select(`
-          id, name, category, rate, availability, image_url, description, response_time, total_bookings,
-          provider:profiles!provider_id (name, avatar_url, rating)
+          id, provider_id, name, category, rate, availability, image_url, description, response_time, total_bookings,
+          provider:profiles!provider_id (name, avatar_url, rating, is_verified)
         `)
         .neq('status', 'deleted')
         .order('total_bookings', { ascending: false })
@@ -158,8 +160,10 @@ export default function ServicesPage() {
                   id: service.id,
                   name: service.name,
                   provider: service.provider?.name ?? 'UMaT Student',
+                  providerId: service.provider_id,
                   providerImage: service.provider?.avatar_url ?? '/placeholder-user.jpg',
                   providerRating: service.provider?.rating ?? 5.0,
+                  providerVerified: service.provider?.is_verified ?? false,
                   category: service.category as any,
                   rate: service.rate ?? 'Contact for pricing',
                   description: service.description ?? '',

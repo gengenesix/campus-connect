@@ -4,11 +4,13 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from '
 import type { User, Session } from '@supabase/supabase-js'
 import { supabase } from '@/lib/supabase'
 
-interface Profile {
+export interface Profile {
   id: string
   email: string
   name: string | null
   department: string | null
+  course: string | null
+  class_year: string | null
   hostel: string | null
   phone: string | null
   bio: string | null
@@ -17,6 +19,7 @@ interface Profile {
   rating: number
   total_reviews: number
   is_verified: boolean
+  created_at?: string
 }
 
 interface AuthContextType {
@@ -40,16 +43,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true)
 
   const fetchProfile = async (userId: string) => {
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', userId)
-      .single()
-    if (!error && data) setProfile(data as Profile)
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single()
+      if (!error && data) setProfile(data as Profile)
+    } catch {
+      // Ignore network errors — profile will be null
+    }
   }
 
   useEffect(() => {
-    // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session)
       setUser(session?.user ?? null)
@@ -57,7 +63,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setLoading(false)
     })
 
-    // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         setSession(session)
@@ -92,17 +97,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signOut = async () => {
     await supabase.auth.signOut()
+    setProfile(null)
+    setUser(null)
+    setSession(null)
   }
 
   const updateProfile = async (updates: Partial<Profile>) => {
     if (!user) return { error: 'Not authenticated' }
-    const { error } = await supabase
-      .from('profiles')
-      .update(updates)
-      .eq('id', user.id)
-    if (error) return { error: error.message }
-    await fetchProfile(user.id)
-    return { error: null }
+    try {
+      // Strip read-only fields before sending to DB
+      const { id, email, created_at, ...safeUpdates } = updates as any
+      const { error } = await supabase
+        .from('profiles')
+        .update(safeUpdates)
+        .eq('id', user.id)
+      if (error) return { error: error.message }
+      await fetchProfile(user.id)
+      return { error: null }
+    } catch (err: any) {
+      return { error: err?.message ?? 'Update failed. Please try again.' }
+    }
   }
 
   const refreshProfile = async () => {

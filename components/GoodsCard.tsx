@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { useAuth } from '@/context/AuthContext'
 import type { Good } from '@/lib/mockData'
 
 interface GoodsCardProps {
@@ -15,22 +16,43 @@ const conditionColors: Record<string, { bg: string; color: string }> = {
   'Fair':     { bg: '#6D4C41', color: '#fff' },
 }
 
+function VerifiedBadge() {
+  return (
+    <span
+      title="Verified by Campus Connect"
+      style={{
+        display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+        width: '15px', height: '15px',
+        background: '#1d9bf0', borderRadius: '50%',
+        fontSize: '9px', color: '#fff', fontWeight: 900, flexShrink: 0,
+      }}
+    >✓</span>
+  )
+}
+
 export default function GoodsCard({ good }: GoodsCardProps) {
   const cond = conditionColors[good.condition] || { bg: '#111', color: '#fff' }
   const router = useRouter()
+  const { user } = useAuth()
+
+  const handleMessage = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    if (user) {
+      router.push('/messages')
+    } else {
+      router.push('/auth/login?redirect=/messages')
+    }
+  }
 
   return (
     <Link href={`/goods/${good.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
       <div
         style={{
-          border: '2px solid #eee',
-          background: '#fff',
-          overflow: 'hidden',
-          transition: 'all 0.2s',
-          cursor: 'pointer',
-          height: '100%',
-          display: 'flex',
-          flexDirection: 'column',
+          border: '2px solid #eee', background: '#fff',
+          overflow: 'hidden', transition: 'all 0.2s',
+          cursor: 'pointer', height: '100%',
+          display: 'flex', flexDirection: 'column',
         }}
         onMouseEnter={e => {
           const el = e.currentTarget as HTMLElement
@@ -52,6 +74,7 @@ export default function GoodsCard({ good }: GoodsCardProps) {
             alt={good.name}
             style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
             onError={(e) => { e.currentTarget.src = '/placeholder.jpg' }}
+            loading="lazy"
           />
           <span style={{
             position: 'absolute', top: '10px', left: '10px',
@@ -78,14 +101,16 @@ export default function GoodsCard({ good }: GoodsCardProps) {
             {good.name}
           </h3>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px' }}>
             <img
               src={good.sellerImage}
               alt={good.seller}
               style={{ width: '22px', height: '22px', borderRadius: '50%', objectFit: 'cover', border: '1px solid #eee', flexShrink: 0 }}
               onError={(e) => { e.currentTarget.src = '/placeholder-user.jpg' }}
+              loading="lazy"
             />
             <span style={{ fontSize: '12px', fontWeight: 600, color: '#444' }}>{good.seller}</span>
+            {good.sellerVerified && <VerifiedBadge />}
             <span style={{ fontSize: '11px', color: '#f59e0b', marginLeft: 'auto' }}>⭐ {good.sellerRating}/5</span>
           </div>
 
@@ -105,15 +130,19 @@ export default function GoodsCard({ good }: GoodsCardProps) {
               <div style={{ fontSize: '11px', color: '#aaa', marginTop: '3px' }}>⏱ {good.createdAt}</div>
             </div>
             <div
-              onClick={(e) => { e.preventDefault(); e.stopPropagation(); router.push('/messages') }}
+              onClick={handleMessage}
+              title={user ? 'Message seller' : 'Sign in to message seller'}
               style={{
-                padding: '8px 14px', background: '#111', color: '#fff',
+                padding: '8px 14px',
+                background: user ? '#111' : '#f0f0f0',
+                color: user ? '#fff' : '#888',
                 fontFamily: '"Space Grotesk", sans-serif',
                 fontWeight: 700, fontSize: '11px', letterSpacing: '0.5px',
                 cursor: 'pointer',
+                border: user ? 'none' : '1px solid #ddd',
               }}
             >
-              MSG →
+              {user ? 'MSG →' : '🔒 MSG'}
             </div>
           </div>
         </div>

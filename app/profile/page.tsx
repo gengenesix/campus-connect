@@ -6,8 +6,20 @@ import { useRouter } from 'next/navigation'
 import { useAuth } from '@/context/AuthContext'
 import { supabase } from '@/lib/supabase'
 
+const DEPARTMENTS = [
+  'Mining Engineering', 'Electrical/Electronic Engineering', 'Mechanical Engineering',
+  'Computer Science & Engineering', 'Geomatic Engineering', 'Petroleum Engineering',
+  'Metallurgical Engineering', 'Civil Engineering', 'Materials Engineering',
+  'Environmental & Safety Engineering', 'Other',
+]
+const HOSTELS = [
+  'Kwame Nkrumah Hall', 'Akuafo Hall', 'Mensah Sarbah Hall',
+  'Volta Hall', 'Commonwealth Hall', 'Off-Campus', 'Other',
+]
+const CLASS_YEARS = ['Year 1', 'Year 2', 'Year 3', 'Year 4', 'Year 5', 'Postgraduate', 'PhD']
+
 export default function ProfilePage() {
-  const { user, profile, loading, updateProfile, refreshProfile, signOut } = useAuth()
+  const { user, profile, loading, updateProfile, signOut } = useAuth()
   const router = useRouter()
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -18,6 +30,8 @@ export default function ProfilePage() {
   const [form, setForm] = useState({
     name: '',
     department: '',
+    course: '',
+    class_year: '',
     hostel: '',
     phone: '',
     bio: '',
@@ -32,6 +46,8 @@ export default function ProfilePage() {
       setForm({
         name: profile.name ?? '',
         department: profile.department ?? '',
+        course: profile.course ?? '',
+        class_year: profile.class_year ?? '',
         hostel: profile.hostel ?? '',
         phone: profile.phone ?? '',
         bio: profile.bio ?? '',
@@ -54,34 +70,48 @@ export default function ProfilePage() {
 
     if (!uploadErr) {
       const { data: { publicUrl } } = supabase.storage.from('avatars').getPublicUrl(path)
-      await updateProfile({ avatar_url: publicUrl })
-      setSaveMsg('Avatar updated!')
+      const { error } = await updateProfile({ avatar_url: publicUrl } as any)
+      if (!error) {
+        setSaveMsg('Profile picture updated!')
+      } else {
+        setSaveMsg(`Upload error: ${error}`)
+      }
     } else {
-      setSaveMsg('Avatar upload failed — storage may not be configured yet.')
+      setSaveMsg('Avatar upload failed — check that the storage bucket is configured.')
     }
     setUploadingAvatar(false)
-    setTimeout(() => setSaveMsg(''), 3000)
+    setTimeout(() => setSaveMsg(''), 4000)
   }
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!form.name.trim()) { setSaveMsg('Name is required.'); return }
+    if (!form.name.trim()) { setSaveMsg('Full name is required.'); return }
     setSaving(true)
-    const { error } = await updateProfile({
-      name: form.name.trim(),
-      department: form.department || null,
-      hostel: form.hostel || null,
-      phone: form.phone || null,
-      bio: form.bio || null,
-    } as any)
-    setSaving(false)
-    if (error) {
-      setSaveMsg(`Error: ${error}`)
-    } else {
-      setEditing(false)
-      setSaveMsg('Profile updated!')
+    setSaveMsg('')
+
+    try {
+      const { error } = await updateProfile({
+        name: form.name.trim(),
+        department: form.department || null,
+        course: form.course || null,
+        class_year: form.class_year || null,
+        hostel: form.hostel || null,
+        phone: form.phone || null,
+        bio: form.bio || null,
+      } as any)
+
+      if (error) {
+        setSaveMsg(`Error: ${error}`)
+      } else {
+        setEditing(false)
+        setSaveMsg('Profile updated successfully!')
+      }
+    } catch (err: any) {
+      setSaveMsg(`Unexpected error: ${err?.message ?? 'Please try again.'}`)
+    } finally {
+      setSaving(false)
     }
-    setTimeout(() => setSaveMsg(''), 3000)
+    setTimeout(() => setSaveMsg(''), 4000)
   }
 
   const initials = profile?.name
@@ -103,17 +133,35 @@ export default function ProfilePage() {
       {/* Header */}
       <div style={{ background: '#111', color: '#fff', padding: '36px 20px' }}>
         <div className="container">
-          <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '36px', letterSpacing: '-1px' }}>
-            MY PROFILE
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+            <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '36px', letterSpacing: '-1px' }}>
+              MY PROFILE
+            </div>
+            {profile?.is_verified && (
+              <span
+                title="Verified by Campus Connect admin"
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: '5px',
+                  background: '#1d9bf0', color: '#fff',
+                  padding: '4px 12px', fontSize: '12px', fontWeight: 700,
+                  letterSpacing: '0.5px',
+                }}
+              >
+                <span style={{ fontSize: '14px' }}>✓</span> VERIFIED
+              </span>
+            )}
           </div>
-          <p style={{ color: '#888', marginTop: '4px', fontSize: '14px' }}>
-            {user.email}
-          </p>
+          <p style={{ color: '#888', marginTop: '4px', fontSize: '14px' }}>{user.email}</p>
         </div>
       </div>
 
       {saveMsg && (
-        <div style={{ background: saveMsg.startsWith('Error') ? '#fee2e2' : '#dcfce7', borderBottom: `2px solid ${saveMsg.startsWith('Error') ? '#ef4444' : '#16a34a'}`, padding: '12px 24px', textAlign: 'center', fontWeight: 700, fontSize: '14px', color: saveMsg.startsWith('Error') ? '#dc2626' : '#15803d' }}>
+        <div style={{
+          background: saveMsg.startsWith('Error') || saveMsg.startsWith('Unexpected') || saveMsg.startsWith('Avatar upload') ? '#fee2e2' : '#dcfce7',
+          borderBottom: `2px solid ${saveMsg.startsWith('Error') || saveMsg.startsWith('Unexpected') || saveMsg.startsWith('Avatar upload') ? '#ef4444' : '#16a34a'}`,
+          padding: '12px 24px', textAlign: 'center', fontWeight: 700, fontSize: '14px',
+          color: saveMsg.startsWith('Error') || saveMsg.startsWith('Unexpected') || saveMsg.startsWith('Avatar upload') ? '#dc2626' : '#15803d',
+        }}>
           {saveMsg}
         </div>
       )}
@@ -121,13 +169,17 @@ export default function ProfilePage() {
       <div className="container" style={{ paddingTop: '32px', paddingBottom: '80px' }}>
         <div style={{ display: 'grid', gridTemplateColumns: '280px 1fr', gap: '32px', alignItems: 'start' }}>
 
-          {/* Sidebar — Avatar + Stats */}
+          {/* Sidebar */}
           <div>
             <div style={{ border: '2px solid #111', background: '#fff', boxShadow: '6px 6px 0 #111', padding: '28px 20px', textAlign: 'center' }}>
               {/* Avatar */}
               <div style={{ position: 'relative', display: 'inline-block', marginBottom: '16px' }}>
                 {profile?.avatar_url ? (
-                  <img src={profile.avatar_url} alt={profile.name ?? ''} style={{ width: '100px', height: '100px', borderRadius: '50%', objectFit: 'cover', border: '3px solid #111', display: 'block' }} />
+                  <img
+                    src={profile.avatar_url}
+                    alt={profile.name ?? ''}
+                    style={{ width: '100px', height: '100px', borderRadius: '50%', objectFit: 'cover', border: '3px solid #111', display: 'block' }}
+                  />
                 ) : (
                   <div style={{ width: '100px', height: '100px', borderRadius: '50%', background: '#1B5E20', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: '"Archivo Black", sans-serif', fontSize: '32px', border: '3px solid #111', margin: '0 auto' }}>
                     {initials}
@@ -137,18 +189,34 @@ export default function ProfilePage() {
                   onClick={() => fileInputRef.current?.click()}
                   disabled={uploadingAvatar}
                   style={{ position: 'absolute', bottom: 0, right: 0, width: '28px', height: '28px', borderRadius: '50%', background: '#5d3fd3', color: '#fff', border: '2px solid #111', cursor: 'pointer', fontSize: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                  title="Change avatar"
+                  title="Change profile picture"
                 >
                   {uploadingAvatar ? '…' : '✎'}
                 </button>
                 <input ref={fileInputRef} type="file" accept="image/*" onChange={handleAvatarChange} style={{ display: 'none' }} />
               </div>
 
-              <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '20px', marginBottom: '4px' }}>
-                {profile?.name ?? 'Your Name'}
+              <div style={{ position: 'relative', display: 'inline-block' }}>
+                <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '20px', marginBottom: '2px' }}>
+                  {profile?.name ?? 'Your Name'}
+                </div>
+                {profile?.is_verified && (
+                  <span
+                    title="Verified by Campus Connect"
+                    style={{
+                      display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                      width: '18px', height: '18px',
+                      background: '#1d9bf0', borderRadius: '50%',
+                      fontSize: '10px', color: '#fff', fontWeight: 900,
+                      position: 'absolute', top: '2px', right: '-22px',
+                    }}
+                  >✓</span>
+                )}
               </div>
-              <div style={{ fontSize: '12px', color: '#888', marginBottom: '4px' }}>{profile?.department ?? 'UMaT Student'}</div>
-              <div style={{ fontSize: '12px', color: '#888', marginBottom: '20px' }}>{profile?.hostel ?? ''}</div>
+              <div style={{ fontSize: '12px', color: '#888', marginBottom: '2px' }}>{profile?.department ?? 'UMaT Student'}</div>
+              {profile?.course && <div style={{ fontSize: '12px', color: '#999', marginBottom: '2px' }}>{profile.course}</div>}
+              {profile?.class_year && <div style={{ fontSize: '12px', color: '#bbb', marginBottom: '16px' }}>{profile.class_year}</div>}
+              {!profile?.course && !profile?.class_year && <div style={{ marginBottom: '16px' }} />}
 
               {/* Stats */}
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '20px' }}>
@@ -203,22 +271,31 @@ export default function ProfilePage() {
               <div style={{ padding: '28px 24px' }}>
                 {editing ? (
                   <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                    {[
-                      { key: 'name', label: 'FULL NAME *', type: 'text', placeholder: 'Kwame Asante' },
-                      { key: 'phone', label: 'PHONE / WHATSAPP', type: 'tel', placeholder: '+233 XX XXX XXXX' },
-                    ].map(field => (
-                      <div key={field.key}>
-                        <label style={{ display: 'block', fontWeight: 700, fontSize: '12px', letterSpacing: '1.5px', marginBottom: '8px' }}>{field.label}</label>
-                        <input
-                          type={field.type}
-                          value={(form as any)[field.key]}
-                          onChange={e => setForm(p => ({ ...p, [field.key]: e.target.value }))}
-                          placeholder={field.placeholder}
-                          style={{ width: '100%', padding: '12px 16px', border: '2px solid #111', fontFamily: '"Space Grotesk", sans-serif', fontSize: '14px', outline: 'none', boxSizing: 'border-box' }}
-                        />
-                      </div>
-                    ))}
+                    {/* Name */}
+                    <div>
+                      <label style={{ display: 'block', fontWeight: 700, fontSize: '12px', letterSpacing: '1.5px', marginBottom: '8px' }}>FULL NAME *</label>
+                      <input
+                        type="text"
+                        value={form.name}
+                        onChange={e => setForm(p => ({ ...p, name: e.target.value }))}
+                        placeholder="Kwame Asante"
+                        style={{ width: '100%', padding: '12px 16px', border: '2px solid #111', fontFamily: '"Space Grotesk", sans-serif', fontSize: '14px', outline: 'none', boxSizing: 'border-box' }}
+                      />
+                    </div>
 
+                    {/* Phone */}
+                    <div>
+                      <label style={{ display: 'block', fontWeight: 700, fontSize: '12px', letterSpacing: '1.5px', marginBottom: '8px' }}>PHONE / WHATSAPP</label>
+                      <input
+                        type="tel"
+                        value={form.phone}
+                        onChange={e => setForm(p => ({ ...p, phone: e.target.value }))}
+                        placeholder="+233 XX XXX XXXX"
+                        style={{ width: '100%', padding: '12px 16px', border: '2px solid #111', fontFamily: '"Space Grotesk", sans-serif', fontSize: '14px', outline: 'none', boxSizing: 'border-box' }}
+                      />
+                    </div>
+
+                    {/* Department */}
                     <div>
                       <label style={{ display: 'block', fontWeight: 700, fontSize: '12px', letterSpacing: '1.5px', marginBottom: '8px' }}>DEPARTMENT</label>
                       <select
@@ -227,12 +304,36 @@ export default function ProfilePage() {
                         style={{ width: '100%', padding: '12px 16px', border: '2px solid #111', fontFamily: '"Space Grotesk", sans-serif', fontSize: '14px', background: '#fff', boxSizing: 'border-box' }}
                       >
                         <option value="">Select department</option>
-                        {['Mining Engineering', 'Electrical/Electronic Engineering', 'Mechanical Engineering', 'Computer Science & Engineering', 'Geomatic Engineering', 'Petroleum Engineering', 'Metallurgical Engineering', 'Civil Engineering', 'Materials Engineering', 'Environmental & Safety Engineering', 'Other'].map(d => (
-                          <option key={d} value={d}>{d}</option>
-                        ))}
+                        {DEPARTMENTS.map(d => <option key={d} value={d}>{d}</option>)}
                       </select>
                     </div>
 
+                    {/* Course */}
+                    <div>
+                      <label style={{ display: 'block', fontWeight: 700, fontSize: '12px', letterSpacing: '1.5px', marginBottom: '8px' }}>PROGRAMME / COURSE</label>
+                      <input
+                        type="text"
+                        value={form.course}
+                        onChange={e => setForm(p => ({ ...p, course: e.target.value }))}
+                        placeholder="e.g. BSc Mining Engineering"
+                        style={{ width: '100%', padding: '12px 16px', border: '2px solid #111', fontFamily: '"Space Grotesk", sans-serif', fontSize: '14px', outline: 'none', boxSizing: 'border-box' }}
+                      />
+                    </div>
+
+                    {/* Class Year */}
+                    <div>
+                      <label style={{ display: 'block', fontWeight: 700, fontSize: '12px', letterSpacing: '1.5px', marginBottom: '8px' }}>YEAR / LEVEL</label>
+                      <select
+                        value={form.class_year}
+                        onChange={e => setForm(p => ({ ...p, class_year: e.target.value }))}
+                        style={{ width: '100%', padding: '12px 16px', border: '2px solid #111', fontFamily: '"Space Grotesk", sans-serif', fontSize: '14px', background: '#fff', boxSizing: 'border-box' }}
+                      >
+                        <option value="">Select year</option>
+                        {CLASS_YEARS.map(y => <option key={y} value={y}>{y}</option>)}
+                      </select>
+                    </div>
+
+                    {/* Hostel */}
                     <div>
                       <label style={{ display: 'block', fontWeight: 700, fontSize: '12px', letterSpacing: '1.5px', marginBottom: '8px' }}>HOSTEL / AREA</label>
                       <select
@@ -241,18 +342,17 @@ export default function ProfilePage() {
                         style={{ width: '100%', padding: '12px 16px', border: '2px solid #111', fontFamily: '"Space Grotesk", sans-serif', fontSize: '14px', background: '#fff', boxSizing: 'border-box' }}
                       >
                         <option value="">Select hostel</option>
-                        {['Kwame Nkrumah Hall', 'Akuafo Hall', 'Mensah Sarbah Hall', 'Volta Hall', 'Commonwealth Hall', 'Off-Campus', 'Other'].map(h => (
-                          <option key={h} value={h}>{h}</option>
-                        ))}
+                        {HOSTELS.map(h => <option key={h} value={h}>{h}</option>)}
                       </select>
                     </div>
 
+                    {/* Bio */}
                     <div>
                       <label style={{ display: 'block', fontWeight: 700, fontSize: '12px', letterSpacing: '1.5px', marginBottom: '8px' }}>BIO</label>
                       <textarea
                         value={form.bio}
                         onChange={e => setForm(p => ({ ...p, bio: e.target.value }))}
-                        placeholder="Tell other students about yourself — your degree, what you sell or offer..."
+                        placeholder="Tell other students about yourself..."
                         rows={4}
                         style={{ width: '100%', padding: '12px 16px', border: '2px solid #111', fontFamily: '"Space Grotesk", sans-serif', fontSize: '14px', outline: 'none', boxSizing: 'border-box', resize: 'vertical' }}
                       />
@@ -268,7 +368,7 @@ export default function ProfilePage() {
                       </button>
                       <button
                         type="button"
-                        onClick={() => setEditing(false)}
+                        onClick={() => { setEditing(false); setSaveMsg('') }}
                         style={{ padding: '14px 24px', background: '#fff', color: '#666', fontWeight: 600, border: '2px solid #ddd', cursor: 'pointer', fontFamily: '"Space Grotesk", sans-serif' }}
                       >
                         Cancel
@@ -282,6 +382,8 @@ export default function ProfilePage() {
                       { label: 'EMAIL', value: user.email },
                       { label: 'PHONE / WHATSAPP', value: profile?.phone },
                       { label: 'DEPARTMENT', value: profile?.department },
+                      { label: 'PROGRAMME / COURSE', value: profile?.course },
+                      { label: 'YEAR / LEVEL', value: profile?.class_year },
                       { label: 'HOSTEL', value: profile?.hostel },
                     ].map(field => (
                       <div key={field.label} style={{ paddingBottom: '16px', borderBottom: '1px solid #f0f0f0' }}>
@@ -302,7 +404,7 @@ export default function ProfilePage() {
               </div>
             </div>
 
-            {/* Account Info */}
+            {/* Account Quick Links */}
             <div style={{ marginTop: '24px', border: '2px solid #111', background: '#fff', boxShadow: '4px 4px 0 #111' }}>
               <div style={{ background: '#f0f0f0', padding: '14px 24px', borderBottom: '2px solid #111' }}>
                 <span style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '14px', letterSpacing: '0.5px' }}>ACCOUNT</span>

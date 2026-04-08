@@ -1,9 +1,8 @@
 -- ============================================================
--- Campus Connect — Supabase Schema (corrected)
--- Run this in the Supabase SQL Editor
+-- Campus Connect — Supabase Schema (v2 — production)
+-- Run this in the Supabase SQL Editor (safe to re-run)
 -- ============================================================
 
--- Enable UUID extension
 create extension if not exists "uuid-ossp";
 
 -- ============================================================
@@ -14,6 +13,8 @@ create table if not exists public.profiles (
   email text not null,
   name text,
   department text,
+  course text,           -- programme / degree e.g. BSc Mining Engineering
+  class_year text,       -- Year 1 / Year 2 / ... / Postgraduate / PhD
   hostel text,
   phone text,
   bio text,
@@ -26,7 +27,11 @@ create table if not exists public.profiles (
   updated_at timestamptz default now()
 );
 
--- Auto-create profile on user signup
+-- Add new columns to existing deployments (safe — ignored if columns already exist)
+alter table public.profiles add column if not exists course text;
+alter table public.profiles add column if not exists class_year text;
+
+-- Auto-create profile row when a new auth user signs up
 create or replace function public.handle_new_user()
 returns trigger as $$
 begin
@@ -121,8 +126,11 @@ create table if not exists public.messages (
   created_at timestamptz default now()
 );
 
--- Conversation view (latest message per pair)
-create or replace view public.conversations as
+-- Conversations view — uses security_invoker so it respects the RLS
+-- on the underlying messages table (prevents anonymous data access)
+create or replace view public.conversations
+  with (security_invoker = true)
+as
 select distinct on (
     least(sender_id, receiver_id),
     greatest(sender_id, receiver_id)
@@ -158,7 +166,7 @@ create table if not exists public.reviews (
 );
 
 -- ============================================================
--- ROW LEVEL SECURITY (RLS)
+-- ROW LEVEL SECURITY
 -- ============================================================
 alter table public.profiles enable row level security;
 alter table public.products enable row level security;
@@ -167,17 +175,35 @@ alter table public.bookings enable row level security;
 alter table public.messages enable row level security;
 alter table public.reviews enable row level security;
 
--- Drop existing policies before recreating (idempotent)
+-- ============================================================
+-- HELPER: is_admin()
+-- Used in RLS policies so admin can manage all records.
+-- security definer + stable avoids RLS recursion.
+-- ============================================================
+create or replace function public.is_admin()
+returns boolean as $$
+  select exists (
+    select 1 from public.profiles
+    where id = auth.uid() and role = 'admin'
+  );
+$$ language sql security definer stable;
+
+-- ============================================================
+-- DROP EXISTING POLICIES (idempotent)
+-- ============================================================
 drop policy if exists "Public profiles are viewable by everyone" on public.profiles;
 drop policy if exists "Users can update own profile" on public.profiles;
+drop policy if exists "Admins can update any profile" on public.profiles;
 drop policy if exists "Active products are viewable by everyone" on public.products;
 drop policy if exists "Users can insert own products" on public.products;
 drop policy if exists "Sellers can update own products" on public.products;
 drop policy if exists "Sellers can delete own products" on public.products;
+drop policy if exists "Admins can manage all products" on public.products;
 drop policy if exists "Active services are viewable by everyone" on public.services;
 drop policy if exists "Providers can insert own services" on public.services;
 drop policy if exists "Providers can update own services" on public.services;
 drop policy if exists "Providers can delete own services" on public.services;
+drop policy if exists "Admins can manage all services" on public.services;
 drop policy if exists "Users can view own bookings" on public.bookings;
 drop policy if exists "Buyers can create bookings" on public.bookings;
 drop policy if exists "Participants can update booking status" on public.bookings;
@@ -187,51 +213,85 @@ drop policy if exists "Receiver can mark messages as read" on public.messages;
 drop policy if exists "Reviews are public" on public.reviews;
 drop policy if exists "Authenticated users can write reviews" on public.reviews;
 
--- PROFILES
+-- ============================================================
+-- PROFILES POLICIES
+-- ============================================================
 create policy "Public profiles are viewable by everyone" on public.profiles
   for select using (true);
+
 create policy "Users can update own profile" on public.profiles
   for update using (auth.uid() = id);
 
--- PRODUCTS
+-- Admins can update anyone's profile (e.g. set is_verified)
+create policy "Admins can update any profile" on public.profiles
+  for update using (public.is_admin());
+
+-- ============================================================
+-- PRODUCTS POLICIES
+-- ============================================================
 create policy "Active products are viewable by everyone" on public.products
   for select using (status != 'deleted');
+
 create policy "Users can insert own products" on public.products
   for insert with check (auth.uid() = seller_id);
+
 create policy "Sellers can update own products" on public.products
   for update using (auth.uid() = seller_id);
+
 create policy "Sellers can delete own products" on public.products
   for delete using (auth.uid() = seller_id);
 
--- SERVICES
+create policy "Admins can manage all products" on public.products
+  for all using (public.is_admin());
+
+-- ============================================================
+-- SERVICES POLICIES
+-- ============================================================
 create policy "Active services are viewable by everyone" on public.services
   for select using (status != 'deleted');
+
 create policy "Providers can insert own services" on public.services
   for insert with check (auth.uid() = provider_id);
+
 create policy "Providers can update own services" on public.services
   for update using (auth.uid() = provider_id);
+
 create policy "Providers can delete own services" on public.services
   for delete using (auth.uid() = provider_id);
 
--- BOOKINGS
+create policy "Admins can manage all services" on public.services
+  for all using (public.is_admin());
+
+-- ============================================================
+-- BOOKINGS POLICIES
+-- ============================================================
 create policy "Users can view own bookings" on public.bookings
   for select using (auth.uid() = buyer_id or auth.uid() = provider_id);
+
 create policy "Buyers can create bookings" on public.bookings
   for insert with check (auth.uid() = buyer_id);
+
 create policy "Participants can update booking status" on public.bookings
   for update using (auth.uid() = buyer_id or auth.uid() = provider_id);
 
--- MESSAGES
+-- ============================================================
+-- MESSAGES POLICIES
+-- ============================================================
 create policy "Users can view own messages" on public.messages
   for select using (auth.uid() = sender_id or auth.uid() = receiver_id);
+
 create policy "Authenticated users can send messages" on public.messages
   for insert with check (auth.uid() = sender_id);
+
 create policy "Receiver can mark messages as read" on public.messages
   for update using (auth.uid() = receiver_id);
 
--- REVIEWS
+-- ============================================================
+-- REVIEWS POLICIES
+-- ============================================================
 create policy "Reviews are public" on public.reviews
   for select using (true);
+
 create policy "Authenticated users can write reviews" on public.reviews
   for insert with check (auth.uid() = reviewer_id);
 
@@ -290,9 +350,10 @@ create index if not exists messages_receiver_id_idx on public.messages(receiver_
 create index if not exists messages_created_at_idx on public.messages(created_at desc);
 create index if not exists bookings_buyer_id_idx on public.bookings(buyer_id);
 create index if not exists bookings_provider_id_idx on public.bookings(provider_id);
+create index if not exists profiles_is_verified_idx on public.profiles(is_verified);
 
 -- ============================================================
--- UPDATED_AT trigger
+-- UPDATED_AT TRIGGER
 -- ============================================================
 create or replace function public.handle_updated_at()
 returns trigger as $$

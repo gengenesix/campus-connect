@@ -8,8 +8,10 @@ export interface Good {
   condition: 'New' | 'Like New' | 'Good' | 'Fair'
   category: 'Electronics' | 'Clothing' | 'Books' | 'Furniture' | 'Sports' | 'Other'
   seller: string
+  sellerId?: string
   sellerImage: string
   sellerRating: number
+  sellerVerified?: boolean
   image: string
   description: string
   createdAt: string
@@ -20,8 +22,10 @@ export interface Service {
   id: string
   name: string
   provider: string
+  providerId?: string
   providerImage: string
   providerRating: number
+  providerVerified?: boolean
   category: 'Barbing' | 'Tutoring' | 'Photography' | 'Laundry' | 'Tech Repair' | 'Design' | 'Other'
   rate: string
   description: string
@@ -52,6 +56,7 @@ export const mockGoods: Good[] = [
     seller: 'Kwame K.',
     sellerImage: AVATARS.kwame,
     sellerRating: 4.8,
+    sellerVerified: false,
     image: '/images/goods/laptop.jpg',
     description: 'Barely used Dell XPS 13 laptop. Core i7, 16GB RAM, 512GB SSD. Original box and charger included. Selling because I upgraded.',
     createdAt: '2 days ago',
@@ -66,6 +71,7 @@ export const mockGoods: Good[] = [
     seller: 'Ama S.',
     sellerImage: AVATARS.ama,
     sellerRating: 4.5,
+    sellerVerified: false,
     image: '/images/goods/denim-jacket.jpg',
     description: 'Classic blue denim jacket in good condition. Size M. Minor wear on cuffs but still looks great for campus life.',
     createdAt: '5 days ago',
@@ -80,6 +86,7 @@ export const mockGoods: Good[] = [
     seller: 'Yaw M.',
     sellerImage: AVATARS.yaw,
     sellerRating: 4.9,
+    sellerVerified: false,
     image: '/images/goods/textbook.jpg',
     description: 'Morrison & Boyd Organic Chemistry (7th edition). Some highlighting in chapters 1–5. Perfect for 2nd year students.',
     createdAt: '1 week ago',
@@ -94,6 +101,7 @@ export const mockGoods: Good[] = [
     seller: 'Abena K.',
     sellerImage: AVATARS.abena,
     sellerRating: 4.7,
+    sellerVerified: false,
     image: '/images/goods/office-chair.jpg',
     description: 'Comfortable ergonomic chair. Adjustable height and armrests. Perfect for long study sessions. Barely used.',
     createdAt: '3 days ago',
@@ -108,6 +116,7 @@ export const mockGoods: Good[] = [
     seller: 'Kofi J.',
     sellerImage: AVATARS.kofi,
     sellerRating: 4.6,
+    sellerVerified: false,
     image: '/images/goods/basketball.jpg',
     description: 'Brand new official Wilson basketball. Never used. Still in packaging. Bought as a gift but already have one.',
     createdAt: '4 days ago',
@@ -122,6 +131,7 @@ export const mockGoods: Good[] = [
     seller: 'Nana O.',
     sellerImage: AVATARS.nana,
     sellerRating: 4.9,
+    sellerVerified: false,
     image: '/images/goods/headphones.jpg',
     description: 'Sony wireless noise-cancelling headphones. Excellent condition with original case and all accessories.',
     createdAt: '1 day ago',
@@ -136,6 +146,7 @@ export const mockGoods: Good[] = [
     seller: 'Akua A.',
     sellerImage: AVATARS.akua,
     sellerRating: 4.7,
+    sellerVerified: false,
     image: '/images/goods/calculator.jpg',
     description: 'Casio FX-991EX ClassWiz scientific calculator. All functions working. Minor scratches on back.',
     createdAt: '6 days ago',
@@ -150,6 +161,7 @@ export const mockGoods: Good[] = [
     seller: 'Kojo A.',
     sellerImage: AVATARS.kojo,
     sellerRating: 4.8,
+    sellerVerified: false,
     image: '/images/goods/drawing-set.jpg',
     description: 'Complete engineering drawing set — T-square, set squares, compass, scale rule. Good condition for 1st year students.',
     createdAt: '2 weeks ago',
@@ -164,6 +176,7 @@ export const mockServices: Service[] = [
     provider: "Kojo's Barber Studio",
     providerImage: AVATARS.kojo,
     providerRating: 4.9,
+    providerVerified: false,
     category: 'Barbing',
     rate: 'GHS 30–50',
     description: 'Professional haircut with fade, lineup, and styling. Walk-ins welcome. Studio located near the SRC building. Low cut, afro, twist — all styles done.',
@@ -178,6 +191,7 @@ export const mockServices: Service[] = [
     provider: 'Akosua M.',
     providerImage: AVATARS.ama,
     providerRating: 4.8,
+    providerVerified: false,
     category: 'Tutoring',
     rate: 'GHS 80–120/hr',
     description: '3rd year Mining Engineering student offering tutoring in Mathematics, Physics, and Statics. Exam prep and assignment help. In-person or online.',
@@ -192,6 +206,7 @@ export const mockServices: Service[] = [
     provider: "Ade's Photo Studio",
     providerImage: AVATARS.kofi,
     providerRating: 4.7,
+    providerVerified: false,
     category: 'Photography',
     rate: 'GHS 500–2,000',
     description: 'Professional photography for events, graduation portraits, and campus activities. Quick 48hr turnaround on edited photos. Portfolio available on request.',
@@ -206,6 +221,7 @@ export const mockServices: Service[] = [
     provider: 'Fresh Wash Services',
     providerImage: AVATARS.abena,
     providerRating: 4.6,
+    providerVerified: false,
     category: 'Laundry',
     rate: 'GHS 5–15/item',
     description: 'Fast, reliable laundry service. Free pickup and delivery within campus hostels. Same-day service available for urgent orders. Clothes returned neatly folded.',
@@ -220,6 +236,7 @@ export const mockServices: Service[] = [
     provider: 'TechFix Hub UMaT',
     providerImage: AVATARS.kwame,
     providerRating: 4.8,
+    providerVerified: false,
     category: 'Tech Repair',
     rate: 'Varies by repair',
     description: 'Expert repair for phones, laptops, and tablets. Screen replacements, battery swaps, software issues, virus removal. Genuine parts. 1-month warranty on all repairs.',
@@ -234,6 +251,7 @@ export const mockServices: Service[] = [
     provider: 'Yaa Creative Studio',
     providerImage: AVATARS.nana,
     providerRating: 4.9,
+    providerVerified: false,
     category: 'Design',
     rate: 'GHS 150–1,500',
     description: 'Professional graphic design for logos, flyers, social media graphics, and presentations. Fast revisions. Unlimited concepts until you are satisfied.',

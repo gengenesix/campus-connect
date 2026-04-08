@@ -6,6 +6,7 @@ import { supabase } from "@/lib/supabase"
 
 interface Product {
   id: string
+  seller_id: string
   title: string
   price: number
   condition: string
@@ -19,6 +20,7 @@ interface Product {
     name: string
     avatar_url: string | null
     rating: number
+    is_verified: boolean
   } | null
 }
 
@@ -39,8 +41,8 @@ export default function GoodsPage() {
       const { data } = await supabase
         .from('products')
         .select(`
-          id, title, price, condition, category, image_url, views, description, created_at, whatsapp,
-          seller:profiles!seller_id (name, avatar_url, rating)
+          id, seller_id, title, price, condition, category, image_url, views, description, created_at, whatsapp,
+          seller:profiles!seller_id (name, avatar_url, rating, is_verified)
         `)
         .neq('status', 'deleted')
         .order('created_at', { ascending: false })
@@ -215,8 +217,10 @@ export default function GoodsPage() {
                   condition: product.condition as any,
                   category: product.category as any,
                   seller: product.seller?.name ?? 'UMaT Student',
+                  sellerId: product.seller_id,
                   sellerImage: product.seller?.avatar_url ?? '/placeholder-user.jpg',
                   sellerRating: product.seller?.rating ?? 5.0,
+                  sellerVerified: product.seller?.is_verified ?? false,
                   image: product.image_url ?? '/placeholder.jpg',
                   description: product.description ?? '',
                   createdAt: timeAgo(product.created_at),
