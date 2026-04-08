@@ -10,83 +10,67 @@ import { timeAgo } from "@/lib/utils"
 
 const SHOWCASE = [
   {
-    label: 'SOBOLO',
-    sublabel: 'Fresh chilled hibiscus',
-    price: 'GHS 5–15',
+    label: 'CAMPUS FOOD',
+    sublabel: 'Rice, stew & local dishes',
     href: '/goods',
-    img: 'https://images.unsplash.com/photo-1559181567-c3190ca9be46?w=400&h=560&fit=crop&crop=center',
+    img: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&h=560&fit=crop&crop=center&q=80',
     tag: 'FOOD & DRINK',
-    accent: '#c2185b',
   },
   {
-    label: 'BRUKINA',
-    sublabel: 'Traditional millet drink',
-    price: 'GHS 5–10',
+    label: 'FRESH DRINKS',
+    sublabel: 'Cold beverages & juices',
     href: '/goods',
-    img: 'https://images.unsplash.com/photo-1571091718767-18b5b1457add?w=400&h=560&fit=crop&crop=center',
+    img: 'https://images.unsplash.com/photo-1544145945-f90425340c7e?w=400&h=560&fit=crop&crop=center&q=80',
     tag: 'FOOD & DRINK',
-    accent: '#e65100',
   },
   {
     label: 'NAIL ART',
     sublabel: 'Professional nail services',
-    price: 'GHS 30–80',
     href: '/services',
-    img: 'https://images.unsplash.com/photo-1604654894610-df63bc536371?w=400&h=560&fit=crop&crop=center',
+    img: 'https://images.unsplash.com/photo-1604654894610-df63bc536371?w=400&h=560&fit=crop&crop=center&q=80',
     tag: 'BEAUTY',
-    accent: '#ad1457',
   },
   {
     label: 'BARBERING',
     sublabel: 'Cuts, fades & styling',
-    price: 'GHS 20–60',
     href: '/services',
-    img: 'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=400&h=560&fit=crop&crop=center',
+    img: 'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=400&h=560&fit=crop&crop=center&q=80',
     tag: 'GROOMING',
-    accent: '#212121',
   },
   {
     label: 'DRESSES',
     sublabel: 'Kente, African prints & more',
-    price: 'GHS 80–350',
     href: '/goods',
-    img: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=400&h=560&fit=crop&crop=center',
+    img: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=400&h=560&fit=crop&crop=center&q=80',
     tag: 'FASHION',
-    accent: '#6a1b9a',
   },
   {
     label: 'TEXTBOOKS',
     sublabel: 'All courses & levels',
-    price: 'GHS 25–120',
     href: '/goods',
-    img: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=400&h=560&fit=crop&crop=center',
+    img: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=400&h=560&fit=crop&crop=center&q=80',
     tag: 'ACADEMICS',
-    accent: '#1565c0',
   },
   {
     label: 'CALCULATORS',
     sublabel: 'Casio, Sharp & more',
-    price: 'GHS 40–180',
     href: '/goods',
-    img: 'https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=400&h=560&fit=crop&crop=center',
+    img: 'https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=400&h=560&fit=crop&crop=center&q=80',
     tag: 'ELECTRONICS',
-    accent: '#1B5E20',
   },
   {
     label: 'LAUNDRY',
     sublabel: 'Pickup & same-day delivery',
-    price: 'GHS 5/item',
     href: '/services',
-    img: 'https://images.unsplash.com/photo-1545173168-9f1947eebb7f?w=400&h=560&fit=crop&crop=center',
+    img: 'https://images.unsplash.com/photo-1545173168-9f1947eebb7f?w=400&h=560&fit=crop&crop=center&q=80',
     tag: 'HOME SERVICE',
-    accent: '#0277bd',
   },
 ]
 
 const TICKER_ITEMS = [
-  'SOBOLO', 'BRUKINA', 'NAIL ART', 'BARBERING', 'KENTE DRESSES', 'TEXTBOOKS',
+  'CAMPUS FOOD', 'FRESH DRINKS', 'NAIL ART', 'BARBERING', 'KENTE DRESSES', 'TEXTBOOKS',
   'CALCULATORS', 'LAUNDRY', 'TUTORING', 'PHOTOGRAPHY', 'TECH REPAIR', 'GRAPHIC DESIGN',
-  'LAPTOPS', 'PHONES', 'FOOD', 'CLOTHING', 'FURNITURE', 'SPORTS GEAR',
+  'LAPTOPS', 'PHONES', 'JOLLOF RICE', 'CLOTHING', 'FURNITURE', 'SPORTS GEAR',
 ]
 
 export default function HomePage() {
@@ -169,19 +153,74 @@ export default function HomePage() {
           to { opacity: 1; transform: translateY(0); }
         }
         .showcase-card:hover .showcase-overlay {
-          background: linear-gradient(transparent 20%, rgba(0,0,0,0.92)) !important;
+          background: linear-gradient(transparent 10%, rgba(0,0,0,0.94)) !important;
         }
         .showcase-card:hover img {
-          transform: scale(1.06);
+          transform: scale(1.07);
         }
         .showcase-card img {
           transition: transform 0.5s ease;
+        }
+        .showcase-card:hover .showcase-arrow {
+          opacity: 1 !important;
+          transform: translateX(0) !important;
         }
         .how-card:hover {
           transform: translate(-3px, -3px);
           box-shadow: 7px 7px 0 #111 !important;
         }
         .how-card { transition: all 0.2s; }
+        .showcase-scroll {
+          overflow-x: auto;
+          padding-left: max(20px, calc((100vw - 1240px) / 2));
+          padding-right: 20px;
+          padding-bottom: 16px;
+          scrollbar-width: thin;
+          scrollbar-color: #a78bfa #222;
+        }
+        .showcase-inner {
+          display: flex;
+          gap: 14px;
+          width: max-content;
+        }
+        .showcase-item {
+          width: 210px;
+          height: 310px;
+          flex-shrink: 0;
+        }
+        @media (max-width: 768px) {
+          .showcase-scroll {
+            overflow-x: visible;
+            padding-left: 16px;
+            padding-right: 16px;
+            padding-bottom: 0;
+          }
+          .showcase-inner {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            width: 100%;
+            gap: 10px;
+          }
+          .showcase-item {
+            width: 100%;
+            height: 180px;
+          }
+          .showcase-end-card {
+            display: none;
+          }
+          .showcase-label {
+            font-size: 15px !important;
+          }
+          .showcase-sublabel {
+            display: none;
+          }
+        }
+        @media (min-width: 769px) and (max-width: 1024px) {
+          .showcase-item {
+            width: 175px;
+            height: 260px;
+          }
+        }
       `}</style>
 
       {/* Hero Section */}
@@ -300,41 +339,41 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Horizontal scroll */}
-        <div style={{ overflowX: 'auto', paddingLeft: 'max(20px, calc((100vw - 1240px) / 2))', paddingRight: '20px', paddingBottom: '8px', scrollbarWidth: 'thin', scrollbarColor: '#a78bfa #222' }}>
-          <div style={{ display: 'flex', gap: '14px', width: 'max-content' }}>
+        {/* Horizontal scroll / responsive grid */}
+        <div className="showcase-scroll">
+          <div className="showcase-inner">
             {SHOWCASE.map(item => (
               <Link
                 key={item.label}
                 href={item.href}
-                className="showcase-card"
-                style={{ textDecoration: 'none', display: 'block', position: 'relative', width: '200px', height: '290px', flexShrink: 0, overflow: 'hidden', border: '2px solid #222', cursor: 'pointer' }}
+                className="showcase-card showcase-item"
+                style={{ textDecoration: 'none', display: 'block', position: 'relative', overflow: 'hidden', border: '2px solid #2a2a2a', cursor: 'pointer' }}
               >
                 <img
                   src={item.img}
                   alt={item.label}
                   style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-                  onError={(e) => { (e.currentTarget as HTMLImageElement).src = 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=560&fit=crop' }}
+                  onError={(e) => { (e.currentTarget as HTMLImageElement).src = 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&h=560&fit=crop&q=80' }}
                   loading="lazy"
                 />
                 {/* Gradient overlay */}
                 <div
                   className="showcase-overlay"
-                  style={{ position: 'absolute', inset: 0, background: 'linear-gradient(transparent 35%, rgba(0,0,0,0.88))', transition: 'background 0.3s' }}
+                  style={{ position: 'absolute', inset: 0, background: 'linear-gradient(transparent 30%, rgba(0,0,0,0.85))', transition: 'background 0.3s' }}
                 />
                 {/* Content */}
-                <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '16px 14px 14px' }}>
-                  <div style={{ fontSize: '9px', fontWeight: 700, letterSpacing: '1.5px', color: '#a78bfa', marginBottom: '5px', fontFamily: '"Space Grotesk", sans-serif' }}>
+                <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '14px 12px 12px' }}>
+                  <div style={{ fontSize: '9px', fontWeight: 700, letterSpacing: '1.5px', color: '#a78bfa', marginBottom: '4px', fontFamily: '"Space Grotesk", sans-serif' }}>
                     {item.tag}
                   </div>
-                  <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '19px', color: '#fff', lineHeight: 1.1, marginBottom: '3px' }}>
+                  <div className="showcase-label" style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '18px', color: '#fff', lineHeight: 1.1, marginBottom: '2px' }}>
                     {item.label}
                   </div>
-                  <div style={{ fontSize: '11px', color: '#bbb', marginBottom: '10px' }}>
+                  <div className="showcase-sublabel" style={{ fontSize: '11px', color: '#ccc', marginBottom: '6px' }}>
                     {item.sublabel}
                   </div>
-                  <div style={{ display: 'inline-block', padding: '4px 10px', background: item.accent, color: '#fff', fontSize: '10px', fontWeight: 700, letterSpacing: '0.5px', fontFamily: '"Space Grotesk", sans-serif' }}>
-                    {item.price}
+                  <div className="showcase-arrow" style={{ fontSize: '11px', color: '#a78bfa', fontWeight: 700, letterSpacing: '1px', fontFamily: '"Space Grotesk", sans-serif', opacity: 0, transform: 'translateX(-6px)', transition: 'all 0.25s' }}>
+                    SHOP NOW →
                   </div>
                 </div>
               </Link>
@@ -342,7 +381,8 @@ export default function HomePage() {
             {/* End card — CTA */}
             <Link
               href="/goods"
-              style={{ textDecoration: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '160px', height: '290px', flexShrink: 0, border: '2px dashed #333', color: '#666', gap: '12px' }}
+              className="showcase-end-card"
+              style={{ textDecoration: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '150px', flexShrink: 0, border: '2px dashed #333', color: '#666', gap: '12px' }}
             >
               <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '36px', color: '#a78bfa' }}>+</div>
               <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '13px', color: '#888', textAlign: 'center', lineHeight: 1.4 }}>
