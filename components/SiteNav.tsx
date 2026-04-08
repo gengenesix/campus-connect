@@ -96,17 +96,7 @@ export default function SiteNav() {
           {!loading && (
             user ? (
               <>
-                <Link
-                  href="/sell"
-                  style={{
-                    display: 'inline-block', padding: '10px 22px',
-                    background: '#111', color: '#fff',
-                    fontFamily: '"Archivo Black", sans-serif', fontSize: '13px',
-                    textDecoration: 'none', border: '2px solid #111', transition: 'all 0.2s',
-                  }}
-                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#5d3fd3'; (e.currentTarget as HTMLElement).style.borderColor = '#5d3fd3' }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#111'; (e.currentTarget as HTMLElement).style.borderColor = '#111' }}
-                >
+                <Link href="/sell" className="nav-sell-btn">
                   + SELL
                 </Link>
 
@@ -186,22 +176,17 @@ export default function SiteNav() {
                 >
                   SIGN IN
                 </Link>
-                <Link
-                  href="/auth/register"
-                  style={{ padding: '10px 18px', background: '#1B5E20', color: '#fff', fontFamily: '"Archivo Black", sans-serif', fontSize: '12px', textDecoration: 'none', border: '2px solid #1B5E20', letterSpacing: '0.5px' }}
-                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#5d3fd3'; (e.currentTarget as HTMLElement).style.borderColor = '#5d3fd3' }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#1B5E20'; (e.currentTarget as HTMLElement).style.borderColor = '#1B5E20' }}
-                >
+                <Link href="/auth/register" className="nav-sell-btn" style={{ background: '#1B5E20', borderColor: '#1B5E20', color: '#fff' }}>
                   JOIN FREE
                 </Link>
               </>
             )
           )}
 
-          {/* Mobile hamburger */}
+          {/* Mobile hamburger — shown via CSS at ≤1024px */}
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
-            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px', display: 'none' }}
+            style={{ background: 'none', border: '2px solid #111', cursor: 'pointer', padding: '6px 10px', display: 'none' }}
             className="mobile-menu-btn"
             aria-label="Menu"
           >

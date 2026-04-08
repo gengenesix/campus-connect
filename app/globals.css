@@ -1417,3 +1417,252 @@ body {
     display: block !important;
   }
 }
+
+/* ============================================
+   GOODS CARD — CSS hover (replaces inline JS)
+   ============================================ */
+.gc-card {
+  background: #fff;
+  overflow: hidden;
+  border: 2px solid #e8e8e8;
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  height: 100%;
+  transition: border-color 0.18s, box-shadow 0.18s, transform 0.18s;
+}
+.gc-card:hover {
+  border-color: #111;
+  box-shadow: 5px 5px 0 #111;
+  transform: translate(-2px, -2px);
+}
+.gc-card:hover .gc-img {
+  transform: scale(1.06);
+}
+.gc-card:hover .gc-cta {
+  opacity: 1 !important;
+  transform: translateY(0) !important;
+}
+.gc-card:hover .gc-overlay {
+  background: rgba(17,17,17,0.15) !important;
+}
+
+/* ============================================
+   SERVICE CARD — CSS hover
+   ============================================ */
+.sc-card {
+  background: #fff;
+  overflow: hidden;
+  border: 2px solid #e8e8e8;
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  height: 100%;
+  transition: border-color 0.18s, box-shadow 0.18s, transform 0.18s;
+}
+.sc-card:hover {
+  border-color: #111;
+  box-shadow: 5px 5px 0 #111;
+  transform: translate(-2px, -2px);
+}
+.sc-card:hover .sc-img {
+  transform: scale(1.06);
+}
+.sc-card:hover .sc-cta {
+  opacity: 1 !important;
+  transform: translateY(0) !important;
+}
+
+/* ============================================
+   FIX: Mobile hamburger — was display:none with no show rule
+   ============================================ */
+@media (max-width: 1024px) {
+  .mobile-menu-btn {
+    display: flex !important;
+  }
+  /* Hide desktop auth buttons on mobile */
+  .nav-desktop-auth {
+    display: none;
+  }
+}
+
+/* ============================================
+   SKELETON SHIMMER — for loading states
+   ============================================ */
+@keyframes shimmer {
+  0%   { background-position: -800px 0; }
+  100% { background-position:  800px 0; }
+}
+.skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e6e6e6 50%, #f0f0f0 75%);
+  background-size: 800px 100%;
+  animation: shimmer 1.6s infinite linear;
+}
+
+/* ============================================
+   HERO SEARCH BAR
+   ============================================ */
+.hero-search-form {
+  display: flex;
+  gap: 0;
+  margin-top: 28px;
+  max-width: 480px;
+}
+.hero-search-input {
+  flex: 1;
+  padding: 14px 18px;
+  font-size: 14px;
+  font-family: "Space Grotesk", sans-serif;
+  font-weight: 600;
+  border: 2px solid #111;
+  border-right: none;
+  background: #fff;
+  outline: none;
+  color: #111;
+}
+.hero-search-input::placeholder {
+  color: #aaa;
+  font-weight: 500;
+}
+.hero-search-input:focus {
+  border-color: #5d3fd3;
+}
+.hero-search-btn {
+  padding: 14px 22px;
+  background: #111;
+  color: #ccff00;
+  font-family: "Archivo Black", sans-serif;
+  font-size: 13px;
+  letter-spacing: 0.5px;
+  border: 2px solid #111;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+.hero-search-btn:hover {
+  background: #5d3fd3;
+  border-color: #5d3fd3;
+}
+@media (max-width: 480px) {
+  .hero-search-form {
+    max-width: 100%;
+  }
+}
+
+/* ============================================
+   TESTIMONIALS SECTION
+   ============================================ */
+.testimonial-card {
+  border: 2px solid #111;
+  padding: 28px 24px;
+  background: #fff;
+  box-shadow: 4px 4px 0 #111;
+  transition: transform 0.18s, box-shadow 0.18s;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.testimonial-card:hover {
+  transform: translate(-3px, -3px);
+  box-shadow: 7px 7px 0 #111;
+}
+.testimonial-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+@media (max-width: 768px) {
+  .testimonial-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+@media (min-width: 769px) and (max-width: 1024px) {
+  .testimonial-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* ============================================
+   TRUST STRIP
+   ============================================ */
+.trust-strip {
+  display: flex;
+  gap: 0;
+  border: 2px solid #111;
+  overflow: hidden;
+}
+.trust-item {
+  flex: 1;
+  padding: 20px 24px;
+  border-right: 2px solid #111;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: #fff;
+  transition: background 0.15s;
+}
+.trust-item:last-child {
+  border-right: none;
+}
+.trust-item:hover {
+  background: #f8f8f8;
+}
+@media (max-width: 640px) {
+  .trust-strip {
+    flex-direction: column;
+  }
+  .trust-item {
+    border-right: none;
+    border-bottom: 2px solid #111;
+  }
+  .trust-item:last-child {
+    border-bottom: none;
+  }
+}
+
+/* ============================================
+   NAV LINK ACTIVE STATE
+   ============================================ */
+.nav-link-active {
+  color: #5d3fd3 !important;
+  text-decoration: underline 2px !important;
+}
+
+/* ============================================
+   SELL/OFFER CTA BUTTON in nav — hover fix
+   ============================================ */
+.nav-sell-btn {
+  display: inline-block;
+  padding: 10px 22px;
+  background: #111;
+  color: #fff;
+  font-family: "Archivo Black", sans-serif;
+  font-size: 13px;
+  text-decoration: none;
+  border: 2px solid #111;
+  transition: background 0.15s, border-color 0.15s;
+  white-space: nowrap;
+}
+.nav-sell-btn:hover {
+  background: #5d3fd3;
+  border-color: #5d3fd3;
+}
+
+/* ============================================
+   FILTER BAR sticky top offset (below nav+marquee)
+   ============================================ */
+@media (max-width: 768px) {
+  .filter-bar-sticky {
+    top: 0 !important;
+  }
+}
+
+/* ============================================
+   PRODUCT GRID — 2 cols on small mobile
+   ============================================ */
+@media (max-width: 380px) {
+  .product-grid {
+    grid-template-columns: 1fr !important;
+  }
+}

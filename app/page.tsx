@@ -1,7 +1,8 @@
 "use client"
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import GoodsCard from "@/components/GoodsCard"
 import ServiceCard from "@/components/ServiceCard"
 import { supabase } from "@/lib/supabase"
@@ -73,10 +74,36 @@ const TICKER_ITEMS = [
   'LAPTOPS', 'PHONES', 'JOLLOF RICE', 'CLOTHING', 'FURNITURE', 'SPORTS GEAR',
 ]
 
+const TESTIMONIALS = [
+  {
+    quote: "Sold my old laptop in 2 days for a great price. Way easier than WhatsApp groups — buyers come to you!",
+    name: "Kwame A.",
+    dept: "Mining Engineering, Yr 3",
+    avatar: 'KA',
+    color: '#1B5E20',
+  },
+  {
+    quote: "Got my textbooks for half the price. The seller was from my department — we met at the library. Perfect.",
+    name: "Ama S.",
+    dept: "Electrical Engineering, Yr 2",
+    avatar: 'AS',
+    color: '#5d3fd3',
+  },
+  {
+    quote: "My barbering service has 50+ bookings now. This platform gave me real visibility on campus.",
+    name: "Kofi J.",
+    dept: "Civil Engineering, Yr 4",
+    avatar: 'KJ',
+    color: '#ff3366',
+  },
+]
+
 export default function HomePage() {
   const [goods, setGoods] = useState<Good[]>([])
   const [services, setServices] = useState<Service[]>([])
   const [loadingData, setLoadingData] = useState(true)
+  const [searchQuery, setSearchQuery] = useState('')
+  const router = useRouter()
 
   useEffect(() => {
     const fetchFeatured = async () => {
@@ -140,6 +167,12 @@ export default function HomePage() {
   }, [])
 
   const tickerSet = [...TICKER_ITEMS, ...TICKER_ITEMS]
+
+  const handleHeroSearch = (e: React.FormEvent) => {
+    e.preventDefault()
+    const q = searchQuery.trim()
+    if (q) router.push(`/goods?q=${encodeURIComponent(q)}`)
+  }
 
   return (
     <>
@@ -243,6 +276,19 @@ export default function HomePage() {
               FIND SERVICES
             </Link>
           </div>
+
+          {/* Inline search */}
+          <form onSubmit={handleHeroSearch} className="hero-search-form">
+            <input
+              type="text"
+              placeholder="Search goods & services..."
+              className="hero-search-input"
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+            />
+            <button type="submit" className="hero-search-btn">SEARCH</button>
+          </form>
+
           <div className="social-proof">
             <div className="avatar-stack">
               <img src="https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=100&h=100&fit=crop&crop=face" alt="Student" />
@@ -404,9 +450,20 @@ export default function HomePage() {
             <Link href="/goods">See All →</Link>
           </div>
           {loadingData ? (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px' }}>
+            <div className="product-grid">
               {[1,2,3,4].map(i => (
-                <div key={i} style={{ border: '2px solid #eee', background: '#f8f8f8', height: '320px', animation: 'pulse 1.5s ease-in-out infinite' }} />
+                <div key={i} style={{ border: '2px solid #eee', overflow: 'hidden' }}>
+                  <div className="skeleton" style={{ height: '220px' }} />
+                  <div style={{ padding: '14px 16px 16px' }}>
+                    <div className="skeleton" style={{ height: '16px', marginBottom: '10px', width: '85%' }} />
+                    <div className="skeleton" style={{ height: '12px', marginBottom: '6px', width: '60%' }} />
+                    <div className="skeleton" style={{ height: '12px', marginBottom: '20px', width: '40%' }} />
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <div className="skeleton" style={{ height: '22px', width: '35%' }} />
+                      <div className="skeleton" style={{ height: '22px', width: '25%' }} />
+                    </div>
+                  </div>
+                </div>
               ))}
             </div>
           ) : goods.length === 0 ? (
@@ -436,9 +493,21 @@ export default function HomePage() {
             <Link href="/services">See All →</Link>
           </div>
           {loadingData ? (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px' }}>
+            <div className="product-grid">
               {[1,2,3,4].map(i => (
-                <div key={i} style={{ border: '2px solid #eee', background: '#ececec', height: '320px', animation: 'pulse 1.5s ease-in-out infinite' }} />
+                <div key={i} style={{ border: '2px solid #eee', overflow: 'hidden' }}>
+                  <div className="skeleton" style={{ height: '4px' }} />
+                  <div className="skeleton" style={{ height: '200px' }} />
+                  <div style={{ padding: '14px 16px 16px' }}>
+                    <div className="skeleton" style={{ height: '16px', marginBottom: '10px', width: '80%' }} />
+                    <div className="skeleton" style={{ height: '12px', marginBottom: '6px', width: '55%' }} />
+                    <div className="skeleton" style={{ height: '12px', marginBottom: '20px', width: '70%' }} />
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <div className="skeleton" style={{ height: '18px', width: '30%' }} />
+                      <div className="skeleton" style={{ height: '22px', width: '25%' }} />
+                    </div>
+                  </div>
+                </div>
               ))}
             </div>
           ) : services.length === 0 ? (
@@ -478,6 +547,65 @@ export default function HomePage() {
                 <div style={{ fontSize: '32px', marginBottom: '12px', marginTop: '8px' }}>{item.icon}</div>
                 <h3 style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '20px', marginBottom: '8px' }}>{item.title}</h3>
                 <p style={{ color: '#666', fontSize: '14px', lineHeight: 1.6 }}>{item.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Trust Strip */}
+      <section style={{ background: '#f8f8f8', padding: '48px 20px', borderTop: '2px solid #111' }}>
+        <div className="container">
+          <div className="trust-strip">
+            {[
+              { icon: '🔒', title: 'SAFE & VERIFIED', desc: 'All users are UMaT students. Meet on campus.' },
+              { icon: '💸', title: 'ZERO COMMISSION', desc: 'Keep 100% of what you earn. Always free.' },
+              { icon: '⚡', title: 'INSTANT CONTACT', desc: 'Direct WhatsApp — no middlemen, no delays.' },
+              { icon: '🎓', title: 'CAMPUS ONLY', desc: 'Built for UMaT. Only people you know.' },
+            ].map(item => (
+              <div key={item.title} className="trust-item">
+                <span style={{ fontSize: '28px', flexShrink: 0 }}>{item.icon}</span>
+                <div>
+                  <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '13px', marginBottom: '3px' }}>{item.title}</div>
+                  <div style={{ fontSize: '12px', color: '#666', lineHeight: 1.4 }}>{item.desc}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Student Testimonials */}
+      <section style={{ background: '#fff', padding: '60px 20px', borderTop: '2px solid #111' }}>
+        <div className="container">
+          <div style={{ marginBottom: '40px' }}>
+            <div style={{ fontFamily: '"Space Grotesk", sans-serif', fontSize: '11px', fontWeight: 700, letterSpacing: '3px', color: '#5d3fd3', marginBottom: '10px' }}>
+              STUDENT REVIEWS
+            </div>
+            <h2 style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: 'clamp(28px, 4vw, 42px)', lineHeight: 1.1 }}>
+              WHAT STUDENTS<br />ARE SAYING
+            </h2>
+          </div>
+          <div className="testimonial-grid">
+            {TESTIMONIALS.map(t => (
+              <div key={t.name} className="testimonial-card">
+                <div style={{ fontSize: '36px', color: '#eee', fontFamily: 'Georgia, serif', lineHeight: 1, marginBottom: '-8px' }}>&ldquo;</div>
+                <p style={{ fontSize: '15px', lineHeight: 1.65, color: '#333', fontWeight: 500 }}>{t.quote}</p>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginTop: 'auto', paddingTop: '8px', borderTop: '1px solid #f0f0f0' }}>
+                  <div style={{
+                    width: '40px', height: '40px', borderRadius: '50%',
+                    background: t.color, color: '#fff',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontWeight: 700, fontSize: '13px', flexShrink: 0,
+                    border: '2px solid #111',
+                  }}>
+                    {t.avatar}
+                  </div>
+                  <div>
+                    <div style={{ fontWeight: 700, fontSize: '14px' }}>{t.name}</div>
+                    <div style={{ fontSize: '11px', color: '#888' }}>{t.dept}</div>
+                  </div>
+                </div>
               </div>
             ))}
           </div>

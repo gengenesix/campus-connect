@@ -36,6 +36,14 @@ export default function GoodsPage() {
   const [search, setSearch] = useState('')
   const [sortBy, setSortBy] = useState('newest')
 
+  // Pick up ?q= from URL on mount (from hero search bar)
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const q = new URLSearchParams(window.location.search).get('q')
+      if (q) setSearch(q)
+    }
+  }, [])
+
   useEffect(() => {
     const fetchProducts = async () => {
       setLoading(true)
@@ -82,14 +90,26 @@ export default function GoodsPage() {
       <div>
         <div style={{ background: '#111', color: '#fff', padding: '36px 20px' }}>
           <div className="container">
-            <h1 style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '48px', marginBottom: '6px', letterSpacing: '-1px' }}>
-              BROWSE GOODS
-            </h1>
+            <h1 style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '48px', marginBottom: '6px', letterSpacing: '-1px' }}>BROWSE GOODS</h1>
           </div>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '80px 0', gap: '12px' }}>
-          <div style={{ width: '10px', height: '10px', background: '#5d3fd3', borderRadius: '50%', animation: 'pulse 1s infinite' }} />
-          <span style={{ color: '#888', fontWeight: 600 }}>Loading listings...</span>
+        <div className="container" style={{ paddingTop: '40px', paddingBottom: '60px' }}>
+          <div className="product-grid">
+            {[1,2,3,4,5,6,7,8].map(i => (
+              <div key={i} style={{ border: '2px solid #eee', overflow: 'hidden' }}>
+                <div className="skeleton" style={{ height: '220px' }} />
+                <div style={{ padding: '14px 16px 16px' }}>
+                  <div className="skeleton" style={{ height: '16px', marginBottom: '10px', width: '85%' }} />
+                  <div className="skeleton" style={{ height: '12px', marginBottom: '6px', width: '55%' }} />
+                  <div className="skeleton" style={{ height: '12px', marginBottom: '20px', width: '40%' }} />
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <div className="skeleton" style={{ height: '22px', width: '35%' }} />
+                    <div className="skeleton" style={{ height: '22px', width: '22%' }} />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     )
