@@ -12,7 +12,7 @@ function LoginForm() {
   const [loading, setLoading] = useState(false)
   const [googleLoading, setGoogleLoading] = useState(false)
   const [error, setError] = useState('')
-  const { signIn, user } = useAuth()
+  const { signIn, user, profile, loading: authLoading } = useAuth()
 
   const handleGoogleSignIn = async () => {
     setGoogleLoading(true)
@@ -25,11 +25,16 @@ function LoginForm() {
   }
   const router = useRouter()
   const searchParams = useSearchParams()
-  const redirectTo = searchParams.get('redirect') || '/dashboard'
+  // Don't honour a redirect to /admin from the URL — middleware already handles that gate
+  const rawRedirect = searchParams.get('redirect') || '/dashboard'
+  const redirectTo = rawRedirect.startsWith('/admin') ? '/dashboard' : rawRedirect
 
+  // Wait for both user AND profile to be loaded so we can route to the right place
   useEffect(() => {
-    if (user) router.push(redirectTo)
-  }, [user, router, redirectTo])
+    if (!authLoading && user && profile) {
+      router.push(profile.role === 'admin' ? '/admin' : redirectTo)
+    }
+  }, [authLoading, user, profile, router, redirectTo])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -47,8 +52,8 @@ function LoginForm() {
           : error
       )
       setLoading(false)
-    } else {
-      router.push(redirectTo)
+      // On success: don't redirect here — the useEffect above handles it
+      // once the profile is fetched and role is known
     }
   }
 

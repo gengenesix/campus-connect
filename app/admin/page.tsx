@@ -194,7 +194,28 @@ export default function AdminDashboard() {
   const unverifiedCount = filteredUsers.filter(u => !u.is_verified && !u.is_banned).length
   const bannedCount = users.filter(u => u.is_banned).length
 
-  if (loading || !user || profile?.role !== 'admin') return null
+  // Show a branded loading screen while auth initialises — never a white screen
+  if (loading) {
+    return (
+      <div style={{ background: '#111', minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '16px' }}>
+        <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '28px', color: '#fff', letterSpacing: '-0.5px', opacity: 0.9 }}>
+          ADMIN PANEL
+        </div>
+        <div style={{ display: 'flex', gap: '8px' }}>
+          {[0, 1, 2].map(i => (
+            <div key={i} style={{
+              width: '8px', height: '8px', background: '#ff3366', borderRadius: '50%',
+              animation: `bounce 0.9s ease-in-out ${i * 0.15}s infinite alternate`,
+            }} />
+          ))}
+        </div>
+        <style>{`@keyframes bounce { from { opacity: 0.2; transform: translateY(0); } to { opacity: 1; transform: translateY(-6px); } }`}</style>
+      </div>
+    )
+  }
+
+  // Middleware blocks non-admins server-side — this is a client-side safety net only
+  if (!user || profile?.role !== 'admin') return null
 
   return (
     <div style={{ background: '#f8f8f8', minHeight: '100vh' }}>

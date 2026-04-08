@@ -28,30 +28,54 @@ export async function middleware(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
   const path = request.nextUrl.pathname
 
-  // Redirect unauthenticated users away from protected pages
-  if (!user && PROTECTED_PATHS.some(p => path.startsWith(p))) {
-    const redirectUrl = request.nextUrl.clone()
-    redirectUrl.pathname = '/auth/login'
-    redirectUrl.searchParams.set('redirect', path)
-    const redirect = NextResponse.redirect(redirectUrl)
-    // CRITICAL: copy refreshed session cookies to the redirect response,
-    // otherwise the browser never receives the updated token and the user
-    // gets logged out on every subsequent page load
-    supabaseResponse.cookies.getAll().forEach(cookie =>
-      redirect.cookies.set(cookie.name, cookie.value, cookie)
-    )
-    return redirect
+  const copySessionCookies = (to: NextResponse) => {
+    supabaseResponse.cookies.getAll().forEach(c => to.cookies.set(c.name, c.value, c))
   }
 
-  // Redirect authenticated users away from auth pages
+  // Helper: fetch role from DB (only called when actually needed)
+  const getRole = async (): Promise<string | null> => {
+    if (!user) return null
+    const { data } = await supabase.from('profiles').select('role').eq('id', user.id).single()
+    return data?.role ?? null
+  }
+
+  // ── /admin: server-side gate ───────────────────────────────────────────────
+  // Not logged in → redirect to login
+  if (!user && path.startsWith('/admin')) {
+    const url = request.nextUrl.clone()
+    url.pathname = '/auth/login'
+    url.searchParams.set('redirect', path)
+    const r = NextResponse.redirect(url)
+    copySessionCookies(r)
+    return r
+  }
+  // Logged in but not admin → 404 (hides that /admin even exists)
+  if (user && path.startsWith('/admin')) {
+    const role = await getRole()
+    if (role !== 'admin') {
+      return NextResponse.rewrite(new URL('/not-found', request.url))
+    }
+  }
+
+  // ── Other protected pages ─────────────────────────────────────────────────
+  const nonAdminProtected = PROTECTED_PATHS.filter(p => p !== '/admin')
+  if (!user && nonAdminProtected.some(p => path.startsWith(p))) {
+    const url = request.nextUrl.clone()
+    url.pathname = '/auth/login'
+    url.searchParams.set('redirect', path)
+    const r = NextResponse.redirect(url)
+    copySessionCookies(r)
+    return r
+  }
+
+  // ── Auth pages: redirect already-logged-in users ──────────────────────────
   if (user && AUTH_PATHS.some(p => path.startsWith(p))) {
-    const redirectUrl = request.nextUrl.clone()
-    redirectUrl.pathname = '/dashboard'
-    const redirect = NextResponse.redirect(redirectUrl)
-    supabaseResponse.cookies.getAll().forEach(cookie =>
-      redirect.cookies.set(cookie.name, cookie.value, cookie)
-    )
-    return redirect
+    const role = await getRole()
+    const url = request.nextUrl.clone()
+    url.pathname = role === 'admin' ? '/admin' : '/dashboard'
+    const r = NextResponse.redirect(url)
+    copySessionCookies(r)
+    return r
   }
 
   return supabaseResponse

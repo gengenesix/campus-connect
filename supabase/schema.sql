@@ -3,6 +3,19 @@
 -- Run this in the Supabase SQL Editor (safe to re-run)
 -- ============================================================
 
+-- ============================================================
+-- FRESH START — wipe all data before rebuilding
+-- Deleting auth.users cascades to profiles → products →
+-- services → bookings → messages → reviews automatically.
+-- ============================================================
+delete from auth.users;
+truncate public.reviews   restart identity cascade;
+truncate public.messages  restart identity cascade;
+truncate public.bookings  restart identity cascade;
+truncate public.services  restart identity cascade;
+truncate public.products  restart identity cascade;
+truncate public.profiles  restart identity cascade;
+
 create extension if not exists "uuid-ossp";
 
 -- ============================================================
@@ -309,6 +322,33 @@ create policy "Authenticated users can write reviews" on public.reviews
   for insert with check (auth.uid() = reviewer_id);
 
 -- ============================================================
+-- ADMIN MODERATION POLICIES
+-- These give the admin full read/delete access to all content
+-- for moderation. Without these, admin can see listings but not
+-- messages, bookings, or reviews.
+-- ============================================================
+drop policy if exists "Admins can read all messages" on public.messages;
+create policy "Admins can read all messages" on public.messages
+  for select using (public.is_admin());
+
+drop policy if exists "Admins can delete any message" on public.messages;
+create policy "Admins can delete any message" on public.messages
+  for delete using (public.is_admin());
+
+drop policy if exists "Admins can manage all bookings" on public.bookings;
+create policy "Admins can manage all bookings" on public.bookings
+  for all using (public.is_admin());
+
+drop policy if exists "Admins can manage all reviews" on public.reviews;
+create policy "Admins can manage all reviews" on public.reviews
+  for all using (public.is_admin());
+
+-- Lets admin permanently delete a user account (not just ban them)
+drop policy if exists "Admins can delete profiles" on public.profiles;
+create policy "Admins can delete profiles" on public.profiles
+  for delete using (public.is_admin());
+
+-- ============================================================
 -- STORAGE BUCKETS
 -- ============================================================
 insert into storage.buckets (id, name, public) values ('avatars', 'avatars', true)
@@ -356,8 +396,22 @@ create policy "Users can delete own service images" on storage.objects
 -- ============================================================
 -- REALTIME
 -- ============================================================
-alter publication supabase_realtime add table public.messages;
-alter publication supabase_realtime add table public.bookings;
+do $$
+begin
+  if not exists (
+    select 1 from pg_publication_tables
+    where pubname = 'supabase_realtime' and tablename = 'messages'
+  ) then
+    alter publication supabase_realtime add table public.messages;
+  end if;
+
+  if not exists (
+    select 1 from pg_publication_tables
+    where pubname = 'supabase_realtime' and tablename = 'bookings'
+  ) then
+    alter publication supabase_realtime add table public.bookings;
+  end if;
+end $$;
 
 -- ============================================================
 -- INDEXES
