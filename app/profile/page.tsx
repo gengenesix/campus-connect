@@ -26,6 +26,8 @@ export default function ProfilePage() {
   const [editing, setEditing] = useState(false)
   const [saving, setSaving] = useState(false)
   const [uploadingAvatar, setUploadingAvatar] = useState(false)
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null)
+  const [avatarHover, setAvatarHover] = useState(false)
   const [saveMsg, setSaveMsg] = useState('')
   const [form, setForm] = useState({
     name: '',
@@ -60,30 +62,44 @@ export default function ProfilePage() {
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file || !user) return
-    if (file.size > 3 * 1024 * 1024) { setSaveMsg('Avatar must be under 3MB'); return }
+    if (file.size > 5 * 1024 * 1024) { setSaveMsg('Image must be under 5MB'); return }
 
+    // Show local preview immediately — no waiting for upload
+    const localUrl = URL.createObjectURL(file)
+    setAvatarPreview(localUrl)
     setUploadingAvatar(true)
-    const ext = file.name.split('.').pop()
-    const path = `avatars/${user.id}.${ext}`
+    setSaveMsg('')
 
-    const { error: uploadErr } = await supabase.storage
-      .from('avatars')
-      .upload(path, file, { upsert: true, contentType: file.type })
+    try {
+      // Always use .jpg extension so URLs are stable (avoids duplicate files with different extensions)
+      const path = `avatars/${user.id}.jpg`
 
-    if (!uploadErr) {
-      const { data: { publicUrl } } = supabase.storage.from('avatars').getPublicUrl(path)
-      const { error } = await updateProfile({ avatar_url: publicUrl } as any)
-      if (!error) {
-        setSaveMsg('Profile picture updated!')
-      } else {
-        console.error('Avatar update error:', error)
-        setSaveMsg('Could not save profile photo. Please try again.')
+      const { error: uploadErr } = await supabase.storage
+        .from('avatars')
+        .upload(path, file, { upsert: true, contentType: file.type })
+
+      if (uploadErr) {
+        setAvatarPreview(null)
+        setSaveMsg('Upload failed — ensure the avatars storage bucket exists in Supabase.')
+        return
       }
-    } else {
-      setSaveMsg('Avatar upload failed — check that the storage bucket is configured.')
+
+      // Add cache-busting param so the browser loads the new image
+      const { data: { publicUrl } } = supabase.storage.from('avatars').getPublicUrl(path)
+      const urlWithBust = `${publicUrl}?t=${Date.now()}`
+
+      const { error } = await updateProfile({ avatar_url: urlWithBust } as any)
+      if (error) {
+        setAvatarPreview(null)
+        setSaveMsg('Photo uploaded but profile update failed. Try saving again.')
+      } else {
+        setAvatarPreview(null) // profile state now has the real URL
+        setSaveMsg('Profile photo updated!')
+      }
+    } finally {
+      setUploadingAvatar(false)
+      setTimeout(() => setSaveMsg(''), 5000)
     }
-    setUploadingAvatar(false)
-    setTimeout(() => setSaveMsg(''), 4000)
   }
 
   const handleSave = async (e: React.FormEvent) => {
@@ -172,6 +188,7 @@ export default function ProfilePage() {
         @media (max-width: 768px) {
           .profile-layout { grid-template-columns: 1fr !important; gap: 20px; }
         }
+        @keyframes spin { to { transform: rotate(360deg); } }
       `}</style>
       {/* Header */}
       <div style={{ background: '#111', color: '#fff', padding: '36px 20px' }}>
@@ -253,29 +270,70 @@ export default function ProfilePage() {
           {/* Sidebar */}
           <div>
             <div style={{ border: '2px solid #111', background: '#fff', boxShadow: '6px 6px 0 #111', padding: '28px 20px', textAlign: 'center' }}>
-              {/* Avatar */}
-              <div style={{ position: 'relative', display: 'inline-block', marginBottom: '16px' }}>
-                {profile?.avatar_url ? (
+              {/* Avatar — click anywhere to change */}
+              <div
+                style={{ position: 'relative', display: 'inline-block', marginBottom: '16px', cursor: 'pointer' }}
+                onClick={() => !uploadingAvatar && fileInputRef.current?.click()}
+                onMouseEnter={() => setAvatarHover(true)}
+                onMouseLeave={() => setAvatarHover(false)}
+                title="Click to change profile photo"
+              >
+                {/* Image or initials */}
+                {avatarPreview || profile?.avatar_url ? (
                   <img
-                    src={profile.avatar_url}
-                    alt={profile.name ?? ''}
-                    style={{ width: '100px', height: '100px', borderRadius: '50%', objectFit: 'cover', border: '3px solid #111', display: 'block' }}
+                    src={avatarPreview ?? profile!.avatar_url!}
+                    alt={profile?.name ?? 'Avatar'}
+                    style={{ width: '110px', height: '110px', borderRadius: '50%', objectFit: 'cover', border: '3px solid #111', display: 'block' }}
                   />
                 ) : (
-                  <div style={{ width: '100px', height: '100px', borderRadius: '50%', background: '#1B5E20', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: '"Archivo Black", sans-serif', fontSize: '32px', border: '3px solid #111', margin: '0 auto' }}>
+                  <div style={{ width: '110px', height: '110px', borderRadius: '50%', background: '#1B5E20', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: '"Archivo Black", sans-serif', fontSize: '34px', border: '3px solid #111', margin: '0 auto' }}>
                     {initials}
                   </div>
                 )}
-                <button
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={uploadingAvatar}
-                  style={{ position: 'absolute', bottom: 0, right: 0, width: '28px', height: '28px', borderRadius: '50%', background: '#5d3fd3', color: '#fff', border: '2px solid #111', cursor: 'pointer', fontSize: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                  title="Change profile picture"
-                >
-                  {uploadingAvatar ? '…' : '✎'}
-                </button>
+
+                {/* Hover / uploading overlay */}
+                <div style={{
+                  position: 'absolute', inset: 0, borderRadius: '50%',
+                  background: uploadingAvatar
+                    ? 'rgba(93,63,211,0.75)'
+                    : avatarHover ? 'rgba(0,0,0,0.55)' : 'transparent',
+                  display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                  transition: 'background 0.2s', pointerEvents: 'none', gap: '4px',
+                }}>
+                  {uploadingAvatar ? (
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" style={{ animation: 'spin 0.9s linear infinite' }}>
+                      <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
+                    </svg>
+                  ) : avatarHover ? (
+                    <>
+                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                        <circle cx="12" cy="13" r="4"/>
+                      </svg>
+                      <span style={{ color: '#fff', fontSize: '9px', fontWeight: 700, letterSpacing: '0.5px' }}>CHANGE</span>
+                    </>
+                  ) : null}
+                </div>
+
+                {/* Purple badge bottom-right */}
+                {!uploadingAvatar && (
+                  <div style={{ position: 'absolute', bottom: 2, right: 2, width: '26px', height: '26px', borderRadius: '50%', background: '#5d3fd3', border: '2px solid #fff', display: 'flex', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none' }}>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                      <circle cx="12" cy="13" r="3"/>
+                    </svg>
+                  </div>
+                )}
+
                 <input ref={fileInputRef} type="file" accept="image/*" onChange={handleAvatarChange} style={{ display: 'none' }} />
               </div>
+
+              {/* Upload status text */}
+              {uploadingAvatar && (
+                <div style={{ fontSize: '11px', color: '#5d3fd3', fontWeight: 700, marginBottom: '8px', letterSpacing: '0.5px' }}>
+                  UPLOADING...
+                </div>
+              )}
 
               <div style={{ position: 'relative', display: 'inline-block' }}>
                 <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '20px', marginBottom: '2px' }}>
