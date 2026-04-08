@@ -132,19 +132,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         (safeUpdates as any).role = roleUpdate
       }
 
-      // Use upsert so that if the trigger-created row doesn't exist yet, it gets created.
-      // Always include id + email so the upsert has everything required.
+      // Use update (not upsert) — profile row always exists via the auth trigger.
       const { error } = await supabase
         .from('profiles')
-        .upsert(
-          { id: user.id, email: user.email ?? '', ...safeUpdates },
-          { onConflict: 'id' }
-        )
+        .update(safeUpdates)
+        .eq('id', user.id)
 
-      if (error) return { error: error.message }
+      if (error) {
+        // Row might not exist yet (edge case: OAuth user before trigger ran)
+        // Fall back to upsert
+        const { error: upsertErr } = await supabase
+          .from('profiles')
+          .upsert(
+            { id: user.id, email: user.email ?? '', ...safeUpdates },
+            { onConflict: 'id' }
+          )
+        if (upsertErr) return { error: upsertErr.message }
+      }
 
-      // Refetch so local state reflects what was actually saved
-      await fetchProfile(user.id)
+      // Direct refresh — bypasses fetchingRef guard so profile always reflects saved data
+      const { data: fresh } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single()
+      if (fresh) setProfile(fresh as Profile)
+
       return { error: null }
     } catch (err: any) {
       return { error: err?.message ?? 'Update failed. Please try again.' }

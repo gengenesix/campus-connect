@@ -92,6 +92,12 @@ export default function ProfilePage() {
     setSaving(true)
     setSaveMsg('')
 
+    // Safety: if the save hangs (slow connection / paused DB), unblock UI after 20s
+    const saveGuard = setTimeout(() => {
+      setSaving(false)
+      setSaveMsg('Save timed out — check your internet connection and try again.')
+    }, 20000)
+
     try {
       const roleToSave = form.role && form.role !== 'admin' ? form.role : (profile?.role ?? 'buyer')
       const { error } = await updateProfile({
@@ -120,9 +126,10 @@ export default function ProfilePage() {
     } catch (err: any) {
       setSaveMsg(`Unexpected error: ${err?.message ?? 'Please try again.'}`)
     } finally {
+      clearTimeout(saveGuard)
       setSaving(false)
     }
-    setTimeout(() => setSaveMsg(''), 4000)
+    setTimeout(() => setSaveMsg(''), 5000)
   }
 
   const initials = profile?.name
@@ -231,10 +238,10 @@ export default function ProfilePage() {
 
       {saveMsg && (
         <div style={{
-          background: saveMsg.startsWith('Error') || saveMsg.startsWith('Unexpected') || saveMsg.startsWith('Avatar upload') ? '#fee2e2' : '#dcfce7',
-          borderBottom: `2px solid ${saveMsg.startsWith('Error') || saveMsg.startsWith('Unexpected') || saveMsg.startsWith('Avatar upload') ? '#ef4444' : '#16a34a'}`,
+          background: /error|failed|unable|timed out|unexpected|network/i.test(saveMsg) ? '#fee2e2' : '#dcfce7',
+          borderBottom: `2px solid ${/error|failed|unable|timed out|unexpected|network/i.test(saveMsg) ? '#ef4444' : '#16a34a'}`,
           padding: '12px 24px', textAlign: 'center', fontWeight: 700, fontSize: '14px',
-          color: saveMsg.startsWith('Error') || saveMsg.startsWith('Unexpected') || saveMsg.startsWith('Avatar upload') ? '#dc2626' : '#15803d',
+          color: /error|failed|unable|timed out|unexpected|network/i.test(saveMsg) ? '#dc2626' : '#15803d',
         }}>
           {saveMsg}
         </div>

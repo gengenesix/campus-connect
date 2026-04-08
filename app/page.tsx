@@ -8,6 +8,87 @@ import { supabase } from "@/lib/supabase"
 import type { Good, Service } from "@/lib/mockData"
 import { timeAgo } from "@/lib/utils"
 
+const SHOWCASE = [
+  {
+    label: 'SOBOLO',
+    sublabel: 'Fresh chilled hibiscus',
+    price: 'GHS 5–15',
+    href: '/goods',
+    img: 'https://images.unsplash.com/photo-1559181567-c3190ca9be46?w=400&h=560&fit=crop&crop=center',
+    tag: 'FOOD & DRINK',
+    accent: '#c2185b',
+  },
+  {
+    label: 'BRUKINA',
+    sublabel: 'Traditional millet drink',
+    price: 'GHS 5–10',
+    href: '/goods',
+    img: 'https://images.unsplash.com/photo-1571091718767-18b5b1457add?w=400&h=560&fit=crop&crop=center',
+    tag: 'FOOD & DRINK',
+    accent: '#e65100',
+  },
+  {
+    label: 'NAIL ART',
+    sublabel: 'Professional nail services',
+    price: 'GHS 30–80',
+    href: '/services',
+    img: 'https://images.unsplash.com/photo-1604654894610-df63bc536371?w=400&h=560&fit=crop&crop=center',
+    tag: 'BEAUTY',
+    accent: '#ad1457',
+  },
+  {
+    label: 'BARBERING',
+    sublabel: 'Cuts, fades & styling',
+    price: 'GHS 20–60',
+    href: '/services',
+    img: 'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=400&h=560&fit=crop&crop=center',
+    tag: 'GROOMING',
+    accent: '#212121',
+  },
+  {
+    label: 'DRESSES',
+    sublabel: 'Kente, African prints & more',
+    price: 'GHS 80–350',
+    href: '/goods',
+    img: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=400&h=560&fit=crop&crop=center',
+    tag: 'FASHION',
+    accent: '#6a1b9a',
+  },
+  {
+    label: 'TEXTBOOKS',
+    sublabel: 'All courses & levels',
+    price: 'GHS 25–120',
+    href: '/goods',
+    img: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=400&h=560&fit=crop&crop=center',
+    tag: 'ACADEMICS',
+    accent: '#1565c0',
+  },
+  {
+    label: 'CALCULATORS',
+    sublabel: 'Casio, Sharp & more',
+    price: 'GHS 40–180',
+    href: '/goods',
+    img: 'https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=400&h=560&fit=crop&crop=center',
+    tag: 'ELECTRONICS',
+    accent: '#1B5E20',
+  },
+  {
+    label: 'LAUNDRY',
+    sublabel: 'Pickup & same-day delivery',
+    price: 'GHS 5/item',
+    href: '/services',
+    img: 'https://images.unsplash.com/photo-1545173168-9f1947eebb7f?w=400&h=560&fit=crop&crop=center',
+    tag: 'HOME SERVICE',
+    accent: '#0277bd',
+  },
+]
+
+const TICKER_ITEMS = [
+  'SOBOLO', 'BRUKINA', 'NAIL ART', 'BARBERING', 'KENTE DRESSES', 'TEXTBOOKS',
+  'CALCULATORS', 'LAUNDRY', 'TUTORING', 'PHOTOGRAPHY', 'TECH REPAIR', 'GRAPHIC DESIGN',
+  'LAPTOPS', 'PHONES', 'FOOD', 'CLOTHING', 'FURNITURE', 'SPORTS GEAR',
+]
+
 export default function HomePage() {
   const [goods, setGoods] = useState<Good[]>([])
   const [services, setServices] = useState<Service[]>([])
@@ -74,8 +155,35 @@ export default function HomePage() {
     fetchFeatured()
   }, [])
 
+  const tickerSet = [...TICKER_ITEMS, ...TICKER_ITEMS]
+
   return (
     <>
+      <style>{`
+        @keyframes ticker {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
+        }
+        @keyframes fadeUp {
+          from { opacity: 0; transform: translateY(16px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .showcase-card:hover .showcase-overlay {
+          background: linear-gradient(transparent 20%, rgba(0,0,0,0.92)) !important;
+        }
+        .showcase-card:hover img {
+          transform: scale(1.06);
+        }
+        .showcase-card img {
+          transition: transform 0.5s ease;
+        }
+        .how-card:hover {
+          transform: translate(-3px, -3px);
+          box-shadow: 7px 7px 0 #111 !important;
+        }
+        .how-card { transition: all 0.2s; }
+      `}</style>
+
       {/* Hero Section */}
       <section className="hero-section">
         <div className="hero-content">
@@ -140,8 +248,19 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Ticker Strip */}
+      <div style={{ background: '#a78bfa', borderTop: '2px solid #111', borderBottom: '2px solid #111', padding: '12px 0', overflow: 'hidden' }}>
+        <div style={{ display: 'flex', animation: 'ticker 28s linear infinite', width: 'max-content', gap: '0' }}>
+          {tickerSet.map((item, i) => (
+            <span key={i} style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '13px', color: '#111', whiteSpace: 'nowrap', padding: '0 28px', borderRight: '2px solid rgba(0,0,0,0.15)' }}>
+              {item}
+            </span>
+          ))}
+        </div>
+      </div>
+
       {/* Stats Strip */}
-      <div style={{ background: '#111', color: '#fff', padding: '28px 20px', borderTop: '3px solid #1B5E20' }}>
+      <div style={{ background: '#111', color: '#fff', padding: '28px 20px' }}>
         <div className="container" style={{ display: 'flex', justifyContent: 'space-around', flexWrap: 'wrap', gap: '20px', textAlign: 'center' }}>
           {[
             { num: '0%', label: 'COMMISSION' },
@@ -157,6 +276,86 @@ export default function HomePage() {
         </div>
       </div>
 
+      {/* WHAT'S ON CAMPUS — Showcase */}
+      <section style={{ background: '#0a0a0a', padding: '64px 0 48px', overflow: 'hidden' }}>
+        <div className="container" style={{ marginBottom: '32px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+            <div>
+              <div style={{ fontFamily: '"Space Grotesk", sans-serif', fontSize: '11px', fontWeight: 700, letterSpacing: '3px', color: '#a78bfa', marginBottom: '10px' }}>
+                CAMPUS MARKET
+              </div>
+              <h2 style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: 'clamp(32px, 5vw, 52px)', color: '#fff', lineHeight: 1, margin: 0 }}>
+                WHAT&apos;S ON<br />
+                <span style={{ color: '#a78bfa' }}>CAMPUS</span>
+              </h2>
+            </div>
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <Link href="/goods" style={{ padding: '10px 20px', border: '1px solid #444', color: '#ccc', fontSize: '12px', fontWeight: 700, textDecoration: 'none', letterSpacing: '1px', fontFamily: '"Space Grotesk", sans-serif', transition: 'all 0.2s' }}>
+                GOODS
+              </Link>
+              <Link href="/services" style={{ padding: '10px 20px', background: '#a78bfa', color: '#111', fontSize: '12px', fontWeight: 700, textDecoration: 'none', letterSpacing: '1px', fontFamily: '"Archivo Black", sans-serif' }}>
+                SERVICES
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        {/* Horizontal scroll */}
+        <div style={{ overflowX: 'auto', paddingLeft: 'max(20px, calc((100vw - 1240px) / 2))', paddingRight: '20px', paddingBottom: '8px', scrollbarWidth: 'thin', scrollbarColor: '#a78bfa #222' }}>
+          <div style={{ display: 'flex', gap: '14px', width: 'max-content' }}>
+            {SHOWCASE.map(item => (
+              <Link
+                key={item.label}
+                href={item.href}
+                className="showcase-card"
+                style={{ textDecoration: 'none', display: 'block', position: 'relative', width: '200px', height: '290px', flexShrink: 0, overflow: 'hidden', border: '2px solid #222', cursor: 'pointer' }}
+              >
+                <img
+                  src={item.img}
+                  alt={item.label}
+                  style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                  onError={(e) => { (e.currentTarget as HTMLImageElement).src = 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=560&fit=crop' }}
+                  loading="lazy"
+                />
+                {/* Gradient overlay */}
+                <div
+                  className="showcase-overlay"
+                  style={{ position: 'absolute', inset: 0, background: 'linear-gradient(transparent 35%, rgba(0,0,0,0.88))', transition: 'background 0.3s' }}
+                />
+                {/* Content */}
+                <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '16px 14px 14px' }}>
+                  <div style={{ fontSize: '9px', fontWeight: 700, letterSpacing: '1.5px', color: '#a78bfa', marginBottom: '5px', fontFamily: '"Space Grotesk", sans-serif' }}>
+                    {item.tag}
+                  </div>
+                  <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '19px', color: '#fff', lineHeight: 1.1, marginBottom: '3px' }}>
+                    {item.label}
+                  </div>
+                  <div style={{ fontSize: '11px', color: '#bbb', marginBottom: '10px' }}>
+                    {item.sublabel}
+                  </div>
+                  <div style={{ display: 'inline-block', padding: '4px 10px', background: item.accent, color: '#fff', fontSize: '10px', fontWeight: 700, letterSpacing: '0.5px', fontFamily: '"Space Grotesk", sans-serif' }}>
+                    {item.price}
+                  </div>
+                </div>
+              </Link>
+            ))}
+            {/* End card — CTA */}
+            <Link
+              href="/goods"
+              style={{ textDecoration: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '160px', height: '290px', flexShrink: 0, border: '2px dashed #333', color: '#666', gap: '12px' }}
+            >
+              <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '36px', color: '#a78bfa' }}>+</div>
+              <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '13px', color: '#888', textAlign: 'center', lineHeight: 1.4 }}>
+                200+<br />MORE ITEMS
+              </div>
+              <div style={{ fontSize: '11px', color: '#a78bfa', fontWeight: 700, letterSpacing: '1px' }}>
+                BROWSE ALL →
+              </div>
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* Featured Goods */}
       <section className="trending-section" id="featured">
         <div className="container">
@@ -165,7 +364,11 @@ export default function HomePage() {
             <Link href="/goods">See All →</Link>
           </div>
           {loadingData ? (
-            <div style={{ textAlign: 'center', padding: '40px 0', color: '#888', fontWeight: 600 }}>Loading listings...</div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px' }}>
+              {[1,2,3,4].map(i => (
+                <div key={i} style={{ border: '2px solid #eee', background: '#f8f8f8', height: '320px', animation: 'pulse 1.5s ease-in-out infinite' }} />
+              ))}
+            </div>
           ) : goods.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '48px 20px', border: '2px dashed #ddd' }}>
               <div style={{ fontSize: '32px', marginBottom: '12px' }}>📦</div>
@@ -193,7 +396,11 @@ export default function HomePage() {
             <Link href="/services">See All →</Link>
           </div>
           {loadingData ? (
-            <div style={{ textAlign: 'center', padding: '40px 0', color: '#888', fontWeight: 600 }}>Loading services...</div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px' }}>
+              {[1,2,3,4].map(i => (
+                <div key={i} style={{ border: '2px solid #eee', background: '#ececec', height: '320px', animation: 'pulse 1.5s ease-in-out infinite' }} />
+              ))}
+            </div>
           ) : services.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '48px 20px', border: '2px dashed #ddd' }}>
               <div style={{ fontSize: '32px', marginBottom: '12px' }}>🛠️</div>
@@ -226,7 +433,7 @@ export default function HomePage() {
               { step: '02', title: 'List or Browse', desc: 'Post your items for sale or browse goods and services from fellow students.', icon: '📋' },
               { step: '03', title: 'Connect & Deal', desc: 'Message sellers directly, book services, and meet safely on campus.', icon: '🤝' },
             ].map(item => (
-              <div key={item.step} style={{ border: '2px solid #111', padding: '32px', boxShadow: '4px 4px 0 #111', background: '#fff' }}>
+              <div key={item.step} className="how-card" style={{ border: '2px solid #111', padding: '32px', boxShadow: '4px 4px 0 #111', background: '#fff' }}>
                 <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '48px', color: '#eee', lineHeight: 1 }}>{item.step}</div>
                 <div style={{ fontSize: '32px', marginBottom: '12px', marginTop: '8px' }}>{item.icon}</div>
                 <h3 style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '20px', marginBottom: '8px' }}>{item.title}</h3>
