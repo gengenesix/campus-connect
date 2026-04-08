@@ -35,6 +35,7 @@ export default function ProfilePage() {
     hostel: '',
     phone: '',
     bio: '',
+    role: '',
   })
 
   useEffect(() => {
@@ -51,6 +52,7 @@ export default function ProfilePage() {
         hostel: profile.hostel ?? '',
         phone: profile.phone ?? '',
         bio: profile.bio ?? '',
+        role: profile.role ?? 'buyer',
       })
     }
   }, [profile])
@@ -74,7 +76,8 @@ export default function ProfilePage() {
       if (!error) {
         setSaveMsg('Profile picture updated!')
       } else {
-        setSaveMsg(`Upload error: ${error}`)
+        console.error('Avatar update error:', error)
+        setSaveMsg('Could not save profile photo. Please try again.')
       }
     } else {
       setSaveMsg('Avatar upload failed — check that the storage bucket is configured.')
@@ -90,6 +93,7 @@ export default function ProfilePage() {
     setSaveMsg('')
 
     try {
+      const roleToSave = form.role && form.role !== 'admin' ? form.role : (profile?.role ?? 'buyer')
       const { error } = await updateProfile({
         name: form.name.trim(),
         department: form.department || null,
@@ -98,10 +102,17 @@ export default function ProfilePage() {
         hostel: form.hostel || null,
         phone: form.phone || null,
         bio: form.bio || null,
+        role: roleToSave,
       } as any)
 
       if (error) {
-        setSaveMsg(`Error: ${error}`)
+        console.error('Profile save error:', error)
+        const friendly = error.includes('row-level security') || error.includes('policy') || error.includes('RLS')
+          ? 'Unable to save profile. Please sign out and sign back in, then try again.'
+          : error.includes('network') || error.includes('fetch') || error.includes('Failed')
+          ? 'Network error — check your connection and try again.'
+          : 'Could not save your profile. Please try again.'
+        setSaveMsg(friendly)
       } else {
         setEditing(false)
         setSaveMsg('Profile updated successfully!')
@@ -149,6 +160,12 @@ export default function ProfilePage() {
 
   return (
     <div style={{ background: '#f8f8f8', minHeight: '80vh' }}>
+      <style>{`
+        .profile-layout { display: grid; grid-template-columns: 280px 1fr; gap: 32px; align-items: start; }
+        @media (max-width: 768px) {
+          .profile-layout { grid-template-columns: 1fr !important; gap: 20px; }
+        }
+      `}</style>
       {/* Header */}
       <div style={{ background: '#111', color: '#fff', padding: '36px 20px' }}>
         <div className="container">
@@ -224,7 +241,7 @@ export default function ProfilePage() {
       )}
 
       <div className="container" style={{ paddingTop: '32px', paddingBottom: '80px' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '280px 1fr', gap: '32px', alignItems: 'start' }}>
+        <div className="profile-layout">
 
           {/* Sidebar */}
           <div>
@@ -277,15 +294,20 @@ export default function ProfilePage() {
 
               {/* Stats */}
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '20px' }}>
-                {[
-                  { label: 'Rating', value: profile?.rating?.toFixed(1) ?? '—' },
-                  { label: 'Reviews', value: profile?.total_reviews?.toString() ?? '0' },
-                ].map(stat => (
-                  <div key={stat.label} style={{ border: '2px solid #eee', padding: '12px 8px', textAlign: 'center' }}>
-                    <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '22px', color: '#1B5E20' }}>{stat.value}</div>
-                    <div style={{ fontSize: '11px', color: '#888', marginTop: '2px' }}>{stat.label}</div>
+                <div style={{ border: '2px solid #eee', padding: '12px 8px', textAlign: 'center' }}>
+                  <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '22px', color: '#1B5E20' }}>
+                    {(profile?.total_reviews ?? 0) > 0 ? (profile?.rating?.toFixed(1) ?? '—') : '—'}
                   </div>
-                ))}
+                  <div style={{ fontSize: '11px', color: '#888', marginTop: '2px' }}>Rating</div>
+                </div>
+                <div style={{ border: '2px solid #eee', padding: '12px 8px', textAlign: 'center' }}>
+                  <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '22px', color: '#1B5E20' }}>
+                    {profile?.total_reviews ?? 0}
+                  </div>
+                  <div style={{ fontSize: '11px', color: '#888', marginTop: '2px' }}>
+                    {(profile?.total_reviews ?? 0) === 0 ? 'No reviews' : 'Reviews'}
+                  </div>
+                </div>
               </div>
 
               {/* Role Badge */}
@@ -414,6 +436,25 @@ export default function ProfilePage() {
                         style={{ width: '100%', padding: '12px 16px', border: '2px solid #111', fontFamily: '"Space Grotesk", sans-serif', fontSize: '14px', outline: 'none', boxSizing: 'border-box', resize: 'vertical' }}
                       />
                     </div>
+
+                    {/* Role */}
+                    {profile?.role !== 'admin' && (
+                      <div style={{ border: '2px solid #f59e0b', background: '#fffbeb', padding: '16px' }}>
+                        <label style={{ display: 'block', fontWeight: 700, fontSize: '12px', letterSpacing: '1.5px', marginBottom: '8px', color: '#92400e' }}>ACCOUNT TYPE</label>
+                        <select
+                          value={form.role ?? profile?.role ?? 'buyer'}
+                          onChange={e => setForm(p => ({ ...p, role: e.target.value }))}
+                          style={{ width: '100%', padding: '12px 16px', border: '2px solid #111', fontFamily: '"Space Grotesk", sans-serif', fontSize: '14px', background: '#fff', boxSizing: 'border-box' }}
+                        >
+                          <option value="buyer">Buyer — Browse and buy items</option>
+                          <option value="seller">Seller — List and sell goods</option>
+                          <option value="provider">Service Provider — Offer campus services (barbing, tutoring, laundry, etc.)</option>
+                        </select>
+                        <p style={{ fontSize: '11px', color: '#92400e', marginTop: '6px', marginBottom: 0 }}>
+                          Sellers and providers can also buy — all users can browse the marketplace.
+                        </p>
+                      </div>
+                    )}
 
                     <div style={{ display: 'flex', gap: '10px' }}>
                       <button

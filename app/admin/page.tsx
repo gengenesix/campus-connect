@@ -51,7 +51,7 @@ function initials(name: string | null) {
 }
 
 export default function AdminDashboard() {
-  const { user, profile, loading } = useAuth()
+  const { user, profile, loading, signOut } = useAuth()
   const router = useRouter()
 
   const [activeTab, setActiveTab] = useState<'users' | 'listings' | 'services'>('users')
@@ -236,12 +236,20 @@ export default function AdminDashboard() {
               Campus Connect · {profile?.name ?? user.email}
             </p>
           </div>
-          <Link
-            href="/dashboard"
-            style={{ padding: '10px 20px', border: '2px solid #444', color: '#ccc', fontFamily: '"Archivo Black", sans-serif', fontSize: '12px', textDecoration: 'none', letterSpacing: '0.5px' }}
-          >
-            ← DASHBOARD
-          </Link>
+          <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+            <Link
+              href="/dashboard"
+              style={{ padding: '10px 20px', border: '2px solid #444', color: '#ccc', fontFamily: '"Archivo Black", sans-serif', fontSize: '12px', textDecoration: 'none', letterSpacing: '0.5px' }}
+            >
+              ← DASHBOARD
+            </Link>
+            <button
+              onClick={async () => { await signOut(); router.replace('/') }}
+              style={{ padding: '10px 20px', border: '2px solid #dc2626', color: '#dc2626', background: 'transparent', fontFamily: '"Archivo Black", sans-serif', fontSize: '12px', cursor: 'pointer', letterSpacing: '0.5px' }}
+            >
+              SIGN OUT
+            </button>
+          </div>
         </div>
       </div>
 

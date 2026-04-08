@@ -38,16 +38,21 @@ export default function GoodsPage() {
   useEffect(() => {
     const fetchProducts = async () => {
       setLoading(true)
-      const { data } = await supabase
-        .from('products')
-        .select(`
-          id, seller_id, title, price, condition, category, image_url, views, description, created_at, whatsapp,
-          seller:profiles!seller_id (name, avatar_url, rating, is_verified)
-        `)
-        .neq('status', 'deleted')
-        .order('created_at', { ascending: false })
-      setProducts((data as Product[]) ?? [])
-      setLoading(false)
+      try {
+        const { data } = await supabase
+          .from('products')
+          .select(`
+            id, seller_id, title, price, condition, category, image_url, views, description, created_at, whatsapp,
+            seller:profiles!seller_id (name, avatar_url, rating, is_verified)
+          `)
+          .neq('status', 'deleted')
+          .order('created_at', { ascending: false })
+        setProducts((data as Product[]) ?? [])
+      } catch {
+        setProducts([])
+      } finally {
+        setLoading(false)
+      }
     }
     fetchProducts()
   }, [])

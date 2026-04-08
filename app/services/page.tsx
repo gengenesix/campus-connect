@@ -34,16 +34,21 @@ export default function ServicesPage() {
   useEffect(() => {
     const fetchServices = async () => {
       setLoading(true)
-      const { data } = await supabase
-        .from('services')
-        .select(`
-          id, provider_id, name, category, rate, availability, image_url, description, response_time, total_bookings,
-          provider:profiles!provider_id (name, avatar_url, rating, is_verified)
-        `)
-        .neq('status', 'deleted')
-        .order('total_bookings', { ascending: false })
-      setServices((data as Service[]) ?? [])
-      setLoading(false)
+      try {
+        const { data } = await supabase
+          .from('services')
+          .select(`
+            id, provider_id, name, category, rate, availability, image_url, description, response_time, total_bookings,
+            provider:profiles!provider_id (name, avatar_url, rating, is_verified)
+          `)
+          .neq('status', 'deleted')
+          .order('total_bookings', { ascending: false })
+        setServices((data as Service[]) ?? [])
+      } catch {
+        setServices([])
+      } finally {
+        setLoading(false)
+      }
     }
     fetchServices()
   }, [])

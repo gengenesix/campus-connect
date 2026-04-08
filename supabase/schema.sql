@@ -33,7 +33,7 @@ create table if not exists public.profiles (
   bio text,
   avatar_url text,
   role text default 'buyer' check (role in ('buyer', 'seller', 'provider', 'admin')),
-  rating numeric(3,2) default 5.0,
+  rating numeric(3,2) default 0.0,
   total_reviews int default 0,
   is_verified boolean default false,
   created_at timestamptz default now(),
@@ -218,6 +218,7 @@ drop policy if exists "Public profiles are viewable by everyone" on public.profi
 drop policy if exists "Users can update own profile" on public.profiles;
 drop policy if exists "Admins can update any profile" on public.profiles;
 drop policy if exists "Admins can ban users" on public.profiles;
+drop policy if exists "Users can create own profile" on public.profiles;
 drop policy if exists "Active products are viewable by everyone" on public.products;
 drop policy if exists "Users can insert own products (unbanned)" on public.products;
 drop policy if exists "Users can insert own products" on public.products;
@@ -247,6 +248,10 @@ create policy "Public profiles are viewable by everyone" on public.profiles
 
 create policy "Users can update own profile" on public.profiles
   for update using (auth.uid() = id);
+
+-- Users can insert their own profile row (needed when trigger hasn't run yet)
+create policy "Users can create own profile" on public.profiles
+  for insert with check (auth.uid() = id);
 
 -- Admins can update anyone's profile (e.g. set is_verified)
 create policy "Admins can update any profile" on public.profiles

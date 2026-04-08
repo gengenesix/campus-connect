@@ -90,7 +90,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     )
 
-    return () => subscription.unsubscribe()
+    // Safety: if INITIAL_SESSION never fires (stale/dead session), force loading off after 8s
+    const timeout = setTimeout(() => setLoading(false), 8000)
+
+    return () => {
+      subscription.unsubscribe()
+      clearTimeout(timeout)
+    }
   }, [])
 
   const signIn = async (email: string, password: string) => {
@@ -120,7 +126,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!user) return { error: 'Not authenticated' }
     try {
       // Strip fields that must not be changed by the user
-      const { id, email, created_at, rating, total_reviews, is_verified, is_banned, ...safeUpdates } = updates as any
+      const { id, email, created_at, rating, total_reviews, is_verified, is_banned, role: roleUpdate, ...safeUpdates } = updates as any
+      // Allow role changes (buyer ↔ seller ↔ provider) but never allow self-assigning admin
+      if (roleUpdate && roleUpdate !== 'admin') {
+        (safeUpdates as any).role = roleUpdate
+      }
 
       // Use upsert so that if the trigger-created row doesn't exist yet, it gets created.
       // Always include id + email so the upsert has everything required.
