@@ -17,6 +17,7 @@ interface AdminUser {
   avatar_url: string | null
   role: string
   is_verified: boolean
+  is_banned: boolean
   rating: number
   total_reviews: number
   created_at: string
@@ -34,6 +35,17 @@ interface AdminProduct {
   seller: { name: string | null } | null
 }
 
+interface AdminService {
+  id: string
+  name: string
+  category: string
+  rate: string | null
+  status: string
+  total_bookings: number
+  created_at: string
+  provider: { name: string | null } | null
+}
+
 function initials(name: string | null) {
   return name ? name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() : '?'
 }
@@ -42,11 +54,14 @@ export default function AdminDashboard() {
   const { user, profile, loading } = useAuth()
   const router = useRouter()
 
-  const [activeTab, setActiveTab] = useState<'users' | 'listings'>('users')
+  const [activeTab, setActiveTab] = useState<'users' | 'listings' | 'services'>('users')
   const [users, setUsers] = useState<AdminUser[]>([])
   const [products, setProducts] = useState<AdminProduct[]>([])
+  const [services, setServices] = useState<AdminService[]>([])
   const [loadingData, setLoadingData] = useState(true)
   const [verifyingId, setVerifyingId] = useState<string | null>(null)
+  const [banningId, setBanningId] = useState<string | null>(null)
+  const [removingId, setRemovingId] = useState<string | null>(null)
   const [search, setSearch] = useState('')
   const [stats, setStats] = useState({ users: 0, verified: 0, listings: 0, services: 0 })
   const [toast, setToast] = useState('')
@@ -72,17 +87,23 @@ export default function AdminDashboard() {
         .select('id, title, price, status, condition, category, views, created_at, seller:profiles!seller_id(name)')
         .neq('status', 'deleted')
         .order('created_at', { ascending: false }),
-      supabase.from('services').select('id', { count: 'exact', head: true }).neq('status', 'deleted'),
+      supabase.from('services')
+        .select('id, name, category, rate, status, total_bookings, created_at, provider:profiles!provider_id(name)')
+        .neq('status', 'deleted')
+        .order('created_at', { ascending: false }),
     ])
 
     const allUsers = (usersRes.data as AdminUser[]) ?? []
+    const allProducts = (productsRes.data as unknown as AdminProduct[]) ?? []
+    const allServices = (servicesRes.data as unknown as AdminService[]) ?? []
     setUsers(allUsers)
-    setProducts((productsRes.data as unknown as AdminProduct[]) ?? [])
+    setProducts(allProducts)
+    setServices(allServices)
     setStats({
       users: allUsers.length,
       verified: allUsers.filter(u => u.is_verified).length,
-      listings: productsRes.data?.length ?? 0,
-      services: servicesRes.count ?? 0,
+      listings: allProducts.length,
+      services: allServices.length,
     })
     setLoadingData(false)
   }, [user, profile])
@@ -99,11 +120,64 @@ export default function AdminDashboard() {
     if (!error) {
       setUsers(prev => prev.map(u => u.id === userId ? { ...u, is_verified: !currentState } : u))
       setStats(prev => ({ ...prev, verified: prev.verified + (currentState ? -1 : 1) }))
-      showToast(currentState ? 'Verification removed.' : '✓ User verified successfully!')
+      showToast(currentState ? 'Verification removed.' : '✓ User verified!')
     } else {
       showToast(`Error: ${error.message}`)
     }
     setVerifyingId(null)
+  }
+
+  const toggleBan = async (userId: string, currentState: boolean) => {
+    if (!confirm(currentState ? 'Unban this user?' : 'Ban this user? They will no longer be able to create listings.')) return
+    setBanningId(userId)
+    const { error } = await supabase
+      .from('profiles')
+      .update({ is_banned: !currentState })
+      .eq('id', userId)
+
+    if (!error) {
+      setUsers(prev => prev.map(u => u.id === userId ? { ...u, is_banned: !currentState } : u))
+      showToast(currentState ? 'User unbanned.' : '🚫 User banned.')
+    } else {
+      showToast(`Error: ${error.message}`)
+    }
+    setBanningId(null)
+  }
+
+  const removeListing = async (productId: string) => {
+    if (!confirm('Remove this listing? This cannot be undone.')) return
+    setRemovingId(productId)
+    const { error } = await supabase
+      .from('products')
+      .update({ status: 'deleted' })
+      .eq('id', productId)
+
+    if (!error) {
+      setProducts(prev => prev.filter(p => p.id !== productId))
+      setStats(prev => ({ ...prev, listings: prev.listings - 1 }))
+      showToast('Listing removed.')
+    } else {
+      showToast(`Error: ${error.message}`)
+    }
+    setRemovingId(null)
+  }
+
+  const removeService = async (serviceId: string) => {
+    if (!confirm('Remove this service? This cannot be undone.')) return
+    setRemovingId(serviceId)
+    const { error } = await supabase
+      .from('services')
+      .update({ status: 'deleted' })
+      .eq('id', serviceId)
+
+    if (!error) {
+      setServices(prev => prev.filter(s => s.id !== serviceId))
+      setStats(prev => ({ ...prev, services: prev.services - 1 }))
+      showToast('Service removed.')
+    } else {
+      showToast(`Error: ${error.message}`)
+    }
+    setRemovingId(null)
   }
 
   const filteredUsers = users.filter(u => {
@@ -117,7 +191,8 @@ export default function AdminDashboard() {
     )
   })
 
-  const unverifiedCount = filteredUsers.filter(u => !u.is_verified).length
+  const unverifiedCount = filteredUsers.filter(u => !u.is_verified && !u.is_banned).length
+  const bannedCount = users.filter(u => u.is_banned).length
 
   if (loading || !user || profile?.role !== 'admin') return null
 
@@ -164,10 +239,11 @@ export default function AdminDashboard() {
       <div className="container" style={{ paddingTop: '28px', paddingBottom: '60px' }}>
 
         {/* Stats */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginBottom: '32px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '16px', marginBottom: '32px' }}>
           {[
             { label: 'TOTAL USERS', value: stats.users, color: '#5d3fd3' },
             { label: 'VERIFIED', value: stats.verified, color: '#1B5E20' },
+            { label: 'BANNED', value: bannedCount, color: '#dc2626' },
             { label: 'LISTINGS', value: stats.listings, color: '#111' },
             { label: 'SERVICES', value: stats.services, color: '#ff3366' },
           ].map(stat => (
@@ -189,30 +265,36 @@ export default function AdminDashboard() {
 
         {/* Tabs */}
         <div style={{ display: 'flex', borderBottom: '2px solid #111', marginBottom: '24px' }}>
-          {(['users', 'listings'] as const).map(tab => (
+          {([
+            { key: 'users', label: `USERS (${stats.users})` },
+            { key: 'listings', label: `LISTINGS (${stats.listings})` },
+            { key: 'services', label: `SERVICES (${stats.services})` },
+          ] as const).map(tab => (
             <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
+              key={tab.key}
+              onClick={() => setActiveTab(tab.key)}
               style={{
                 padding: '12px 28px',
-                background: activeTab === tab ? '#111' : '#fff',
-                color: activeTab === tab ? '#fff' : '#666',
+                background: activeTab === tab.key ? '#111' : '#fff',
+                color: activeTab === tab.key ? '#fff' : '#666',
                 border: '2px solid #111', borderBottom: 'none',
                 fontFamily: '"Archivo Black", sans-serif',
                 fontSize: '12px', letterSpacing: '1px',
                 cursor: 'pointer', marginBottom: '-2px',
               }}
             >
-              {tab === 'users' ? `USERS (${stats.users})` : `LISTINGS (${stats.listings})`}
+              {tab.label}
             </button>
           ))}
         </div>
 
-        {loadingData ? (
+        {loadingData && (
           <div style={{ textAlign: 'center', padding: '60px', color: '#888', fontWeight: 600 }}>
             Loading data...
           </div>
-        ) : activeTab === 'users' ? (
+        )}
+
+        {!loadingData && activeTab === 'users' && (
           <>
             {/* Search */}
             <div style={{ display: 'flex', gap: '12px', alignItems: 'center', marginBottom: '16px' }}>
@@ -243,10 +325,10 @@ export default function AdminDashboard() {
                     gridTemplateColumns: '52px 1fr auto',
                     gap: '16px',
                     alignItems: 'center',
-                    background: '#fff',
-                    border: u.is_verified ? '2px solid #e0e0e0' : '2px solid #fbbf24',
+                    background: u.is_banned ? '#fff5f5' : '#fff',
+                    border: u.is_banned ? '2px solid #fca5a5' : u.is_verified ? '2px solid #e0e0e0' : '2px solid #fbbf24',
                     padding: '14px 16px',
-                    borderLeft: u.is_verified ? '4px solid #1B5E20' : '4px solid #f59e0b',
+                    borderLeft: u.is_banned ? '4px solid #dc2626' : u.is_verified ? '4px solid #1B5E20' : '4px solid #f59e0b',
                   }}
                 >
                   {/* Avatar */}
@@ -289,6 +371,11 @@ export default function AdminDashboard() {
                       }}>
                         {u.role.toUpperCase()}
                       </span>
+                      {u.is_banned && (
+                        <span style={{ background: '#dc2626', color: '#fff', fontSize: '10px', fontWeight: 700, padding: '2px 8px', letterSpacing: '0.5px' }}>
+                          BANNED
+                        </span>
+                      )}
                     </div>
                     <div style={{ fontSize: '12px', color: '#666' }}>{u.email}</div>
                     <div style={{ fontSize: '11px', color: '#999', marginTop: '2px' }}>
@@ -300,25 +387,43 @@ export default function AdminDashboard() {
                     </div>
                   </div>
 
-                  {/* Verify Action */}
-                  <div style={{ flexShrink: 0 }}>
+                  {/* Actions */}
+                  <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', gap: '6px' }}>
                     <button
                       onClick={() => toggleVerify(u.id, u.is_verified)}
-                      disabled={verifyingId === u.id || u.role === 'admin'}
+                      disabled={verifyingId === u.id || u.role === 'admin' || u.is_banned}
                       style={{
-                        padding: '9px 18px',
+                        padding: '7px 14px',
                         background: u.is_verified ? '#fff' : '#1d9bf0',
                         color: u.is_verified ? '#dc2626' : '#fff',
                         border: u.is_verified ? '2px solid #dc2626' : '2px solid #1d9bf0',
                         fontFamily: '"Archivo Black", sans-serif',
-                        fontSize: '11px', letterSpacing: '0.5px',
-                        cursor: (verifyingId === u.id || u.role === 'admin') ? 'not-allowed' : 'pointer',
+                        fontSize: '10px', letterSpacing: '0.5px',
+                        cursor: (verifyingId === u.id || u.role === 'admin' || u.is_banned) ? 'not-allowed' : 'pointer',
                         whiteSpace: 'nowrap',
-                        opacity: u.role === 'admin' ? 0.4 : 1,
+                        opacity: (u.role === 'admin' || u.is_banned) ? 0.4 : 1,
                       }}
                     >
                       {verifyingId === u.id ? '...' : u.is_verified ? '✕ REVOKE' : '✓ VERIFY'}
                     </button>
+                    {u.role !== 'admin' && (
+                      <button
+                        onClick={() => toggleBan(u.id, u.is_banned ?? false)}
+                        disabled={banningId === u.id}
+                        style={{
+                          padding: '7px 14px',
+                          background: u.is_banned ? '#e8f5e9' : '#fee2e2',
+                          color: u.is_banned ? '#1B5E20' : '#dc2626',
+                          border: u.is_banned ? '2px solid #1B5E20' : '2px solid #dc2626',
+                          fontFamily: '"Archivo Black", sans-serif',
+                          fontSize: '10px', letterSpacing: '0.5px',
+                          cursor: banningId === u.id ? 'not-allowed' : 'pointer',
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
+                        {banningId === u.id ? '...' : u.is_banned ? '↩ UNBAN' : '🚫 BAN'}
+                      </button>
+                    )}
                   </div>
                 </div>
               ))}
@@ -330,7 +435,9 @@ export default function AdminDashboard() {
               )}
             </div>
           </>
-        ) : (
+        )}
+
+        {!loadingData && activeTab === 'listings' && (
           <>
             <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '18px', marginBottom: '16px' }}>
               ALL LISTINGS ({products.length})
@@ -364,12 +471,72 @@ export default function AdminDashboard() {
                     >
                       VIEW →
                     </Link>
+                    <button
+                      onClick={() => removeListing(p.id)}
+                      disabled={removingId === p.id}
+                      style={{ fontSize: '12px', color: '#dc2626', fontWeight: 700, background: 'none', border: 'none', cursor: removingId === p.id ? 'not-allowed' : 'pointer', fontFamily: '"Space Grotesk", sans-serif', opacity: removingId === p.id ? 0.5 : 1 }}
+                    >
+                      {removingId === p.id ? '...' : 'REMOVE'}
+                    </button>
                   </div>
                 </div>
               ))}
               {products.length === 0 && (
                 <div style={{ textAlign: 'center', padding: '60px', color: '#888' }}>
                   No listings yet.
+                </div>
+              )}
+            </div>
+          </>
+        )}
+
+        {!loadingData && activeTab === 'services' && (
+          <>
+            <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '18px', marginBottom: '16px' }}>
+              ALL SERVICES ({services.length})
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              {services.map(s => (
+                <div key={s.id} style={{ background: '#fff', border: '2px solid #eee', padding: '14px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '16px' }}>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontWeight: 700, fontSize: '15px', marginBottom: '3px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {s.name}
+                    </div>
+                    <div style={{ fontSize: '12px', color: '#666' }}>
+                      by {(s.provider as any)?.name ?? 'Unknown'} · {s.category} · {s.rate ?? 'No rate set'}
+                    </div>
+                    <div style={{ fontSize: '11px', color: '#999', marginTop: '2px' }}>
+                      {s.total_bookings} bookings · {new Date(s.created_at).toLocaleDateString('en-GB')}
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexShrink: 0 }}>
+                    <span style={{
+                      background: s.status === 'active' ? '#dcfce7' : '#fee2e2',
+                      color: s.status === 'active' ? '#15803d' : '#dc2626',
+                      fontSize: '11px', fontWeight: 700, padding: '3px 10px',
+                      border: '1px solid currentColor',
+                    }}>
+                      {s.status.toUpperCase()}
+                    </span>
+                    <Link
+                      href={`/services/${s.id}`}
+                      style={{ fontSize: '12px', color: '#1B5E20', fontWeight: 700, textDecoration: 'none' }}
+                    >
+                      VIEW →
+                    </Link>
+                    <button
+                      onClick={() => removeService(s.id)}
+                      disabled={removingId === s.id}
+                      style={{ fontSize: '12px', color: '#dc2626', fontWeight: 700, background: 'none', border: 'none', cursor: removingId === s.id ? 'not-allowed' : 'pointer', fontFamily: '"Space Grotesk", sans-serif', opacity: removingId === s.id ? 0.5 : 1 }}
+                    >
+                      {removingId === s.id ? '...' : 'REMOVE'}
+                    </button>
+                  </div>
+                </div>
+              ))}
+              {services.length === 0 && (
+                <div style={{ textAlign: 'center', padding: '60px', color: '#888' }}>
+                  No services yet.
                 </div>
               )}
             </div>

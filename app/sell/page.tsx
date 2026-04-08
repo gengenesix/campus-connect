@@ -52,9 +52,18 @@ export default function SellPage() {
     setError('')
   }
 
+  // Sellers/providers must have name + phone + department before listing
+  const profileReady = !!(profile?.name?.trim() && profile?.phone?.trim() && profile?.department?.trim())
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!user || !profile) return
+
+    if (!profileReady) {
+      setError('Please complete your profile (name, phone, department) before listing.')
+      return
+    }
+
     if (!form.name.trim()) { setError('Item name is required.'); return }
     if (!form.category) { setError('Please select a category.'); return }
     if (!form.condition) { setError('Please select the item condition.'); return }
@@ -64,53 +73,56 @@ export default function SellPage() {
     setLoading(true)
     setError('')
 
-    let imageUrl: string | null = null
+    try {
+      let imageUrl: string | null = null
 
-    // Upload image if provided
-    if (imageFile) {
-      const ext = imageFile.name.split('.').pop()
-      const path = `products/${user.id}/${Date.now()}.${ext}`
-      const { error: uploadError } = await supabase.storage
-        .from('product-images')
-        .upload(path, imageFile, { contentType: imageFile.type })
-
-      if (uploadError) {
-        // If storage not configured, proceed without image
-        console.warn('Image upload failed:', uploadError.message)
-      } else {
-        const { data: { publicUrl } } = supabase.storage
+      // Upload image if provided
+      if (imageFile) {
+        const ext = imageFile.name.split('.').pop()
+        const path = `products/${user.id}/${Date.now()}.${ext}`
+        const { error: uploadError } = await supabase.storage
           .from('product-images')
-          .getPublicUrl(path)
-        imageUrl = publicUrl
+          .upload(path, imageFile, { contentType: imageFile.type })
+
+        if (uploadError) {
+          console.warn('Image upload failed:', uploadError.message)
+        } else {
+          const { data: { publicUrl } } = supabase.storage
+            .from('product-images')
+            .getPublicUrl(path)
+          imageUrl = publicUrl
+        }
       }
-    }
 
-    // Insert product into database
-    const { data, error: insertError } = await supabase
-      .from('products')
-      .insert({
-        seller_id: user.id,
-        title: form.name.trim(),
-        description: form.description.trim(),
-        price: Number(form.price),
-        category: form.category,
-        condition: form.condition,
-        image_url: imageUrl,
-        whatsapp: form.phone.trim() || profile.phone || null,
-        status: 'active',
-      })
-      .select('id')
-      .single()
+      // Insert product into database
+      const { data, error: insertError } = await supabase
+        .from('products')
+        .insert({
+          seller_id: user.id,
+          title: form.name.trim(),
+          description: form.description.trim(),
+          price: Number(form.price),
+          category: form.category,
+          condition: form.condition,
+          image_url: imageUrl,
+          whatsapp: form.phone.trim() || profile.phone || null,
+          status: 'active',
+        })
+        .select('id')
+        .single()
 
-    if (insertError) {
-      setError(insertError.message)
+      if (insertError) {
+        setError(insertError.message)
+        return
+      }
+
+      setNewId(data?.id ?? null)
+      setSuccess(true)
+    } catch (err: any) {
+      setError(err?.message ?? 'Something went wrong. Please try again.')
+    } finally {
       setLoading(false)
-      return
     }
-
-    setNewId(data?.id ?? null)
-    setSuccess(true)
-    setLoading(false)
   }
 
   if (authLoading) {
@@ -169,6 +181,27 @@ export default function SellPage() {
 
       <div className="container" style={{ paddingTop: '40px', paddingBottom: '80px' }}>
         <div style={{ maxWidth: '640px' }}>
+
+          {/* Profile incomplete warning */}
+          {!profileReady && (
+            <div style={{ background: '#fff8e1', border: '2px solid #f59e0b', padding: '16px 20px', marginBottom: '24px', display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
+              <span style={{ fontSize: '20px', flexShrink: 0 }}>⚠️</span>
+              <div>
+                <div style={{ fontWeight: 700, fontSize: '14px', color: '#92400e', marginBottom: '4px' }}>
+                  Complete your profile first
+                </div>
+                <p style={{ fontSize: '13px', color: '#78350f', margin: '0 0 10px' }}>
+                  To list items, sellers must have a full name, phone number, and department set on their profile.
+                </p>
+                <a
+                  href="/profile"
+                  style={{ display: 'inline-block', padding: '8px 18px', background: '#f59e0b', color: '#fff', fontFamily: '"Archivo Black", sans-serif', fontSize: '12px', textDecoration: 'none', border: '2px solid #111', letterSpacing: '0.5px' }}
+                >
+                  COMPLETE PROFILE →
+                </a>
+              </div>
+            </div>
+          )}
 
           {error && (
             <div style={{ background: '#fee2e2', border: '2px solid #ef4444', padding: '12px 16px', marginBottom: '24px', fontSize: '14px', color: '#dc2626', fontWeight: 600, display: 'flex', gap: '8px' }}>

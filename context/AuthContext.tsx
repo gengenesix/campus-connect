@@ -1,6 +1,6 @@
 "use client"
 
-import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
+import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from 'react'
 import type { User, Session } from '@supabase/supabase-js'
 import { supabase } from '@/lib/supabase'
 
@@ -19,6 +19,7 @@ export interface Profile {
   rating: number
   total_reviews: number
   is_verified: boolean
+  is_banned?: boolean
   created_at?: string
 }
 
@@ -41,8 +42,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [profile, setProfile] = useState<Profile | null>(null)
   const [session, setSession] = useState<Session | null>(null)
   const [loading, setLoading] = useState(true)
+  // Track in-flight profile fetch to avoid double-fetching
+  const fetchingRef = useRef<string | null>(null)
 
   const fetchProfile = async (userId: string) => {
+    if (fetchingRef.current === userId) return
+    fetchingRef.current = userId
     try {
       const { data, error } = await supabase
         .from('profiles')
@@ -51,27 +56,36 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .single()
       if (!error && data) setProfile(data as Profile)
     } catch {
-      // Ignore network errors — profile will be null
+      // Ignore network errors — profile will be null, user stays logged in
+    } finally {
+      fetchingRef.current = null
     }
   }
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session)
-      setUser(session?.user ?? null)
-      if (session?.user) fetchProfile(session.user.id)
-      setLoading(false)
-    })
-
+    // Use ONLY onAuthStateChange — it fires INITIAL_SESSION on mount which
+    // is the canonical way to get the current session in @supabase/ssr.
+    // Calling getSession() alongside onAuthStateChange creates a race condition
+    // where stale cached data can briefly override the validated server state.
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         setSession(session)
         setUser(session?.user ?? null)
+
         if (session?.user) {
-          await fetchProfile(session.user.id)
+          // Fetch profile on sign-in, token refresh, and initial session
+          if (
+            event === 'SIGNED_IN' ||
+            event === 'INITIAL_SESSION' ||
+            event === 'TOKEN_REFRESHED' ||
+            event === 'USER_UPDATED'
+          ) {
+            await fetchProfile(session.user.id)
+          }
         } else {
           setProfile(null)
         }
+
         setLoading(false)
       }
     )
@@ -105,13 +119,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const updateProfile = async (updates: Partial<Profile>) => {
     if (!user) return { error: 'Not authenticated' }
     try {
-      // Strip read-only fields before sending to DB
-      const { id, email, created_at, ...safeUpdates } = updates as any
+      // Strip fields that must not be changed by the user
+      const { id, email, created_at, rating, total_reviews, is_verified, is_banned, ...safeUpdates } = updates as any
+
+      // Use upsert so that if the trigger-created row doesn't exist yet, it gets created.
+      // Always include id + email so the upsert has everything required.
       const { error } = await supabase
         .from('profiles')
-        .update(safeUpdates)
-        .eq('id', user.id)
+        .upsert(
+          { id: user.id, email: user.email ?? '', ...safeUpdates },
+          { onConflict: 'id' }
+        )
+
       if (error) return { error: error.message }
+
+      // Refetch so local state reflects what was actually saved
       await fetchProfile(user.id)
       return { error: null }
     } catch (err: any) {

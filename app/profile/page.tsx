@@ -118,6 +118,25 @@ export default function ProfilePage() {
     ? profile.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()
     : user?.email?.[0]?.toUpperCase() ?? '?'
 
+  // Profile completeness calculation
+  const completenessFields = [
+    { label: 'Full Name', value: profile?.name, weight: 20 },
+    { label: 'Phone/WhatsApp', value: profile?.phone, weight: 20 },
+    { label: 'Department', value: profile?.department, weight: 15 },
+    { label: 'Profile Photo', value: profile?.avatar_url, weight: 15 },
+    { label: 'Programme/Course', value: profile?.course, weight: 10 },
+    { label: 'Year/Level', value: profile?.class_year, weight: 10 },
+    { label: 'Hostel/Location', value: profile?.hostel, weight: 5 },
+    { label: 'Bio', value: profile?.bio, weight: 5 },
+  ]
+  const completenessScore = completenessFields.reduce(
+    (sum, f) => sum + (f.value ? f.weight : 0), 0
+  )
+  const missingRequired = completenessFields
+    .filter(f => f.weight >= 15 && !f.value)
+    .map(f => f.label)
+  const isSellerOrProvider = profile?.role === 'seller' || profile?.role === 'provider'
+
   if (loading) {
     return (
       <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -154,6 +173,44 @@ export default function ProfilePage() {
           <p style={{ color: '#888', marginTop: '4px', fontSize: '14px' }}>{user.email}</p>
         </div>
       </div>
+
+      {/* Profile completion bar */}
+      {completenessScore < 100 && (
+        <div style={{ background: '#fff', borderBottom: '2px solid #111', padding: '14px 20px' }}>
+          <div className="container">
+            <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
+              <div style={{ flex: 1, minWidth: '200px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
+                  <span style={{ fontWeight: 700, fontSize: '12px', letterSpacing: '0.5px' }}>
+                    PROFILE {completenessScore}% COMPLETE
+                  </span>
+                  {isSellerOrProvider && missingRequired.length > 0 && (
+                    <span style={{ fontSize: '11px', color: '#f59e0b', fontWeight: 700 }}>
+                      ⚠️ {missingRequired.join(', ')} required to list
+                    </span>
+                  )}
+                </div>
+                <div style={{ height: '8px', background: '#f0f0f0', border: '1px solid #ddd' }}>
+                  <div style={{
+                    height: '100%',
+                    width: `${completenessScore}%`,
+                    background: completenessScore >= 80 ? '#1B5E20' : completenessScore >= 50 ? '#f59e0b' : '#dc2626',
+                    transition: 'width 0.6s ease',
+                  }} />
+                </div>
+              </div>
+              {!editing && (
+                <button
+                  onClick={() => setEditing(true)}
+                  style={{ padding: '8px 16px', background: '#111', color: '#fff', fontFamily: '"Archivo Black", sans-serif', fontSize: '11px', border: 'none', cursor: 'pointer', letterSpacing: '0.5px', flexShrink: 0 }}
+                >
+                  COMPLETE NOW →
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {saveMsg && (
         <div style={{

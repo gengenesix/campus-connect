@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
+import { useAuth } from '@/context/AuthContext'
 
 interface Product {
   id: string
@@ -55,6 +56,7 @@ function timeAgo(dateStr: string) {
 
 export default function GoodDetailPage() {
   const params = useParams<{ id: string }>()
+  const { user } = useAuth()
   const [product, setProduct] = useState<Product | null>(null)
   const [related, setRelated] = useState<RelatedProduct[]>([])
   const [loading, setLoading] = useState(true)
@@ -213,15 +215,30 @@ export default function GoodDetailPage() {
 
             {/* Actions */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '24px' }}>
-              <a
-                href={whatsappHref}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn-primary hover-lift"
-                style={{ textAlign: 'center', display: 'block', textDecoration: 'none', padding: '16px 40px' }}
-              >
-                💬 MESSAGE SELLER
-              </a>
+              {user ? (
+                <a
+                  href={whatsappHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn-primary hover-lift"
+                  style={{ textAlign: 'center', display: 'block', textDecoration: 'none', padding: '16px 40px' }}
+                >
+                  💬 MESSAGE SELLER
+                </a>
+              ) : (
+                <Link
+                  href={`/auth/login?redirect=/goods/${product.id}`}
+                  style={{
+                    textAlign: 'center', display: 'block', textDecoration: 'none',
+                    padding: '16px 40px', background: '#888', color: '#fff',
+                    fontFamily: '"Archivo Black", sans-serif', fontSize: '15px',
+                    border: '2px solid #111', boxShadow: '4px 4px 0 #111',
+                    letterSpacing: '0.5px',
+                  }}
+                >
+                  🔒 LOGIN TO CONTACT SELLER
+                </Link>
+              )}
               <Link
                 href="/goods"
                 className="btn-secondary hover-lift"

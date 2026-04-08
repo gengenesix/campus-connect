@@ -30,6 +30,7 @@ create table if not exists public.profiles (
 -- Add new columns to existing deployments (safe — ignored if columns already exist)
 alter table public.profiles add column if not exists course text;
 alter table public.profiles add column if not exists class_year text;
+alter table public.profiles add column if not exists is_banned boolean default false;
 
 -- Auto-create profile row when a new auth user signs up
 create or replace function public.handle_new_user()
@@ -188,18 +189,30 @@ returns boolean as $$
   );
 $$ language sql security definer stable;
 
+-- Returns true if the current user is NOT banned
+create or replace function public.is_not_banned()
+returns boolean as $$
+  select exists (
+    select 1 from public.profiles
+    where id = auth.uid() and (is_banned is null or is_banned = false)
+  );
+$$ language sql security definer stable;
+
 -- ============================================================
 -- DROP EXISTING POLICIES (idempotent)
 -- ============================================================
 drop policy if exists "Public profiles are viewable by everyone" on public.profiles;
 drop policy if exists "Users can update own profile" on public.profiles;
 drop policy if exists "Admins can update any profile" on public.profiles;
+drop policy if exists "Admins can ban users" on public.profiles;
 drop policy if exists "Active products are viewable by everyone" on public.products;
+drop policy if exists "Users can insert own products (unbanned)" on public.products;
 drop policy if exists "Users can insert own products" on public.products;
 drop policy if exists "Sellers can update own products" on public.products;
 drop policy if exists "Sellers can delete own products" on public.products;
 drop policy if exists "Admins can manage all products" on public.products;
 drop policy if exists "Active services are viewable by everyone" on public.services;
+drop policy if exists "Providers can insert own services (unbanned)" on public.services;
 drop policy if exists "Providers can insert own services" on public.services;
 drop policy if exists "Providers can update own services" on public.services;
 drop policy if exists "Providers can delete own services" on public.services;
@@ -233,7 +246,7 @@ create policy "Active products are viewable by everyone" on public.products
   for select using (status != 'deleted');
 
 create policy "Users can insert own products" on public.products
-  for insert with check (auth.uid() = seller_id);
+  for insert with check (auth.uid() = seller_id and public.is_not_banned());
 
 create policy "Sellers can update own products" on public.products
   for update using (auth.uid() = seller_id);
@@ -251,7 +264,7 @@ create policy "Active services are viewable by everyone" on public.services
   for select using (status != 'deleted');
 
 create policy "Providers can insert own services" on public.services
-  for insert with check (auth.uid() = provider_id);
+  for insert with check (auth.uid() = provider_id and public.is_not_banned());
 
 create policy "Providers can update own services" on public.services
   for update using (auth.uid() = provider_id);
@@ -309,10 +322,13 @@ insert into storage.buckets (id, name, public) values ('service-images', 'servic
 drop policy if exists "Avatar images are publicly accessible" on storage.objects;
 drop policy if exists "Users can upload their own avatar" on storage.objects;
 drop policy if exists "Users can update their own avatar" on storage.objects;
+drop policy if exists "Users can delete their own avatar" on storage.objects;
 drop policy if exists "Product images are publicly accessible" on storage.objects;
 drop policy if exists "Authenticated users can upload product images" on storage.objects;
+drop policy if exists "Users can delete own product images" on storage.objects;
 drop policy if exists "Service images are publicly accessible" on storage.objects;
 drop policy if exists "Authenticated users can upload service images" on storage.objects;
+drop policy if exists "Users can delete own service images" on storage.objects;
 
 create policy "Avatar images are publicly accessible" on storage.objects
   for select using (bucket_id = 'avatars');
@@ -320,16 +336,22 @@ create policy "Users can upload their own avatar" on storage.objects
   for insert with check (bucket_id = 'avatars' and auth.role() = 'authenticated');
 create policy "Users can update their own avatar" on storage.objects
   for update using (bucket_id = 'avatars' and auth.uid()::text = (storage.foldername(name))[1]);
+create policy "Users can delete their own avatar" on storage.objects
+  for delete using (bucket_id = 'avatars' and auth.uid()::text = (storage.foldername(name))[1]);
 
 create policy "Product images are publicly accessible" on storage.objects
   for select using (bucket_id = 'product-images');
 create policy "Authenticated users can upload product images" on storage.objects
   for insert with check (bucket_id = 'product-images' and auth.role() = 'authenticated');
+create policy "Users can delete own product images" on storage.objects
+  for delete using (bucket_id = 'product-images' and auth.uid()::text = (storage.foldername(name))[1]);
 
 create policy "Service images are publicly accessible" on storage.objects
   for select using (bucket_id = 'service-images');
 create policy "Authenticated users can upload service images" on storage.objects
   for insert with check (bucket_id = 'service-images' and auth.role() = 'authenticated');
+create policy "Users can delete own service images" on storage.objects
+  for delete using (bucket_id = 'service-images' and auth.uid()::text = (storage.foldername(name))[1]);
 
 -- ============================================================
 -- REALTIME
@@ -348,9 +370,12 @@ create index if not exists services_category_idx on public.services(category);
 create index if not exists messages_sender_id_idx on public.messages(sender_id);
 create index if not exists messages_receiver_id_idx on public.messages(receiver_id);
 create index if not exists messages_created_at_idx on public.messages(created_at desc);
+-- Composite index speeds up the conversation-list query (sender_id OR receiver_id)
+create index if not exists messages_conversation_idx on public.messages(sender_id, receiver_id, created_at desc);
 create index if not exists bookings_buyer_id_idx on public.bookings(buyer_id);
 create index if not exists bookings_provider_id_idx on public.bookings(provider_id);
 create index if not exists profiles_is_verified_idx on public.profiles(is_verified);
+create index if not exists profiles_role_idx on public.profiles(role);
 
 -- ============================================================
 -- UPDATED_AT TRIGGER

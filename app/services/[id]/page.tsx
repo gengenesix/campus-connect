@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
+import { useAuth } from '@/context/AuthContext'
 
 interface Service {
   id: string
@@ -34,6 +35,7 @@ interface RelatedService {
 
 export default function ServiceDetailPage() {
   const params = useParams<{ id: string }>()
+  const { user } = useAuth()
   const [service, setService] = useState<Service | null>(null)
   const [related, setRelated] = useState<RelatedService[]>([])
   const [loading, setLoading] = useState(true)
@@ -189,20 +191,34 @@ export default function ServiceDetailPage() {
 
             {/* Book */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '24px' }}>
-              <a
-                href={whatsappHref}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{
-                  textAlign: 'center', display: 'block', textDecoration: 'none',
-                  padding: '18px 40px', background: '#1B5E20', color: '#fff',
-                  fontFamily: '"Archivo Black", sans-serif', fontSize: '16px',
-                  border: '2px solid #111', boxShadow: '4px 4px 0 #111',
-                  transition: 'all 0.2s',
-                }}
-              >
-                📅 BOOK NOW
-              </a>
+              {user ? (
+                <a
+                  href={whatsappHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    textAlign: 'center', display: 'block', textDecoration: 'none',
+                    padding: '18px 40px', background: '#1B5E20', color: '#fff',
+                    fontFamily: '"Archivo Black", sans-serif', fontSize: '16px',
+                    border: '2px solid #111', boxShadow: '4px 4px 0 #111',
+                    transition: 'all 0.2s',
+                  }}
+                >
+                  📅 BOOK NOW
+                </a>
+              ) : (
+                <Link
+                  href={`/auth/login?redirect=/services/${service.id}`}
+                  style={{
+                    textAlign: 'center', display: 'block', textDecoration: 'none',
+                    padding: '18px 40px', background: '#888', color: '#fff',
+                    fontFamily: '"Archivo Black", sans-serif', fontSize: '16px',
+                    border: '2px solid #111', boxShadow: '4px 4px 0 #111',
+                  }}
+                >
+                  🔒 LOGIN TO BOOK
+                </Link>
+              )}
               <Link
                 href="/services"
                 className="btn-secondary hover-lift"
