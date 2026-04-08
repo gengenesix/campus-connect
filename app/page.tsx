@@ -1,11 +1,79 @@
 "use client"
 
+import { useState, useEffect } from 'react'
 import Link from "next/link"
 import GoodsCard from "@/components/GoodsCard"
 import ServiceCard from "@/components/ServiceCard"
-import { mockGoods, mockServices } from "@/lib/mockData"
+import { supabase } from "@/lib/supabase"
+import type { Good, Service } from "@/lib/mockData"
+import { timeAgo } from "@/lib/utils"
 
 export default function HomePage() {
+  const [goods, setGoods] = useState<Good[]>([])
+  const [services, setServices] = useState<Service[]>([])
+  const [loadingData, setLoadingData] = useState(true)
+
+  useEffect(() => {
+    const fetchFeatured = async () => {
+      const [{ data: productsData }, { data: servicesData }] = await Promise.all([
+        supabase
+          .from('products')
+          .select(`id, seller_id, title, price, condition, category, image_url, views, description, created_at, seller:profiles!seller_id (name, avatar_url, rating, is_verified)`)
+          .neq('status', 'deleted')
+          .order('created_at', { ascending: false })
+          .limit(4),
+        supabase
+          .from('services')
+          .select(`id, provider_id, name, category, rate, image_url, description, response_time, total_bookings, availability, provider:profiles!provider_id (name, avatar_url, rating, is_verified)`)
+          .neq('status', 'deleted')
+          .order('total_bookings', { ascending: false })
+          .limit(4),
+      ])
+
+      setGoods(
+        (productsData ?? []).map((p: any) => ({
+          id: p.id,
+          name: p.title,
+          price: p.price,
+          condition: p.condition,
+          category: p.category ?? 'Other',
+          seller: p.seller?.name ?? 'UMaT Student',
+          sellerId: p.seller_id,
+          sellerImage: p.seller?.avatar_url ?? '/placeholder-user.jpg',
+          sellerRating: p.seller?.rating ?? 0,
+          sellerVerified: p.seller?.is_verified ?? false,
+          image: p.image_url ?? '/placeholder.jpg',
+          description: p.description ?? '',
+          createdAt: timeAgo(p.created_at),
+          views: p.views ?? 0,
+        }))
+      )
+
+      setServices(
+        (servicesData ?? []).map((s: any) => ({
+          id: s.id,
+          name: s.name,
+          provider: s.provider?.name ?? 'UMaT Student',
+          providerId: s.provider_id,
+          providerImage: s.provider?.avatar_url ?? '/placeholder-user.jpg',
+          providerRating: s.provider?.rating ?? 0,
+          providerVerified: s.provider?.is_verified ?? false,
+          category: s.category,
+          rate: s.rate ?? 'Contact for pricing',
+          description: s.description ?? '',
+          availability: s.availability ?? 'Contact provider',
+          image: s.image_url ?? '/placeholder.jpg',
+          responseTime: s.response_time ?? 'Varies',
+          bookings: s.total_bookings ?? 0,
+        }))
+      )
+
+      setLoadingData(false)
+    }
+
+    fetchFeatured()
+  }, [])
+
   return (
     <>
       {/* Hero Section */}
@@ -35,8 +103,8 @@ export default function HomePage() {
               <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&crop=face" alt="Student" />
             </div>
             <div>
-              <div className="social-proof-title">2,000+ Active Students</div>
-              <div className="social-proof-subtitle">Growing campus community at UMaT</div>
+              <div className="social-proof-title">UMaT Campus Community</div>
+              <div className="social-proof-subtitle">Students buying, selling &amp; connecting</div>
             </div>
           </div>
         </div>
@@ -76,10 +144,10 @@ export default function HomePage() {
       <div style={{ background: '#111', color: '#fff', padding: '28px 20px', borderTop: '3px solid #1B5E20' }}>
         <div className="container" style={{ display: 'flex', justifyContent: 'space-around', flexWrap: 'wrap', gap: '20px', textAlign: 'center' }}>
           {[
-            { num: '2,000+', label: 'ACTIVE STUDENTS' },
-            { num: '500+', label: 'LIVE LISTINGS' },
+            { num: '0%', label: 'COMMISSION' },
             { num: '100%', label: 'FREE FOREVER' },
-            { num: '50+', label: 'SERVICE PROVIDERS' },
+            { num: 'P2P', label: 'DIRECT DEALS' },
+            { num: 'UMaT', label: 'CAMPUS ONLY' },
           ].map(s => (
             <div key={s.label}>
               <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '32px', color: '#a78bfa' }}>{s.num}</div>
@@ -96,11 +164,24 @@ export default function HomePage() {
             <h3>Latest Goods</h3>
             <Link href="/goods">See All →</Link>
           </div>
-          <div className="product-grid">
-            {mockGoods.slice(0, 4).map(good => (
-              <GoodsCard key={good.id} good={good} />
-            ))}
-          </div>
+          {loadingData ? (
+            <div style={{ textAlign: 'center', padding: '40px 0', color: '#888', fontWeight: 600 }}>Loading listings...</div>
+          ) : goods.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '48px 20px', border: '2px dashed #ddd' }}>
+              <div style={{ fontSize: '32px', marginBottom: '12px' }}>📦</div>
+              <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '20px', marginBottom: '8px' }}>NO LISTINGS YET</div>
+              <p style={{ color: '#888', marginBottom: '20px', fontSize: '14px' }}>Be the first to list something on Campus Connect!</p>
+              <Link href="/sell" className="btn-primary" style={{ display: 'inline-block', textDecoration: 'none', padding: '12px 28px' }}>
+                LIST AN ITEM →
+              </Link>
+            </div>
+          ) : (
+            <div className="product-grid">
+              {goods.map(good => (
+                <GoodsCard key={good.id} good={good} />
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
@@ -111,11 +192,24 @@ export default function HomePage() {
             <h3>Popular Services</h3>
             <Link href="/services">See All →</Link>
           </div>
-          <div className="product-grid">
-            {mockServices.slice(0, 4).map(service => (
-              <ServiceCard key={service.id} service={service} />
-            ))}
-          </div>
+          {loadingData ? (
+            <div style={{ textAlign: 'center', padding: '40px 0', color: '#888', fontWeight: 600 }}>Loading services...</div>
+          ) : services.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '48px 20px', border: '2px dashed #ddd' }}>
+              <div style={{ fontSize: '32px', marginBottom: '12px' }}>🛠️</div>
+              <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '20px', marginBottom: '8px' }}>NO SERVICES YET</div>
+              <p style={{ color: '#888', marginBottom: '20px', fontSize: '14px' }}>Have skills? Be the first to offer a campus service!</p>
+              <Link href="/offer-service" className="btn-primary" style={{ display: 'inline-block', textDecoration: 'none', padding: '12px 28px' }}>
+                OFFER A SERVICE →
+              </Link>
+            </div>
+          ) : (
+            <div className="product-grid">
+              {services.map(service => (
+                <ServiceCard key={service.id} service={service} />
+              ))}
+            </div>
+          )}
         </div>
       </section>
 

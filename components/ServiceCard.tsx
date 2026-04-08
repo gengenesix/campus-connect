@@ -111,7 +111,9 @@ export default function ServiceCard({ service }: ServiceCardProps) {
             />
             <span style={{ fontSize: '12px', fontWeight: 600, color: '#444' }}>{service.provider}</span>
             {service.providerVerified && <VerifiedBadge />}
-            <span style={{ fontSize: '11px', color: '#f59e0b', marginLeft: 'auto' }}>⭐ {service.providerRating}</span>
+            <span style={{ fontSize: '11px', color: service.providerRating > 0 ? '#f59e0b' : '#aaa', marginLeft: 'auto' }}>
+              {service.providerRating > 0 ? `⭐ ${service.providerRating}/5` : '★ New'}
+            </span>
           </div>
 
           <p style={{

@@ -167,7 +167,7 @@ export default function ServicesPage() {
                   provider: service.provider?.name ?? 'UMaT Student',
                   providerId: service.provider_id,
                   providerImage: service.provider?.avatar_url ?? '/placeholder-user.jpg',
-                  providerRating: service.provider?.rating ?? 5.0,
+                  providerRating: service.provider?.rating ?? 0,
                   providerVerified: service.provider?.is_verified ?? false,
                   category: service.category as any,
                   rate: service.rate ?? 'Contact for pricing',

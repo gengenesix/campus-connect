@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/context/AuthContext'
+import { timeAgo } from '@/lib/utils'
 
 interface Product {
   id: string
@@ -39,19 +40,6 @@ const conditionColors: Record<string, { bg: string; text: string }> = {
   'Like New': { bg: '#1565C0', text: '#fff' },
   'Good':     { bg: '#E65100', text: '#fff' },
   'Fair':     { bg: '#6D4C41', text: '#fff' },
-}
-
-function timeAgo(dateStr: string) {
-  const diff = Date.now() - new Date(dateStr).getTime()
-  const m = Math.floor(diff / 60000)
-  if (m < 1) return 'Just now'
-  if (m < 60) return `${m}m ago`
-  const h = Math.floor(m / 60)
-  if (h < 24) return `${h}h ago`
-  const d = Math.floor(h / 24)
-  if (d < 7) return `${d}d ago`
-  if (d < 30) return `${Math.floor(d / 7)}w ago`
-  return `${Math.floor(d / 30)}mo ago`
 }
 
 export default function GoodDetailPage() {
@@ -203,7 +191,9 @@ export default function GoodDetailPage() {
                 )}
                 <div>
                   <div style={{ fontWeight: 700, fontSize: '16px', marginBottom: '2px' }}>{product.seller?.name ?? 'UMaT Student'}</div>
-                  <div style={{ fontSize: '13px', color: '#888' }}>⭐ {product.seller?.rating?.toFixed(1) ?? '5.0'}/5 · UMaT Student</div>
+                  <div style={{ fontSize: '13px', color: '#888' }}>
+                    {product.seller?.rating ? `⭐ ${product.seller.rating.toFixed(1)}/5` : '★ New seller'} · UMaT Student
+                  </div>
                 </div>
                 {product.seller?.is_verified && (
                   <div style={{ marginLeft: 'auto', background: '#e8f5e9', color: '#1B5E20', padding: '4px 12px', fontSize: '11px', fontWeight: 700, border: '1px solid #1B5E20' }}>

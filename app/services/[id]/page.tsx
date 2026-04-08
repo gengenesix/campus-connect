@@ -184,7 +184,9 @@ export default function ServiceDetailPage() {
                 )}
                 <div>
                   <div style={{ fontWeight: 700, fontSize: '16px', marginBottom: '2px' }}>{service.provider?.name ?? 'UMaT Provider'}</div>
-                  <div style={{ fontSize: '13px', color: '#888' }}>⭐ {service.provider?.rating?.toFixed(1) ?? '5.0'}/5 · UMaT Provider</div>
+                  <div style={{ fontSize: '13px', color: '#888' }}>
+                    {service.provider?.rating ? `⭐ ${service.provider.rating.toFixed(1)}/5` : '★ New provider'} · UMaT Provider
+                  </div>
                 </div>
               </div>
             </div>

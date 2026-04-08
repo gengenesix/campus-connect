@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import GoodsCard from "@/components/GoodsCard"
 import { supabase } from "@/lib/supabase"
+import { timeAgo } from "@/lib/utils"
 
 interface Product {
   id: string
@@ -224,7 +225,7 @@ export default function GoodsPage() {
                   seller: product.seller?.name ?? 'UMaT Student',
                   sellerId: product.seller_id,
                   sellerImage: product.seller?.avatar_url ?? '/placeholder-user.jpg',
-                  sellerRating: product.seller?.rating ?? 5.0,
+                  sellerRating: product.seller?.rating ?? 0,
                   sellerVerified: product.seller?.is_verified ?? false,
                   image: product.image_url ?? '/placeholder.jpg',
                   description: product.description ?? '',
@@ -240,15 +241,3 @@ export default function GoodsPage() {
   )
 }
 
-function timeAgo(dateStr: string) {
-  const diff = Date.now() - new Date(dateStr).getTime()
-  const m = Math.floor(diff / 60000)
-  if (m < 1) return 'Just now'
-  if (m < 60) return `${m}m ago`
-  const h = Math.floor(m / 60)
-  if (h < 24) return `${h}h ago`
-  const d = Math.floor(h / 24)
-  if (d < 7) return `${d}d ago`
-  if (d < 30) return `${Math.floor(d / 7)}w ago`
-  return `${Math.floor(d / 30)}mo ago`
-}

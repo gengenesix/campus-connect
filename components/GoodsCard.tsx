@@ -111,7 +111,9 @@ export default function GoodsCard({ good }: GoodsCardProps) {
             />
             <span style={{ fontSize: '12px', fontWeight: 600, color: '#444' }}>{good.seller}</span>
             {good.sellerVerified && <VerifiedBadge />}
-            <span style={{ fontSize: '11px', color: '#f59e0b', marginLeft: 'auto' }}>⭐ {good.sellerRating}/5</span>
+            <span style={{ fontSize: '11px', color: good.sellerRating > 0 ? '#f59e0b' : '#aaa', marginLeft: 'auto' }}>
+              {good.sellerRating > 0 ? `⭐ ${good.sellerRating}/5` : '★ New'}
+            </span>
           </div>
 
           <p style={{
