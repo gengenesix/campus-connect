@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useParams } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/context/AuthContext'
@@ -135,12 +136,15 @@ export default function GoodDetailPage() {
 
           {/* LEFT — Image */}
           <div>
-            <div style={{ border: '3px solid #111', overflow: 'hidden', background: '#fff', boxShadow: '8px 8px 0 #111' }}>
-              <img
+            <div style={{ border: '3px solid #111', overflow: 'hidden', background: '#fff', boxShadow: '8px 8px 0 #111', position: 'relative', height: '460px' }}>
+              <Image
                 src={product.image_url ?? '/placeholder.jpg'}
                 alt={product.title}
-                style={{ width: '100%', height: '460px', objectFit: 'cover', display: 'block' }}
-                onError={(e) => { e.currentTarget.src = '/placeholder.jpg' }}
+                fill
+                priority
+                style={{ objectFit: 'cover' }}
+                sizes="(max-width: 768px) 100vw, 55vw"
+                onError={(e: any) => { e.currentTarget.src = '/placeholder.jpg' }}
               />
             </div>
             <div style={{ display: 'flex', gap: '8px', marginTop: '12px', flexWrap: 'wrap' }}>
@@ -178,11 +182,13 @@ export default function GoodDetailPage() {
               <div style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '1.5px', marginBottom: '12px', color: '#888' }}>SELLER</div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                 {product.seller?.avatar_url ? (
-                  <img
+                  <Image
                     src={product.seller.avatar_url}
                     alt={product.seller.name}
-                    style={{ width: '52px', height: '52px', borderRadius: '50%', border: '2px solid #111', objectFit: 'cover' }}
-                    onError={(e) => { e.currentTarget.src = '/placeholder-user.jpg' }}
+                    width={52}
+                    height={52}
+                    style={{ borderRadius: '50%', border: '2px solid #111', objectFit: 'cover' }}
+                    onError={(e: any) => { e.currentTarget.src = '/placeholder-user.jpg' }}
                   />
                 ) : (
                   <div style={{ width: '52px', height: '52px', borderRadius: '50%', background: '#1B5E20', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '18px', border: '2px solid #111' }}>
@@ -262,7 +268,9 @@ export default function GoodDetailPage() {
                     onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = '#111'; (e.currentTarget as HTMLElement).style.boxShadow = '4px 4px 0 #111' }}
                     onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = '#eee'; (e.currentTarget as HTMLElement).style.boxShadow = 'none' }}
                   >
-                    <img src={g.image_url ?? '/placeholder.jpg'} alt={g.title} style={{ width: '100%', height: '180px', objectFit: 'cover', display: 'block' }} onError={(e) => { e.currentTarget.src = '/placeholder.jpg' }} />
+                    <div style={{ position: 'relative', height: '180px', overflow: 'hidden' }}>
+                      <Image src={g.image_url ?? '/placeholder.jpg'} alt={g.title} fill style={{ objectFit: 'cover' }} sizes="33vw" onError={(e: any) => { e.currentTarget.src = '/placeholder.jpg' }} />
+                    </div>
                     <div style={{ padding: '12px' }}>
                       <div style={{ fontWeight: 700, fontSize: '14px', marginBottom: '4px' }}>{g.title}</div>
                       <div style={{ fontFamily: '"Archivo Black"', fontSize: '18px', color: '#5d3fd3' }}>GHS {g.price.toLocaleString()}</div>

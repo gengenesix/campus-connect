@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/context/AuthContext'
 import { supabase } from '@/lib/supabase'
@@ -198,20 +199,50 @@ export default function MessagesPage() {
     if (!input.trim() || !user || !activePartner || sending) return
     setSending(true)
     const content = input.trim()
+    const tempId = `opt_${Date.now()}`
+
+    // Optimistic update — show message instantly before server confirms
+    const optimisticMsg: Message = {
+      id: tempId,
+      sender_id: user.id,
+      receiver_id: activePartner,
+      content,
+      is_read: false,
+      created_at: new Date().toISOString(),
+    }
+    setMessages(prev => [...prev, optimisticMsg])
     setInput('')
 
-    const { data, error } = await supabase
-      .from('messages')
-      .insert({ sender_id: user.id, receiver_id: activePartner, content })
-      .select()
-      .single()
+    try {
+      const res = await fetch('/api/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ receiverId: activePartner, content }),
+      })
 
-    if (!error && data) {
-      setMessages(prev => [...prev, data as Message])
-      // Update last message in conversations list
-      setConversations(prev => prev.map(c =>
-        c.partner_id === activePartner ? { ...c, last_message: content, last_time: data.created_at } : c
-      ))
+      if (res.status === 429) {
+        // Rate limited — remove optimistic message and show error
+        setMessages(prev => prev.filter(m => m.id !== tempId))
+        setInput(content)
+        setSending(false)
+        return
+      }
+
+      if (res.ok) {
+        const data: Message = await res.json()
+        // Replace optimistic message with real one from server
+        setMessages(prev => prev.map(m => m.id === tempId ? data : m))
+        setConversations(prev => prev.map(c =>
+          c.partner_id === activePartner ? { ...c, last_message: content, last_time: data.created_at } : c
+        ))
+      } else {
+        // Remove optimistic message on error
+        setMessages(prev => prev.filter(m => m.id !== tempId))
+        setInput(content)
+      }
+    } catch {
+      setMessages(prev => prev.filter(m => m.id !== tempId))
+      setInput(content)
     }
     setSending(false)
   }
@@ -295,7 +326,7 @@ export default function MessagesPage() {
                   }}
                 >
                   {conv.partner_avatar ? (
-                    <img src={conv.partner_avatar} alt={conv.partner_name} style={{ width: '42px', height: '42px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0, border: '2px solid #eee' }} />
+                    <Image src={conv.partner_avatar} alt={conv.partner_name} width={42} height={42} style={{ borderRadius: '50%', objectFit: 'cover', flexShrink: 0, border: '2px solid #eee' }} />
                   ) : (
                     <div style={{ width: '42px', height: '42px', borderRadius: '50%', background: '#1B5E20', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '14px', flexShrink: 0 }}>
                       {conv.partner_name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
@@ -335,7 +366,7 @@ export default function MessagesPage() {
                     ←
                   </button>
                   {activeConv.partner_avatar ? (
-                    <img src={activeConv.partner_avatar} alt={activeConv.partner_name} style={{ width: '36px', height: '36px', borderRadius: '50%', objectFit: 'cover', border: '2px solid #111' }} />
+                    <Image src={activeConv.partner_avatar} alt={activeConv.partner_name} width={36} height={36} style={{ borderRadius: '50%', objectFit: 'cover', border: '2px solid #111' }} />
                   ) : (
                     <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: '#1B5E20', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '13px' }}>
                       {activeInitials}

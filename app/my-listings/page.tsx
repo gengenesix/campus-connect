@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/context/AuthContext'
 import { supabase } from '@/lib/supabase'
@@ -139,7 +140,7 @@ export default function MyListingsPage() {
                     <td style={{ padding: '14px 16px' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                         {listing.image_url ? (
-                          <img src={listing.image_url} alt={listing.title} style={{ width: '48px', height: '48px', objectFit: 'cover', border: '1px solid #eee', flexShrink: 0 }} />
+                          <Image src={listing.image_url} alt={listing.title} width={48} height={48} style={{ objectFit: 'cover', border: '1px solid #eee', flexShrink: 0 }} />
                         ) : (
                           <div style={{ width: '48px', height: '48px', background: '#f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', flexShrink: 0 }}>📦</div>
                         )}

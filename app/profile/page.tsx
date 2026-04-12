@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/context/AuthContext'
 import { supabase } from '@/lib/supabase'
+import imageCompression from 'browser-image-compression'
 
 const DEPARTMENTS = [
   'Mining Engineering', 'Electrical/Electronic Engineering', 'Mechanical Engineering',
@@ -71,12 +72,26 @@ export default function ProfilePage() {
     setSaveMsg('')
 
     try {
+      // Compress avatar to under 500KB before upload
+      let fileToUpload = file
+      if (file.size > 500 * 1024) {
+        try {
+          fileToUpload = await imageCompression(file, {
+            maxSizeMB: 0.5,
+            maxWidthOrHeight: 800,
+            useWebWorker: true,
+          })
+        } catch {
+          fileToUpload = file // fall back to original
+        }
+      }
+
       // Always use .jpg extension so URLs are stable (avoids duplicate files with different extensions)
       const path = `avatars/${user.id}.jpg`
 
       const { error: uploadErr } = await supabase.storage
         .from('avatars')
-        .upload(path, file, { upsert: true, contentType: file.type })
+        .upload(path, fileToUpload, { upsert: true, contentType: file.type })
 
       if (uploadErr) {
         setAvatarPreview(null)

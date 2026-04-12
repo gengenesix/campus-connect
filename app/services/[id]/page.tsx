@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useParams } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/context/AuthContext'
@@ -121,12 +122,15 @@ export default function ServiceDetailPage() {
 
           {/* LEFT — Image + Stats */}
           <div>
-            <div style={{ border: '3px solid #111', overflow: 'hidden', background: '#fff', boxShadow: '8px 8px 0 #1B5E20' }}>
-              <img
+            <div style={{ border: '3px solid #111', overflow: 'hidden', background: '#fff', boxShadow: '8px 8px 0 #1B5E20', position: 'relative', height: '400px' }}>
+              <Image
                 src={service.image_url ?? '/placeholder.jpg'}
                 alt={service.name}
-                style={{ width: '100%', height: '400px', objectFit: 'cover', display: 'block' }}
-                onError={(e) => { e.currentTarget.src = '/placeholder.jpg' }}
+                fill
+                priority
+                style={{ objectFit: 'cover' }}
+                sizes="(max-width: 768px) 100vw, 55vw"
+                onError={(e: any) => { e.currentTarget.src = '/placeholder.jpg' }}
               />
             </div>
             <div style={{ display: 'flex', gap: '8px', marginTop: '12px', flexWrap: 'wrap' }}>
@@ -171,11 +175,13 @@ export default function ServiceDetailPage() {
               <div style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '1.5px', marginBottom: '12px', color: '#888' }}>SERVICE PROVIDER</div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                 {service.provider?.avatar_url ? (
-                  <img
+                  <Image
                     src={service.provider.avatar_url}
                     alt={service.provider.name}
-                    style={{ width: '52px', height: '52px', borderRadius: '50%', border: '2px solid #111', objectFit: 'cover' }}
-                    onError={(e) => { e.currentTarget.src = '/placeholder-user.jpg' }}
+                    width={52}
+                    height={52}
+                    style={{ borderRadius: '50%', border: '2px solid #111', objectFit: 'cover' }}
+                    onError={(e: any) => { e.currentTarget.src = '/placeholder-user.jpg' }}
                   />
                 ) : (
                   <div style={{ width: '52px', height: '52px', borderRadius: '50%', background: '#1B5E20', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '18px', border: '2px solid #111' }}>
@@ -251,7 +257,9 @@ export default function ServiceDetailPage() {
                     onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = '#111'; (e.currentTarget as HTMLElement).style.boxShadow = '4px 4px 0 #1B5E20' }}
                     onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = '#eee'; (e.currentTarget as HTMLElement).style.boxShadow = 'none' }}
                   >
-                    <img src={s.image_url ?? '/placeholder.jpg'} alt={s.name} style={{ width: '100%', height: '160px', objectFit: 'cover', display: 'block' }} onError={(e) => { e.currentTarget.src = '/placeholder.jpg' }} />
+                    <div style={{ position: 'relative', height: '160px', overflow: 'hidden' }}>
+                      <Image src={s.image_url ?? '/placeholder.jpg'} alt={s.name} fill style={{ objectFit: 'cover' }} sizes="33vw" onError={(e: any) => { e.currentTarget.src = '/placeholder.jpg' }} />
+                    </div>
                     <div style={{ padding: '12px' }}>
                       <div style={{ fontWeight: 700, fontSize: '14px', marginBottom: '4px' }}>{s.name}</div>
                       <div style={{ fontFamily: '"Archivo Black"', fontSize: '16px', color: '#1B5E20' }}>{s.rate ?? 'Contact for pricing'}</div>

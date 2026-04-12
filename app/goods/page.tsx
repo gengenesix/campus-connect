@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import GoodsCard from "@/components/GoodsCard"
 import { supabase } from "@/lib/supabase"
 import { timeAgo } from "@/lib/utils"
@@ -34,54 +34,61 @@ export default function GoodsPage() {
   const [condition, setCondition] = useState('')
   const [category, setCategory] = useState('')
   const [search, setSearch] = useState('')
+  const [debouncedSearch, setDebouncedSearch] = useState('')
   const [sortBy, setSortBy] = useState('newest')
 
-  // Pick up ?q= from URL on mount (from hero search bar)
+  // Populate search from ?q= URL param on first load
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const q = new URLSearchParams(window.location.search).get('q')
-      if (q) setSearch(q)
+      if (q) { setSearch(q); setDebouncedSearch(q) }
     }
   }, [])
 
+  // Debounce text input — wait 350ms before hitting the DB
   useEffect(() => {
-    const fetchProducts = async () => {
-      setLoading(true)
-      try {
-        const { data } = await supabase
-          .from('products')
-          .select(`
-            id, seller_id, title, price, condition, category, image_url, views, description, created_at, whatsapp,
-            seller:profiles!seller_id (name, avatar_url, rating, is_verified)
-          `)
-          .neq('status', 'deleted')
-          .order('created_at', { ascending: false })
-        setProducts((data as Product[]) ?? [])
-      } catch {
-        setProducts([])
-      } finally {
-        setLoading(false)
-      }
-    }
-    fetchProducts()
-  }, [])
+    const t = setTimeout(() => setDebouncedSearch(search), 350)
+    return () => clearTimeout(t)
+  }, [search])
 
-  const filtered = products
-    .filter(p => {
-      if (condition && p.condition !== condition) return false
-      if (category && p.category !== category) return false
-      if (search) {
-        const q = search.toLowerCase()
-        if (!p.title.toLowerCase().includes(q) && !p.description.toLowerCase().includes(q)) return false
+  // Server-side filtered fetch — runs whenever any filter changes
+  const fetchProducts = useCallback(async () => {
+    setLoading(true)
+    try {
+      let query = supabase
+        .from('products')
+        .select(`
+          id, seller_id, title, price, condition, category, image_url, views, description, created_at, whatsapp,
+          seller:profiles!seller_id (name, avatar_url, rating, is_verified)
+        `)
+        .neq('status', 'deleted')
+
+      // Full-text search via GIN index (much faster than ILIKE at scale)
+      if (debouncedSearch.trim()) {
+        query = query.textSearch('search_vector', debouncedSearch.trim(), {
+          type: 'websearch',
+          config: 'english',
+        })
       }
-      return true
-    })
-    .sort((a, b) => {
-      if (sortBy === 'price-low') return a.price - b.price
-      if (sortBy === 'price-high') return b.price - a.price
-      if (sortBy === 'popular') return b.views - a.views
-      return 0 // newest — already sorted by created_at desc from DB
-    })
+
+      if (condition) query = query.eq('condition', condition)
+      if (category)  query = query.eq('category', category)
+
+      if (sortBy === 'price-low')  query = query.order('price', { ascending: true })
+      else if (sortBy === 'price-high') query = query.order('price', { ascending: false })
+      else if (sortBy === 'popular')    query = query.order('views', { ascending: false })
+      else                              query = query.order('created_at', { ascending: false })
+
+      const { data } = await query
+      setProducts((data as Product[]) ?? [])
+    } catch {
+      setProducts([])
+    } finally {
+      setLoading(false)
+    }
+  }, [debouncedSearch, condition, category, sortBy])
+
+  useEffect(() => { fetchProducts() }, [fetchProducts])
 
   const hasFilters = condition || category || search
 
@@ -171,7 +178,7 @@ export default function GoodsPage() {
           </select>
           {hasFilters && (
             <button
-              onClick={() => { setCondition(''); setCategory(''); setSearch('') }}
+              onClick={() => { setCondition(''); setCategory(''); setSearch(''); setDebouncedSearch('') }}
               style={{ padding: '10px 18px', background: '#ff3366', color: '#fff', border: '2px solid #111', fontWeight: 700, cursor: 'pointer', fontFamily: '"Space Grotesk", sans-serif', fontSize: '13px' }}
             >
               ✕ CLEAR
@@ -205,37 +212,37 @@ export default function GoodsPage() {
 
       {/* Results */}
       <div className="container" style={{ paddingTop: '28px', paddingBottom: '60px' }}>
-        {filtered.length === 0 ? (
+        {products.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '80px 20px' }}>
             <div style={{ fontSize: '48px', marginBottom: '16px' }}>🔍</div>
             <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '28px', marginBottom: '10px' }}>
-              {products.length === 0 ? 'NO LISTINGS YET' : 'NO RESULTS FOUND'}
+              {hasFilters ? 'NO RESULTS FOUND' : 'NO LISTINGS YET'}
             </div>
             <p style={{ color: '#666', marginBottom: '24px' }}>
-              {products.length === 0 ? 'Be the first to list an item on Campus Connect!' : 'Try adjusting your filters or search term'}
+              {hasFilters ? 'Try adjusting your filters or search term' : 'Be the first to list an item on Campus Connect!'}
             </p>
-            {products.length === 0 ? (
-              <a href="/sell" className="btn-primary" style={{ display: 'inline-block', textDecoration: 'none', padding: '14px 32px' }}>
-                LIST FIRST ITEM →
-              </a>
-            ) : (
+            {hasFilters ? (
               <button
-                onClick={() => { setCondition(''); setCategory(''); setSearch('') }}
+                onClick={() => { setCondition(''); setCategory(''); setSearch(''); setDebouncedSearch('') }}
                 className="btn-primary"
                 style={{ cursor: 'pointer' }}
               >
                 CLEAR FILTERS
               </button>
+            ) : (
+              <a href="/sell" className="btn-primary" style={{ display: 'inline-block', textDecoration: 'none', padding: '14px 32px' }}>
+                LIST FIRST ITEM →
+              </a>
             )}
           </div>
         ) : (
           <>
             <p style={{ marginBottom: '20px', fontWeight: 700, color: '#888', fontSize: '12px', letterSpacing: '1px', fontFamily: '"Space Grotesk", sans-serif' }}>
-              SHOWING <strong style={{ color: '#111' }}>{filtered.length}</strong> ITEM{filtered.length !== 1 ? 'S' : ''}
+              SHOWING <strong style={{ color: '#111' }}>{products.length}</strong> ITEM{products.length !== 1 ? 'S' : ''}
               {hasFilters && <span style={{ color: '#5d3fd3' }}> · FILTERED</span>}
             </p>
             <div className="product-grid">
-              {filtered.map(product => (
+              {products.map(product => (
                 <GoodsCard key={product.id} good={{
                   id: product.id,
                   name: product.title,
@@ -260,4 +267,3 @@ export default function GoodsPage() {
     </div>
   )
 }
-

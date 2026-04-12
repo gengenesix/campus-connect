@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/context/AuthContext'
 import { supabase } from '@/lib/supabase'
+import imageCompression from 'browser-image-compression'
 
 const SERVICE_CATEGORIES = ['Barbing', 'Tutoring', 'Photography', 'Laundry', 'Tech Repair', 'Design', 'Other'] as const
 
@@ -34,13 +35,27 @@ export default function OfferServicePage() {
 
   const update = (key: string, val: string) => setForm(p => ({ ...p, [key]: val }))
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
     if (file.size > 5 * 1024 * 1024) { setError('Image must be under 5MB'); return }
-    setImageFile(file)
     setImagePreview(URL.createObjectURL(file))
     setError('')
+
+    if (file.size > 500 * 1024) {
+      try {
+        const compressed = await imageCompression(file, {
+          maxSizeMB: 0.5,
+          maxWidthOrHeight: 1920,
+          useWebWorker: true,
+        })
+        setImageFile(compressed)
+      } catch {
+        setImageFile(file)
+      }
+    } else {
+      setImageFile(file)
+    }
   }
 
   // Providers must have name + phone + department before listing
@@ -80,27 +95,33 @@ export default function OfferServicePage() {
         }
       }
 
-      const { data, error: insertErr } = await supabase
-        .from('services')
-        .insert({
-          provider_id: user.id,
+      // Insert via API route (server-side rate limiting applied)
+      const res = await fetch('/api/service-listings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
           name: form.name.trim(),
           description: form.description.trim(),
           category: form.category,
           rate: form.rate.trim(),
           availability: form.availability.trim(),
-          image_url: imageUrl,
+          imageUrl,
           whatsapp: form.whatsapp.trim() || profile.phone || null,
-          status: 'active',
-        })
-        .select('id')
-        .single()
+        }),
+      })
 
-      if (insertErr) {
-        setError(insertErr.message)
+      if (res.status === 429) {
+        setError('You\'re creating services too quickly. Please wait a few minutes.')
         return
       }
 
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}))
+        setError(body.error ?? 'Something went wrong. Please try again.')
+        return
+      }
+
+      const data = await res.json()
       setNewId(data?.id ?? null)
       setSuccess(true)
     } catch (err: any) {

@@ -1,6 +1,8 @@
 "use client"
 
+import { useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useAuth } from '@/context/AuthContext'
 import type { Good } from '@/lib/mockData'
 
@@ -24,19 +26,22 @@ function VerifiedBadge() {
 export default function GoodsCard({ good }: { good: Good }) {
   const { user } = useAuth()
   const cond = conditionMeta[good.condition] || { bg: '#333', text: '#fff' }
+  const [imgSrc, setImgSrc] = useState(good.image || '/placeholder.jpg')
+  const [sellerImgSrc, setSellerImgSrc] = useState(good.sellerImage || '/placeholder-user.jpg')
 
   return (
     <Link href={`/goods/${good.id}`} style={{ textDecoration: 'none', color: 'inherit', display: 'block', height: '100%' }}>
       <div className="gc-card">
         {/* Image */}
         <div style={{ position: 'relative', height: '220px', overflow: 'hidden', background: '#f0f0f0', flexShrink: 0 }}>
-          <img
-            src={good.image}
+          <Image
+            src={imgSrc}
             alt={good.name}
+            fill
             className="gc-img"
-            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', transition: 'transform 0.45s ease' }}
-            onError={(e) => { e.currentTarget.src = '/placeholder.jpg' }}
-            loading="lazy"
+            style={{ objectFit: 'cover', transition: 'transform 0.45s ease' }}
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            onError={() => setImgSrc('/placeholder.jpg')}
           />
           {/* Bottom gradient */}
           <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '70px', background: 'linear-gradient(transparent, rgba(0,0,0,0.5))', pointerEvents: 'none' }} />
@@ -85,11 +90,14 @@ export default function GoodsCard({ good }: { good: Good }) {
 
           {/* Seller row */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '7px', marginBottom: '10px' }}>
-            <div style={{ width: '22px', height: '22px', borderRadius: '50%', flexShrink: 0, overflow: 'hidden', border: '1.5px solid #eee' }}>
-              <img
-                src={good.sellerImage} alt={good.seller}
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                onError={(e) => { e.currentTarget.src = '/placeholder-user.jpg' }}
+            <div style={{ position: 'relative', width: '22px', height: '22px', borderRadius: '50%', flexShrink: 0, overflow: 'hidden', border: '1.5px solid #eee' }}>
+              <Image
+                src={sellerImgSrc}
+                alt={good.seller}
+                width={22}
+                height={22}
+                style={{ objectFit: 'cover', width: '100%', height: '100%' }}
+                onError={() => setSellerImgSrc('/placeholder-user.jpg')}
               />
             </div>
             <span style={{ fontSize: '12px', fontWeight: 600, color: '#555', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>

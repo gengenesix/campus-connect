@@ -1,6 +1,8 @@
 "use client"
 
+import { useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useAuth } from '@/context/AuthContext'
 import type { Service } from '@/lib/mockData'
 
@@ -27,6 +29,8 @@ function VerifiedBadge() {
 export default function ServiceCard({ service }: { service: Service }) {
   const { user } = useAuth()
   const accent = categoryAccent[service.category] || '#333'
+  const [imgSrc, setImgSrc] = useState(service.image || '/placeholder.jpg')
+  const [providerImgSrc, setProviderImgSrc] = useState(service.providerImage || '/placeholder-user.jpg')
 
   return (
     <Link href={`/services/${service.id}`} style={{ textDecoration: 'none', color: 'inherit', display: 'block', height: '100%' }}>
@@ -36,13 +40,14 @@ export default function ServiceCard({ service }: { service: Service }) {
 
         {/* Image */}
         <div style={{ position: 'relative', height: '200px', overflow: 'hidden', background: '#f0f0f0', flexShrink: 0 }}>
-          <img
-            src={service.image}
+          <Image
+            src={imgSrc}
             alt={service.name}
+            fill
             className="sc-img"
-            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', transition: 'transform 0.45s ease' }}
-            onError={(e) => { e.currentTarget.src = '/placeholder.jpg' }}
-            loading="lazy"
+            style={{ objectFit: 'cover', transition: 'transform 0.45s ease' }}
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            onError={() => setImgSrc('/placeholder.jpg')}
           />
           <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '70px', background: 'linear-gradient(transparent, rgba(0,0,0,0.5))', pointerEvents: 'none' }} />
 
@@ -91,11 +96,14 @@ export default function ServiceCard({ service }: { service: Service }) {
 
           {/* Provider row */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '7px', marginBottom: '10px' }}>
-            <div style={{ width: '22px', height: '22px', borderRadius: '50%', flexShrink: 0, overflow: 'hidden', border: '1.5px solid #eee' }}>
-              <img
-                src={service.providerImage} alt={service.provider}
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                onError={(e) => { e.currentTarget.src = '/placeholder-user.jpg' }}
+            <div style={{ position: 'relative', width: '22px', height: '22px', borderRadius: '50%', flexShrink: 0, overflow: 'hidden', border: '1.5px solid #eee' }}>
+              <Image
+                src={providerImgSrc}
+                alt={service.provider}
+                width={22}
+                height={22}
+                style={{ objectFit: 'cover', width: '100%', height: '100%' }}
+                onError={() => setProviderImgSrc('/placeholder-user.jpg')}
               />
             </div>
             <span style={{ fontSize: '12px', fontWeight: 600, color: '#555', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>

@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/context/AuthContext'
 import { supabase } from '@/lib/supabase'
+import imageCompression from 'browser-image-compression'
 
 const CATEGORIES = ['Electronics', 'Clothing', 'Books', 'Furniture', 'Sports', 'Other'] as const
 const CONDITIONS = ['New', 'Like New', 'Good', 'Fair'] as const
@@ -40,16 +41,32 @@ export default function SellPage() {
 
   const update = (key: string, val: string) => setForm(p => ({ ...p, [key]: val }))
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
     if (file.size > 5 * 1024 * 1024) {
       setError('Image must be under 5MB')
       return
     }
-    setImageFile(file)
+    // Show preview immediately from original
     setImagePreview(URL.createObjectURL(file))
     setError('')
+
+    // Compress to under 500KB if needed — keeps uploads fast and storage lean
+    if (file.size > 500 * 1024) {
+      try {
+        const compressed = await imageCompression(file, {
+          maxSizeMB: 0.5,
+          maxWidthOrHeight: 1920,
+          useWebWorker: true,
+        })
+        setImageFile(compressed)
+      } catch {
+        setImageFile(file) // fall back to original if compression fails
+      }
+    } else {
+      setImageFile(file)
+    }
   }
 
   // Sellers/providers must have name + phone + department before listing
@@ -94,28 +111,33 @@ export default function SellPage() {
         }
       }
 
-      // Insert product into database
-      const { data, error: insertError } = await supabase
-        .from('products')
-        .insert({
-          seller_id: user.id,
+      // Insert via API route (server-side rate limiting applied)
+      const res = await fetch('/api/listings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
           title: form.name.trim(),
           description: form.description.trim(),
           price: Number(form.price),
           category: form.category,
           condition: form.condition,
-          image_url: imageUrl,
+          imageUrl,
           whatsapp: form.phone.trim() || profile.phone || null,
-          status: 'active',
-        })
-        .select('id')
-        .single()
+        }),
+      })
 
-      if (insertError) {
-        setError(insertError.message)
+      if (res.status === 429) {
+        setError('You\'re creating listings too quickly. Please wait a few minutes.')
         return
       }
 
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}))
+        setError(body.error ?? 'Something went wrong. Please try again.')
+        return
+      }
+
+      const data = await res.json()
       setNewId(data?.id ?? null)
       setSuccess(true)
     } catch (err: any) {

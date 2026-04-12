@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/context/AuthContext'
 import { supabase } from '@/lib/supabase'
@@ -363,11 +364,12 @@ export default function AdminDashboard() {
                   {/* Avatar */}
                   <div style={{ flexShrink: 0 }}>
                     {u.avatar_url ? (
-                      <img
+                      <Image
                         src={u.avatar_url}
                         alt={u.name ?? ''}
-                        style={{ width: '44px', height: '44px', borderRadius: '50%', objectFit: 'cover', border: '2px solid #eee' }}
-                        onError={(e) => { e.currentTarget.style.display = 'none' }}
+                        width={44}
+                        height={44}
+                        style={{ borderRadius: '50%', objectFit: 'cover', border: '2px solid #eee' }}
                       />
                     ) : (
                       <div style={{ width: '44px', height: '44px', borderRadius: '50%', background: '#1B5E20', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '14px' }}>

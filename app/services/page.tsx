@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import ServiceCard from "@/components/ServiceCard"
 import { supabase } from "@/lib/supabase"
 
@@ -30,37 +30,50 @@ export default function ServicesPage() {
   const [loading, setLoading] = useState(true)
   const [category, setCategory] = useState('')
   const [search, setSearch] = useState('')
+  const [debouncedSearch, setDebouncedSearch] = useState('')
 
+  // Debounce text input
   useEffect(() => {
-    const fetchServices = async () => {
-      setLoading(true)
-      try {
-        const { data } = await supabase
-          .from('services')
-          .select(`
-            id, provider_id, name, category, rate, availability, image_url, description, response_time, total_bookings,
-            provider:profiles!provider_id (name, avatar_url, rating, is_verified)
-          `)
-          .neq('status', 'deleted')
-          .order('total_bookings', { ascending: false })
-        setServices((data as Service[]) ?? [])
-      } catch {
-        setServices([])
-      } finally {
-        setLoading(false)
-      }
-    }
-    fetchServices()
-  }, [])
+    const t = setTimeout(() => setDebouncedSearch(search), 350)
+    return () => clearTimeout(t)
+  }, [search])
 
-  const filtered = services.filter(s => {
-    if (category && s.category !== category) return false
-    if (search) {
-      const q = search.toLowerCase()
-      if (!s.name.toLowerCase().includes(q) && !(s.provider?.name ?? '').toLowerCase().includes(q)) return false
+  // Server-side filtered fetch
+  const fetchServices = useCallback(async () => {
+    setLoading(true)
+    try {
+      let query = supabase
+        .from('services')
+        .select(`
+          id, provider_id, name, category, rate, availability, image_url, description, response_time, total_bookings,
+          provider:profiles!provider_id (name, avatar_url, rating, is_verified)
+        `)
+        .neq('status', 'deleted')
+
+      // Full-text search via GIN index on services.search_vector
+      if (debouncedSearch.trim()) {
+        query = query.textSearch('search_vector', debouncedSearch.trim(), {
+          type: 'websearch',
+          config: 'english',
+        })
+      }
+
+      if (category) query = query.eq('category', category)
+
+      query = query.order('total_bookings', { ascending: false })
+
+      const { data } = await query
+      setServices((data as Service[]) ?? [])
+    } catch {
+      setServices([])
+    } finally {
+      setLoading(false)
     }
-    return true
-  })
+  }, [debouncedSearch, category])
+
+  useEffect(() => { fetchServices() }, [fetchServices])
+
+  const hasFilters = category || search
 
   if (loading) {
     return (
@@ -70,9 +83,24 @@ export default function ServicesPage() {
             <h1 style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '48px', letterSpacing: '-1px' }}>CAMPUS SERVICES</h1>
           </div>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '80px 0', gap: '12px' }}>
-          <div style={{ width: '10px', height: '10px', background: '#1B5E20', borderRadius: '50%', animation: 'pulse 1s infinite' }} />
-          <span style={{ color: '#888', fontWeight: 600 }}>Loading services...</span>
+        <div className="container" style={{ paddingTop: '40px', paddingBottom: '60px' }}>
+          <div className="product-grid">
+            {[1,2,3,4,5,6].map(i => (
+              <div key={i} style={{ border: '2px solid #eee', overflow: 'hidden' }}>
+                <div className="skeleton" style={{ height: '4px' }} />
+                <div className="skeleton" style={{ height: '200px' }} />
+                <div style={{ padding: '14px 16px 16px' }}>
+                  <div className="skeleton" style={{ height: '16px', marginBottom: '10px', width: '85%' }} />
+                  <div className="skeleton" style={{ height: '12px', marginBottom: '6px', width: '55%' }} />
+                  <div className="skeleton" style={{ height: '12px', marginBottom: '20px', width: '40%' }} />
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <div className="skeleton" style={{ height: '22px', width: '40%' }} />
+                    <div className="skeleton" style={{ height: '22px', width: '22%' }} />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     )
@@ -117,50 +145,58 @@ export default function ServicesPage() {
 
       {/* Search */}
       <div style={{ background: '#fff', borderBottom: '1px solid #eee', padding: '12px 20px' }}>
-        <div className="container">
+        <div className="container" style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
           <input
             type="text"
             placeholder="Search services or providers..."
             value={search}
             onChange={e => setSearch(e.target.value)}
             style={{
-              width: '100%', maxWidth: '480px', padding: '10px 16px',
+              flex: 1, maxWidth: '480px', padding: '10px 16px',
               border: '2px solid #111', fontFamily: '"Space Grotesk", sans-serif',
               fontSize: '14px', fontWeight: 600, outline: 'none',
             }}
           />
+          {hasFilters && (
+            <button
+              onClick={() => { setCategory(''); setSearch(''); setDebouncedSearch('') }}
+              style={{ padding: '10px 18px', background: '#ff3366', color: '#fff', border: '2px solid #111', fontWeight: 700, cursor: 'pointer', fontFamily: '"Space Grotesk", sans-serif', fontSize: '13px' }}
+            >
+              ✕ CLEAR
+            </button>
+          )}
         </div>
       </div>
 
       {/* Results */}
       <div className="container" style={{ paddingTop: '28px', paddingBottom: '60px' }}>
-        {filtered.length === 0 ? (
+        {services.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '80px 20px' }}>
             <div style={{ fontSize: '48px', marginBottom: '16px' }}>🔍</div>
             <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '28px', marginBottom: '10px' }}>
-              {services.length === 0 ? 'NO SERVICES YET' : 'NO SERVICES FOUND'}
+              {hasFilters ? 'NO SERVICES FOUND' : 'NO SERVICES YET'}
             </div>
             <p style={{ color: '#666', marginBottom: '24px' }}>
-              {services.length === 0 ? 'Be the first to offer a service!' : 'Try a different category or search term'}
+              {hasFilters ? 'Try a different category or search term' : 'Be the first to offer a service!'}
             </p>
-            {services.length === 0 ? (
+            {hasFilters ? (
+              <button onClick={() => { setCategory(''); setSearch(''); setDebouncedSearch('') }} className="btn-primary" style={{ cursor: 'pointer' }}>
+                CLEAR FILTERS
+              </button>
+            ) : (
               <a href="/offer-service" className="btn-primary" style={{ display: 'inline-block', textDecoration: 'none', padding: '14px 32px' }}>
                 OFFER A SERVICE →
               </a>
-            ) : (
-              <button onClick={() => { setCategory(''); setSearch('') }} className="btn-primary" style={{ cursor: 'pointer' }}>
-                CLEAR FILTERS
-              </button>
             )}
           </div>
         ) : (
           <>
             <p style={{ marginBottom: '20px', fontWeight: 600, color: '#888', fontSize: '14px' }}>
-              Showing <strong style={{ color: '#111' }}>{filtered.length}</strong> service{filtered.length !== 1 ? 's' : ''}
+              Showing <strong style={{ color: '#111' }}>{services.length}</strong> service{services.length !== 1 ? 's' : ''}
               {category && ` in ${category}`}
             </p>
             <div className="product-grid">
-              {filtered.map(service => (
+              {services.map(service => (
                 <ServiceCard key={service.id} service={{
                   id: service.id,
                   name: service.name,
