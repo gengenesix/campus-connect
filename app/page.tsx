@@ -126,24 +126,27 @@ const TICKER_ITEMS = [
 const TESTIMONIALS = [
   {
     quote: "Sold my old laptop in 2 days for a great price. Way easier than WhatsApp groups — buyers come to you!",
-    name: "Kwame A.",
+    name: "Philip K.",
     dept: "Mining Engineering, Yr 3",
-    avatar: 'KA',
-    color: '#1B5E20',
+    avatar: '/images/testimonials/t1.jpg',
   },
   {
     quote: "Got my textbooks for half the price. The seller was from my department — we met at the library. Perfect.",
-    name: "Ama S.",
+    name: "Sarah A.",
     dept: "Electrical Engineering, Yr 2",
-    avatar: 'AS',
-    color: '#5d3fd3',
+    avatar: '/images/testimonials/t2.jpg',
   },
   {
-    quote: "My barbering service has 50+ bookings now. This platform gave me real visibility on campus.",
-    name: "Kofi J.",
-    dept: "Civil Engineering, Yr 4",
-    avatar: 'KJ',
-    color: '#ff3366',
+    quote: "Found my course materials and sold my old notes all in one place. Campus Connect is genuinely useful.",
+    name: "Rachel O.",
+    dept: "Civil Engineering, Yr 3",
+    avatar: '/images/testimonials/t3.jpg',
+  },
+  {
+    quote: "Got a notification that someone bought my item and I literally screamed! Listed it and it sold same day.",
+    name: "Jasmine T.",
+    dept: "Computer Science, Yr 2",
+    avatar: '/images/testimonials/t4.jpg',
   },
 ]
 
@@ -641,15 +644,15 @@ export default function HomePage() {
                 <div style={{ fontSize: '36px', color: '#eee', fontFamily: 'Georgia, serif', lineHeight: 1, marginBottom: '-8px' }}>&ldquo;</div>
                 <p style={{ fontSize: '15px', lineHeight: 1.65, color: '#333', fontWeight: 500 }}>{t.quote}</p>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginTop: 'auto', paddingTop: '8px', borderTop: '1px solid #f0f0f0' }}>
-                  <div style={{
-                    width: '40px', height: '40px', borderRadius: '50%',
-                    background: t.color, color: '#fff',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontWeight: 700, fontSize: '13px', flexShrink: 0,
-                    border: '2px solid #111',
-                  }}>
-                    {t.avatar}
-                  </div>
+                  <img
+                    src={t.avatar}
+                    alt={t.name}
+                    style={{
+                      width: '44px', height: '44px', borderRadius: '50%',
+                      objectFit: 'cover', objectPosition: 'top',
+                      flexShrink: 0, border: '2px solid #111',
+                    }}
+                  />
                   <div>
                     <div style={{ fontWeight: 700, fontSize: '14px' }}>{t.name}</div>
                     <div style={{ fontSize: '11px', color: '#888' }}>{t.dept}</div>
