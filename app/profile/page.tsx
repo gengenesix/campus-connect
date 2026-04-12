@@ -6,12 +6,14 @@ import { useRouter } from 'next/navigation'
 import { useAuth } from '@/context/AuthContext'
 import { supabase } from '@/lib/supabase'
 import imageCompression from 'browser-image-compression'
-import { FACULTIES, HOSTELS, CLASS_YEARS } from '@/lib/umat-data'
+import { FACULTIES, CLASS_YEARS } from '@/lib/umat-data'
+import { useHostels } from '@/lib/useHostels'
 
 export default function ProfilePage() {
   const { user, profile, loading, updateProfile, signOut } = useAuth()
   const router = useRouter()
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const hostels = useHostels()
 
   const [editing, setEditing] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -75,8 +77,8 @@ export default function ProfilePage() {
         }
       }
 
-      // Always use .jpg extension so URLs are stable (avoids duplicate files with different extensions)
-      const path = `avatars/${user.id}.jpg`
+      // Path: {userId}/avatar.jpg — the folder MUST be the user's ID so storage RLS works
+      const path = `${user.id}/avatar.jpg`
 
       const { error: uploadErr } = await supabase.storage
         .from('avatars')
@@ -84,7 +86,7 @@ export default function ProfilePage() {
 
       if (uploadErr) {
         setAvatarPreview(null)
-        setSaveMsg('Upload failed — ensure the avatars storage bucket exists in Supabase.')
+        setSaveMsg(`Upload failed: ${uploadErr.message}`)
         return
       }
 
@@ -476,20 +478,30 @@ export default function ProfilePage() {
                     {/* Hostel */}
                     <div>
                       <label style={{ display: 'block', fontWeight: 700, fontSize: '12px', letterSpacing: '1.5px', marginBottom: '8px' }}>HOSTEL / RESIDENCE</label>
+                      {form.hostel && !hostels.all.includes(form.hostel) && (
+                        <div style={{ marginBottom: '6px', padding: '6px 10px', background: '#fff8e1', border: '1px solid #f59e0b', fontSize: '11px', color: '#92400e', fontWeight: 600 }}>
+                          ⚠ Your saved hostel "{form.hostel}" is no longer listed. Please select an updated option below.
+                        </div>
+                      )}
                       <select
                         value={form.hostel}
                         onChange={e => setForm(p => ({ ...p, hostel: e.target.value }))}
                         style={{ width: '100%', padding: '12px 16px', border: '2px solid #111', fontFamily: '"Space Grotesk", sans-serif', fontSize: '14px', background: '#fff', boxSizing: 'border-box' }}
                       >
                         <option value="">Select hostel</option>
+                        {form.hostel && !hostels.all.includes(form.hostel) && (
+                          <option value={form.hostel} disabled style={{ color: '#aaa' }}>
+                            ⚠ {form.hostel} (outdated)
+                          </option>
+                        )}
                         <optgroup label="Main Halls of Residence">
-                          {HOSTELS.main.map(h => <option key={h} value={h}>{h}</option>)}
+                          {hostels.main.map(h => <option key={h} value={h}>{h}</option>)}
                         </optgroup>
                         <optgroup label="Private & Affiliated Hostels">
-                          {HOSTELS.private.map(h => <option key={h} value={h}>{h}</option>)}
+                          {hostels.private.map(h => <option key={h} value={h}>{h}</option>)}
                         </optgroup>
                         <optgroup label="Other">
-                          {HOSTELS.other.map(h => <option key={h} value={h}>{h}</option>)}
+                          {hostels.other.map(h => <option key={h} value={h}>{h}</option>)}
                         </optgroup>
                       </select>
                     </div>

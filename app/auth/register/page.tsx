@@ -5,7 +5,8 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/context/AuthContext'
 import { supabase } from '@/lib/supabase'
-import { FACULTIES, HOSTELS, CLASS_YEARS } from '@/lib/umat-data'
+import { FACULTIES, CLASS_YEARS } from '@/lib/umat-data'
+import { useHostels } from '@/lib/useHostels'
 
 async function signInWithGoogle() {
   await supabase.auth.signInWithOAuth({
@@ -25,6 +26,7 @@ export default function RegisterPage() {
   const [success, setSuccess] = useState(false)
   const { user } = useAuth()
   const router = useRouter()
+  const hostels = useHostels()
 
   useEffect(() => {
     if (user) router.push('/dashboard')
@@ -290,7 +292,6 @@ export default function RegisterPage() {
                     ))}
                   </select>
                 </div>
-                </div>
 
                 {/* Class Year */}
                 <div style={{ marginBottom: '16px' }}>
@@ -319,13 +320,13 @@ export default function RegisterPage() {
                   >
                     <option value="">Select hostel (optional)</option>
                     <optgroup label="Main Halls of Residence">
-                      {HOSTELS.main.map(h => <option key={h} value={h}>{h}</option>)}
+                      {hostels.main.map(h => <option key={h} value={h}>{h}</option>)}
                     </optgroup>
                     <optgroup label="Private & Affiliated Hostels">
-                      {HOSTELS.private.map(h => <option key={h} value={h}>{h}</option>)}
+                      {hostels.private.map(h => <option key={h} value={h}>{h}</option>)}
                     </optgroup>
                     <optgroup label="Other">
-                      {HOSTELS.other.map(h => <option key={h} value={h}>{h}</option>)}
+                      {hostels.other.map(h => <option key={h} value={h}>{h}</option>)}
                     </optgroup>
                   </select>
                 </div>

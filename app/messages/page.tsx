@@ -26,6 +26,13 @@ interface Conversation {
   unread: number
 }
 
+interface UserResult {
+  id: string
+  name: string
+  avatar_url: string | null
+  role: string
+}
+
 function timeAgo(dateStr: string) {
   const diff = Date.now() - new Date(dateStr).getTime()
   const m = Math.floor(diff / 60000)
@@ -40,25 +47,55 @@ function formatTime(dateStr: string) {
   return new Date(dateStr).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
 }
 
+function Avatar({ url, name, size = 42 }: { url: string | null; name: string; size?: number }) {
+  const initials = name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() || '?'
+  if (url) {
+    return (
+      <Image
+        src={url} alt={name} width={size} height={size}
+        style={{ borderRadius: '50%', objectFit: 'cover', flexShrink: 0, border: '2px solid #eee' }}
+      />
+    )
+  }
+  return (
+    <div style={{
+      width: size, height: size, borderRadius: '50%',
+      background: '#1B5E20', color: '#fff',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      fontWeight: 700, fontSize: Math.floor(size * 0.33), flexShrink: 0,
+    }}>
+      {initials}
+    </div>
+  )
+}
+
 function MessagesInner() {
-  const { user, loading: authLoading } = useAuth()
+  const { user, profile, loading: authLoading } = useAuth()
   const router = useRouter()
   const searchParams = useSearchParams()
-  const withId = searchParams.get('with')       // pre-open a conversation
-  const productId = searchParams.get('product') // attach to product
-  const productTitle = searchParams.get('title') // display context
+  const withId = searchParams.get('with')
+  const productId = searchParams.get('product')
+  const productTitle = searchParams.get('title')
 
   const [conversations, setConversations] = useState<Conversation[]>([])
   const [activePartner, setActivePartner] = useState<string | null>(null)
-  const [activePartnerProfile, setActivePartnerProfile] = useState<{ name: string; avatar_url: string | null } | null>(null)
+  const [activePartnerProfile, setActivePartnerProfile] = useState<{ name: string; avatar_url: string | null; role?: string } | null>(null)
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
   const [sending, setSending] = useState(false)
   const [loadingConvs, setLoadingConvs] = useState(true)
   const [loadingMsgs, setLoadingMsgs] = useState(false)
   const [mobileView, setMobileView] = useState<'list' | 'chat'>('list')
+
+  // New message search
+  const [showNewMsg, setShowNewMsg] = useState(false)
+  const [userSearch, setUserSearch] = useState('')
+  const [searchResults, setSearchResults] = useState<UserResult[]>([])
+  const [searching, setSearching] = useState(false)
+
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null)
+  const searchInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     if (!authLoading && !user) router.push('/auth/login?redirect=/messages')
@@ -90,14 +127,13 @@ function MessagesInner() {
     }
 
     const partnerIds = [...convMap.keys()]
-
-    // If ?with= points to someone not in any conversation yet, fetch their profile too
     const allIds = withId && !convMap.has(withId) ? [...partnerIds, withId] : partnerIds
 
-    if (allIds.length === 0) { setConversations([]); setLoadingConvs(false); return }
-
-    const { data: profiles } = await supabase.from('profiles').select('id, name, avatar_url').in('id', allIds)
-    const profileMap = new Map((profiles ?? []).map(p => [p.id, p]))
+    let profileMap = new Map<string, { name: string; avatar_url: string | null; role: string }>()
+    if (allIds.length > 0) {
+      const { data: profiles } = await supabase.from('profiles').select('id, name, avatar_url, role').in('id', allIds)
+      profileMap = new Map((profiles ?? []).map(p => [p.id, p]))
+    }
 
     const convList: Conversation[] = partnerIds.map(pid => {
       const conv = convMap.get(pid)!
@@ -107,14 +143,11 @@ function MessagesInner() {
 
     setConversations(convList)
 
-    // If ?with= is set and not yet active, open that conversation
     if (withId && !activePartner) {
       setActivePartner(withId)
       setMobileView('chat')
       const wp = profileMap.get(withId)
-      if (wp) setActivePartnerProfile({ name: wp.name, avatar_url: wp.avatar_url })
-
-      // Pre-fill input with product context
+      if (wp) setActivePartnerProfile({ name: wp.name, avatar_url: wp.avatar_url, role: wp.role })
       if (productTitle && !input) {
         setInput(`Hi, I'm interested in your listing: ${decodeURIComponent(productTitle)}`)
       }
@@ -177,6 +210,39 @@ function MessagesInner() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
 
+  // User search for new conversations
+  const searchUsers = useCallback(async (q: string) => {
+    if (!q.trim() || !user) { setSearchResults([]); return }
+    setSearching(true)
+    const { data } = await supabase
+      .from('profiles')
+      .select('id, name, avatar_url, role')
+      .ilike('name', `%${q}%`)
+      .neq('id', user.id)
+      .neq('is_banned', true)
+      .limit(8)
+    setSearchResults(data ?? [])
+    setSearching(false)
+  }, [user])
+
+  useEffect(() => {
+    const t = setTimeout(() => searchUsers(userSearch), 350)
+    return () => clearTimeout(t)
+  }, [userSearch, searchUsers])
+
+  useEffect(() => {
+    if (showNewMsg) setTimeout(() => searchInputRef.current?.focus(), 80)
+  }, [showNewMsg])
+
+  const openConversation = async (targetId: string, targetName: string, targetAvatar: string | null, targetRole: string) => {
+    setActivePartner(targetId)
+    setActivePartnerProfile({ name: targetName, avatar_url: targetAvatar, role: targetRole })
+    setShowNewMsg(false)
+    setUserSearch('')
+    setSearchResults([])
+    setMobileView('chat')
+  }
+
   const sendMessage = async () => {
     if (!input.trim() || !user || !activePartner || sending) return
     setSending(true)
@@ -208,12 +274,9 @@ function MessagesInner() {
       if (res.ok) {
         const data: Message = await res.json()
         setMessages(prev => prev.map(m => m.id === tempId ? data : m))
-
-        // Update or add conversation in the sidebar
         setConversations(prev => {
           const existing = prev.find(c => c.partner_id === activePartner)
           if (existing) return prev.map(c => c.partner_id === activePartner ? { ...c, last_message: content, last_time: data.created_at } : c)
-          // New conversation — add it
           const partnerInfo = activePartnerProfile
           return [{ partner_id: activePartner, partner_name: partnerInfo?.name ?? 'Unknown', partner_avatar: partnerInfo?.avatar_url ?? null, last_message: content, last_time: data.created_at, unread: 0 }, ...prev]
         })
@@ -231,7 +294,7 @@ function MessagesInner() {
   const activeConv = conversations.find(c => c.partner_id === activePartner)
   const displayName = activeConv?.partner_name ?? activePartnerProfile?.name ?? '...'
   const displayAvatar = activeConv?.partner_avatar ?? activePartnerProfile?.avatar_url ?? null
-  const activeInitials = displayName.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() || '?'
+  const displayRole = activePartnerProfile?.role ?? ''
 
   if (authLoading) {
     return (
@@ -245,10 +308,23 @@ function MessagesInner() {
 
   return (
     <div style={{ background: '#f8f8f8', minHeight: '80vh' }}>
+      <style>{`
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+        .msg-grid { display: grid; grid-template-columns: 300px 1fr; }
+        .msg-sidebar { display: flex; flex-direction: column; }
+        .msg-chat { display: flex; flex-direction: column; }
+        @media (max-width: 700px) {
+          .msg-grid { grid-template-columns: 1fr !important; }
+          .msg-sidebar-hidden { display: none !important; }
+          .msg-chat-hidden { display: none !important; }
+          .msg-back { display: block !important; }
+        }
+      `}</style>
+
       <div style={{ background: '#111', color: '#fff', padding: '28px 20px' }}>
         <div className="container">
           <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '32px', letterSpacing: '-1px' }}>MESSAGES</div>
-          <p style={{ color: '#666', marginTop: '4px', fontSize: '13px' }}>Real-time chat with buyers, sellers and service providers</p>
+          <p style={{ color: '#666', marginTop: '4px', fontSize: '13px' }}>Real-time chat — buyers, sellers and service providers</p>
         </div>
       </div>
 
@@ -258,37 +334,84 @@ function MessagesInner() {
             <div style={{ width: '12px', height: '12px', background: '#1B5E20', borderRadius: '50%', animation: 'pulse 1s infinite' }} />
             <span style={{ color: '#888', fontWeight: 600 }}>Loading conversations...</span>
           </div>
-        ) : conversations.length === 0 && !activePartner ? (
-          <div style={{ textAlign: 'center', padding: '80px 20px' }}>
-            <div style={{ fontSize: '64px', marginBottom: '20px' }}>💬</div>
-            <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '24px', marginBottom: '12px' }}>No messages yet</div>
-            <p style={{ color: '#888', maxWidth: '400px', margin: '0 auto 28px' }}>
-              Start a conversation by clicking "Message Seller" on any listing page.
-            </p>
-            <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
-              <Link href="/goods" style={{ padding: '12px 28px', background: '#111', color: '#fff', fontFamily: '"Archivo Black", sans-serif', fontSize: '13px', textDecoration: 'none', border: '2px solid #111', boxShadow: '4px 4px 0 #888' }}>
-                BROWSE GOODS
-              </Link>
-              <Link href="/services" style={{ padding: '12px 28px', background: '#1B5E20', color: '#fff', fontFamily: '"Archivo Black", sans-serif', fontSize: '13px', textDecoration: 'none', border: '2px solid #1B5E20', boxShadow: '4px 4px 0 #888' }}>
-                BROWSE SERVICES
-              </Link>
-            </div>
-          </div>
         ) : (
           <div
-            style={{ display: 'grid', gridTemplateColumns: '300px 1fr', gap: '0', border: '2px solid #111', boxShadow: '6px 6px 0 #111', background: '#fff', minHeight: '600px' }}
-            className="messages-grid"
+            className="msg-grid"
+            style={{ border: '2px solid #111', boxShadow: '6px 6px 0 #111', background: '#fff', minHeight: '600px' }}
           >
-            {/* Sidebar */}
+            {/* ── Sidebar ── */}
             <aside
+              className={`msg-sidebar${mobileView === 'chat' ? ' msg-sidebar-hidden' : ''}`}
               style={{ borderRight: '2px solid #111', overflowY: 'auto', maxHeight: '700px' }}
-              className={`messages-sidebar${mobileView === 'chat' ? ' messages-sidebar-hidden' : ''}`}
             >
-              <div style={{ padding: '14px 16px', borderBottom: '2px solid #111', background: '#f8f8f8' }}>
-                <span style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '12px', letterSpacing: '1px', color: '#888' }}>CONVERSATIONS</span>
+              {/* Sidebar header */}
+              <div style={{ padding: '12px 14px', borderBottom: '2px solid #111', background: '#f8f8f8', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '8px' }}>
+                <span style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '11px', letterSpacing: '1px', color: '#888' }}>CONVERSATIONS</span>
+                <button
+                  onClick={() => { setShowNewMsg(v => !v); setUserSearch(''); setSearchResults([]) }}
+                  style={{
+                    background: showNewMsg ? '#111' : '#1B5E20', color: '#fff',
+                    border: 'none', padding: '5px 12px',
+                    fontFamily: '"Archivo Black", sans-serif', fontSize: '11px',
+                    cursor: 'pointer', letterSpacing: '0.5px', flexShrink: 0,
+                  }}
+                >
+                  {showNewMsg ? '✕ CANCEL' : '+ NEW'}
+                </button>
               </div>
 
-              {/* Current partner (if not in conversations yet) */}
+              {/* New message search panel */}
+              {showNewMsg && (
+                <div style={{ borderBottom: '2px solid #111', background: '#f0f7f0' }}>
+                  <div style={{ padding: '10px 12px' }}>
+                    <input
+                      ref={searchInputRef}
+                      type="text"
+                      value={userSearch}
+                      onChange={e => setUserSearch(e.target.value)}
+                      placeholder="Search by name..."
+                      style={{
+                        width: '100%', padding: '8px 10px',
+                        border: '2px solid #1B5E20', outline: 'none',
+                        fontFamily: '"Space Grotesk", sans-serif', fontSize: '13px',
+                        boxSizing: 'border-box', background: '#fff',
+                      }}
+                    />
+                  </div>
+                  {searching && (
+                    <div style={{ padding: '6px 14px 10px', fontSize: '11px', color: '#888', fontWeight: 600 }}>Searching...</div>
+                  )}
+                  {searchResults.map(u => (
+                    <button
+                      key={u.id}
+                      onClick={() => openConversation(u.id, u.name, u.avatar_url, u.role)}
+                      style={{
+                        display: 'flex', gap: '10px', alignItems: 'center',
+                        width: '100%', padding: '10px 14px',
+                        background: 'none', border: 'none',
+                        borderBottom: '1px solid #d4edda',
+                        cursor: 'pointer', textAlign: 'left',
+                      }}
+                      onMouseEnter={e => (e.currentTarget.style.background = '#e8f5e9')}
+                      onMouseLeave={e => (e.currentTarget.style.background = 'none')}
+                    >
+                      <Avatar url={u.avatar_url} name={u.name} size={36} />
+                      <div>
+                        <div style={{ fontWeight: 700, fontSize: '13px', color: '#111' }}>{u.name}</div>
+                        <div style={{ fontSize: '10px', color: '#888', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{u.role}</div>
+                      </div>
+                    </button>
+                  ))}
+                  {!searching && userSearch.length > 0 && searchResults.length === 0 && (
+                    <div style={{ padding: '10px 14px 14px', fontSize: '12px', color: '#888', textAlign: 'center' }}>No users found for "{userSearch}"</div>
+                  )}
+                  {!userSearch && !searching && (
+                    <div style={{ padding: '6px 14px 12px', fontSize: '11px', color: '#888' }}>Type a name to find someone to message</div>
+                  )}
+                </div>
+              )}
+
+              {/* Current partner (pending first message) */}
               {activePartner && !conversations.find(c => c.partner_id === activePartner) && activePartnerProfile && (
                 <button
                   onClick={() => { setActivePartner(activePartner); setMobileView('chat') }}
@@ -298,16 +421,22 @@ function MessagesInner() {
                     borderLeft: '3px solid #1B5E20', cursor: 'pointer', textAlign: 'left',
                   }}
                 >
-                  <div style={{ width: '42px', height: '42px', borderRadius: '50%', background: '#1B5E20', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '14px', flexShrink: 0 }}>
-                    {activePartnerProfile.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
-                  </div>
+                  <Avatar url={activePartnerProfile.avatar_url} name={activePartnerProfile.name} />
                   <div style={{ flex: 1 }}>
-                    <div style={{ fontWeight: 700, fontSize: '14px', color: '#111', marginBottom: '3px' }}>{activePartnerProfile.name}</div>
+                    <div style={{ fontWeight: 700, fontSize: '14px', color: '#111', marginBottom: '2px' }}>{activePartnerProfile.name}</div>
                     <div style={{ fontSize: '11px', color: '#888' }}>New conversation</div>
                   </div>
                 </button>
               )}
 
+              {/* Conversation list */}
+              {conversations.length === 0 && !activePartner && !showNewMsg && (
+                <div style={{ padding: '32px 16px', textAlign: 'center', color: '#aaa' }}>
+                  <div style={{ fontSize: '36px', marginBottom: '8px' }}>💬</div>
+                  <div style={{ fontWeight: 700, fontSize: '12px', letterSpacing: '0.5px' }}>NO CONVERSATIONS YET</div>
+                  <div style={{ fontSize: '11px', marginTop: '6px', lineHeight: 1.5 }}>Tap <strong style={{ color: '#1B5E20' }}>+ NEW</strong> to message anyone,<br />or browse listings and tap "Message Seller"</div>
+                </div>
+              )}
               {conversations.map(conv => (
                 <button
                   key={conv.partner_id}
@@ -320,13 +449,7 @@ function MessagesInner() {
                     transition: '0.1s',
                   }}
                 >
-                  {conv.partner_avatar ? (
-                    <Image src={conv.partner_avatar} alt={conv.partner_name} width={42} height={42} style={{ borderRadius: '50%', objectFit: 'cover', flexShrink: 0, border: '2px solid #eee' }} />
-                  ) : (
-                    <div style={{ width: '42px', height: '42px', borderRadius: '50%', background: '#1B5E20', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '14px', flexShrink: 0 }}>
-                      {conv.partner_name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
-                    </div>
-                  )}
+                  <Avatar url={conv.partner_avatar} name={conv.partner_name} />
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
                       <span style={{ fontWeight: 700, fontSize: '14px', color: '#111' }}>{conv.partner_name}</span>
@@ -343,104 +466,131 @@ function MessagesInner() {
               ))}
             </aside>
 
-            {/* Chat Panel */}
+            {/* ── Chat Panel ── */}
             <div
+              className={`msg-chat${mobileView === 'list' ? ' msg-chat-hidden' : ''}`}
               style={{ display: 'flex', flexDirection: 'column' }}
-              className={`messages-chat${mobileView === 'list' ? ' messages-chat-hidden' : ''}`}
             >
-              {/* Chat Header */}
-              <div style={{ padding: '14px 20px', borderBottom: '2px solid #111', background: '#f8f8f8', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <button
-                  onClick={() => setMobileView('list')}
-                  className="messages-back-btn"
-                  style={{ display: 'none', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 700, fontSize: '18px', color: '#111', padding: '0 8px 0 0' }}
-                >←</button>
-                {activePartner && (
-                  <>
-                    {displayAvatar ? (
-                      <Image src={displayAvatar} alt={displayName} width={36} height={36} style={{ borderRadius: '50%', objectFit: 'cover', border: '2px solid #111' }} />
-                    ) : (
-                      <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: '#1B5E20', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '13px' }}>
-                        {activeInitials}
-                      </div>
-                    )}
-                    <div>
+              {activePartner ? (
+                <>
+                  {/* Chat header */}
+                  <div style={{ padding: '14px 20px', borderBottom: '2px solid #111', background: '#f8f8f8', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <button
+                      onClick={() => setMobileView('list')}
+                      className="msg-back"
+                      style={{ display: 'none', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 700, fontSize: '18px', color: '#111', padding: '0 8px 0 0' }}
+                    >←</button>
+                    <Avatar url={displayAvatar} name={displayName} size={36} />
+                    <div style={{ flex: 1 }}>
                       <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '16px' }}>{displayName}</div>
-                      {productTitle && (
-                        <div style={{ fontSize: '11px', color: '#888' }}>Re: {decodeURIComponent(productTitle)}</div>
-                      )}
-                    </div>
-                  </>
-                )}
-                {!activePartner && (
-                  <span style={{ color: '#888', fontSize: '14px' }}>Select a conversation</span>
-                )}
-              </div>
-
-              {/* Messages */}
-              <div style={{ flex: 1, overflowY: 'auto', padding: '20px', display: 'flex', flexDirection: 'column', gap: '12px', maxHeight: '480px', minHeight: '400px' }}>
-                {loadingMsgs ? (
-                  <div style={{ textAlign: 'center', padding: '40px', color: '#888' }}>Loading messages...</div>
-                ) : messages.length === 0 ? (
-                  <div style={{ textAlign: 'center', padding: '60px 20px', color: '#888' }}>
-                    <div style={{ fontSize: '40px', marginBottom: '12px' }}>👋</div>
-                    <div style={{ fontWeight: 600 }}>Say hello to get started!</div>
-                  </div>
-                ) : (
-                  messages.map(msg => {
-                    const isMine = msg.sender_id === user.id
-                    return (
-                      <div key={msg.id} style={{ display: 'flex', justifyContent: isMine ? 'flex-end' : 'flex-start' }}>
-                        <div style={{
-                          maxWidth: '68%',
-                          background: isMine ? '#111' : '#f0f0f0',
-                          color: isMine ? '#fff' : '#111',
-                          padding: '10px 14px',
-                          borderRadius: isMine ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
-                          wordBreak: 'break-word',
-                        }}>
-                          <p style={{ fontSize: '14px', lineHeight: 1.5, margin: 0 }}>{msg.content}</p>
-                          <p style={{ fontSize: '10px', marginTop: '4px', opacity: 0.6, textAlign: 'right', margin: '4px 0 0' }}>{formatTime(msg.created_at)}</p>
-                        </div>
+                      <div style={{ fontSize: '11px', color: '#888', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                        {displayRole || 'Student'}
+                        {productTitle && ` · Re: ${decodeURIComponent(productTitle)}`}
                       </div>
-                    )
-                  })
-                )}
-                <div ref={messagesEndRef} />
-              </div>
+                    </div>
+                    {/* Link to their profile */}
+                    <Link
+                      href={`/profile/${activePartner}`}
+                      style={{ fontSize: '11px', color: '#5d3fd3', fontWeight: 700, textDecoration: 'none', padding: '4px 8px', border: '1px solid #5d3fd3', flexShrink: 0 }}
+                      title="View profile"
+                    >
+                      PROFILE
+                    </Link>
+                  </div>
 
-              {/* Input */}
-              <div style={{ padding: '14px 16px', borderTop: '2px solid #111', display: 'flex', gap: '10px', background: '#fff' }}>
-                <input
-                  type="text"
-                  value={input}
-                  onChange={e => setInput(e.target.value)}
-                  onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage() } }}
-                  placeholder="Type a message... (Enter to send)"
-                  disabled={!activePartner}
-                  style={{
-                    flex: 1, padding: '12px 16px',
-                    border: '2px solid #111', outline: 'none',
-                    fontFamily: '"Space Grotesk", sans-serif', fontSize: '14px',
-                  }}
-                  onFocus={e => (e.currentTarget.style.borderColor = '#1B5E20')}
-                  onBlur={e => (e.currentTarget.style.borderColor = '#111')}
-                />
-                <button
-                  onClick={sendMessage}
-                  disabled={!input.trim() || sending || !activePartner}
-                  style={{
-                    padding: '12px 24px',
-                    background: (!input.trim() || sending || !activePartner) ? '#888' : '#1B5E20',
-                    color: '#fff', border: '2px solid #111',
-                    fontFamily: '"Archivo Black", sans-serif', fontSize: '13px',
-                    cursor: (!input.trim() || sending || !activePartner) ? 'not-allowed' : 'pointer',
-                    letterSpacing: '0.5px',
-                  }}
-                >
-                  {sending ? '...' : 'SEND →'}
-                </button>
-              </div>
+                  {/* Messages */}
+                  <div style={{ flex: 1, overflowY: 'auto', padding: '20px', display: 'flex', flexDirection: 'column', gap: '12px', maxHeight: '480px', minHeight: '400px' }}>
+                    {loadingMsgs ? (
+                      <div style={{ textAlign: 'center', padding: '40px', color: '#888' }}>Loading messages...</div>
+                    ) : messages.length === 0 ? (
+                      <div style={{ textAlign: 'center', padding: '60px 20px', color: '#888' }}>
+                        <div style={{ fontSize: '40px', marginBottom: '12px' }}>👋</div>
+                        <div style={{ fontWeight: 600 }}>Say hello to get started!</div>
+                        <div style={{ fontSize: '12px', marginTop: '6px' }}>You can talk about listings, prices, delivery — anything.</div>
+                      </div>
+                    ) : (
+                      messages.map(msg => {
+                        const isMine = msg.sender_id === user.id
+                        return (
+                          <div key={msg.id} style={{ display: 'flex', justifyContent: isMine ? 'flex-end' : 'flex-start', alignItems: 'flex-end', gap: '8px' }}>
+                            {!isMine && <Avatar url={displayAvatar} name={displayName} size={28} />}
+                            <div style={{
+                              maxWidth: '68%',
+                              background: isMine ? '#111' : '#f0f0f0',
+                              color: isMine ? '#fff' : '#111',
+                              padding: '10px 14px',
+                              borderRadius: isMine ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
+                              wordBreak: 'break-word',
+                            }}>
+                              <p style={{ fontSize: '14px', lineHeight: 1.5, margin: 0 }}>{msg.content}</p>
+                              <p style={{ fontSize: '10px', marginTop: '4px', opacity: 0.6, textAlign: 'right', margin: '4px 0 0' }}>{formatTime(msg.created_at)}</p>
+                            </div>
+                            {isMine && <Avatar url={profile?.avatar_url ?? null} name={profile?.name ?? 'Me'} size={28} />}
+                          </div>
+                        )
+                      })
+                    )}
+                    <div ref={messagesEndRef} />
+                  </div>
+
+                  {/* Input */}
+                  <div style={{ padding: '14px 16px', borderTop: '2px solid #111', display: 'flex', gap: '10px', background: '#fff' }}>
+                    <input
+                      type="text"
+                      value={input}
+                      onChange={e => setInput(e.target.value)}
+                      onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage() } }}
+                      placeholder="Type a message... (Enter to send)"
+                      style={{
+                        flex: 1, padding: '12px 16px',
+                        border: '2px solid #111', outline: 'none',
+                        fontFamily: '"Space Grotesk", sans-serif', fontSize: '14px',
+                      }}
+                      onFocus={e => (e.currentTarget.style.borderColor = '#1B5E20')}
+                      onBlur={e => (e.currentTarget.style.borderColor = '#111')}
+                    />
+                    <button
+                      onClick={sendMessage}
+                      disabled={!input.trim() || sending}
+                      style={{
+                        padding: '12px 24px',
+                        background: (!input.trim() || sending) ? '#888' : '#1B5E20',
+                        color: '#fff', border: '2px solid #111',
+                        fontFamily: '"Archivo Black", sans-serif', fontSize: '13px',
+                        cursor: (!input.trim() || sending) ? 'not-allowed' : 'pointer',
+                        letterSpacing: '0.5px',
+                      }}
+                    >
+                      {sending ? '...' : 'SEND →'}
+                    </button>
+                  </div>
+                </>
+              ) : (
+                /* No active conversation — welcome/empty state */
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '60px 24px', color: '#888', textAlign: 'center' }}>
+                  <div style={{ fontSize: '56px', marginBottom: '16px' }}>💬</div>
+                  <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '22px', color: '#111', marginBottom: '10px' }}>
+                    START A CONVERSATION
+                  </div>
+                  <p style={{ fontSize: '14px', maxWidth: '320px', lineHeight: 1.7, marginBottom: '24px' }}>
+                    Pick someone from the left, or hit <strong style={{ color: '#1B5E20' }}>+ NEW</strong> to message any buyer, seller, or service provider on campus.
+                  </p>
+                  <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', justifyContent: 'center' }}>
+                    <button
+                      onClick={() => { setShowNewMsg(true) }}
+                      style={{ padding: '10px 20px', background: '#1B5E20', color: '#fff', fontFamily: '"Archivo Black", sans-serif', fontSize: '12px', border: '2px solid #111', cursor: 'pointer', boxShadow: '3px 3px 0 #111' }}
+                    >
+                      + NEW MESSAGE
+                    </button>
+                    <Link href="/goods" style={{ padding: '10px 20px', border: '2px solid #111', fontWeight: 700, fontSize: '12px', textDecoration: 'none', color: '#111', boxShadow: '3px 3px 0 #888', display: 'inline-block' }}>
+                      BROWSE GOODS
+                    </Link>
+                    <Link href="/services" style={{ padding: '10px 20px', background: '#111', color: '#fff', fontFamily: '"Archivo Black", sans-serif', fontSize: '12px', textDecoration: 'none', border: '2px solid #111', boxShadow: '3px 3px 0 #888', display: 'inline-block' }}>
+                      BROWSE SERVICES
+                    </Link>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         )}

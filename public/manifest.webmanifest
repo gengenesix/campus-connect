@@ -1,0 +1,59 @@
+{
+  "name": "Campus Connect — UMaT Marketplace",
+  "short_name": "Campus Connect",
+  "description": "Buy, sell and book campus services — free for UMaT students. No commission, no hidden fees.",
+  "start_url": "/?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#f8f8f8",
+  "theme_color": "#111111",
+  "lang": "en",
+  "categories": ["shopping", "education", "lifestyle"],
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-dark-32x32.png",
+      "sizes": "32x32",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/apple-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Browse Goods",
+      "short_name": "Goods",
+      "url": "/goods",
+      "description": "Browse student goods for sale"
+    },
+    {
+      "name": "Browse Services",
+      "short_name": "Services",
+      "url": "/services",
+      "description": "Browse campus services"
+    },
+    {
+      "name": "Messages",
+      "short_name": "Messages",
+      "url": "/messages",
+      "description": "View your messages"
+    },
+    {
+      "name": "Sell an Item",
+      "short_name": "Sell",
+      "url": "/sell",
+      "description": "List something for sale"
+    }
+  ]
+}

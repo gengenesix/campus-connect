@@ -1,5 +1,6 @@
 import type React from "react"
-import type { Metadata } from "next"
+import type { Metadata, Viewport } from "next"
+import Script from "next/script"
 import "./globals.css"
 import SiteNav from "@/components/SiteNav"
 import SiteFooter from "@/components/SiteFooter"
@@ -17,8 +18,22 @@ export const metadata: Metadata = {
     type: "website",
   },
   icons: {
-    icon: "/icon.png",
+    icon: "/icon.svg",
+    apple: "/apple-icon.png",
   },
+  manifest: "/manifest.webmanifest",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "Campus Connect",
+  },
+}
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  minimumScale: 1,
+  themeColor: "#111111",
 }
 
 export default function RootLayout({
@@ -56,6 +71,22 @@ export default function RootLayout({
             }}
           />
         </AuthProvider>
+
+        {/* PWA service worker registration */}
+        <Script
+          id="sw-register"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              if ('serviceWorker' in navigator) {
+                window.addEventListener('load', function() {
+                  navigator.serviceWorker.register('/sw.js')
+                    .catch(function(err) { console.warn('SW registration failed:', err) })
+                })
+              }
+            `,
+          }}
+        />
       </body>
     </html>
   )
