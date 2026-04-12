@@ -6,18 +6,7 @@ import { useRouter } from 'next/navigation'
 import { useAuth } from '@/context/AuthContext'
 import { supabase } from '@/lib/supabase'
 import imageCompression from 'browser-image-compression'
-
-const DEPARTMENTS = [
-  'Mining Engineering', 'Electrical/Electronic Engineering', 'Mechanical Engineering',
-  'Computer Science & Engineering', 'Geomatic Engineering', 'Petroleum Engineering',
-  'Metallurgical Engineering', 'Civil Engineering', 'Materials Engineering',
-  'Environmental & Safety Engineering', 'Other',
-]
-const HOSTELS = [
-  'Kwame Nkrumah Hall', 'Akuafo Hall', 'Mensah Sarbah Hall',
-  'Volta Hall', 'Commonwealth Hall', 'Off-Campus', 'Other',
-]
-const CLASS_YEARS = ['Year 1', 'Year 2', 'Year 3', 'Year 4', 'Year 5', 'Postgraduate', 'PhD']
+import { FACULTIES, HOSTELS, CLASS_YEARS } from '@/lib/umat-data'
 
 export default function ProfilePage() {
   const { user, profile, loading, updateProfile, signOut } = useAuth()
@@ -454,29 +443,21 @@ export default function ProfilePage() {
                       />
                     </div>
 
-                    {/* Department */}
+                    {/* Programme / Course */}
                     <div>
-                      <label style={{ display: 'block', fontWeight: 700, fontSize: '12px', letterSpacing: '1.5px', marginBottom: '8px' }}>DEPARTMENT</label>
+                      <label style={{ display: 'block', fontWeight: 700, fontSize: '12px', letterSpacing: '1.5px', marginBottom: '8px' }}>PROGRAMME / COURSE</label>
                       <select
                         value={form.department}
                         onChange={e => setForm(p => ({ ...p, department: e.target.value }))}
                         style={{ width: '100%', padding: '12px 16px', border: '2px solid #111', fontFamily: '"Space Grotesk", sans-serif', fontSize: '14px', background: '#fff', boxSizing: 'border-box' }}
                       >
-                        <option value="">Select department</option>
-                        {DEPARTMENTS.map(d => <option key={d} value={d}>{d}</option>)}
+                        <option value="">Select your programme</option>
+                        {FACULTIES.map(f => (
+                          <optgroup key={f.short} label={`${f.name}`}>
+                            {f.programmes.map(p => <option key={p} value={p}>{p}</option>)}
+                          </optgroup>
+                        ))}
                       </select>
-                    </div>
-
-                    {/* Course */}
-                    <div>
-                      <label style={{ display: 'block', fontWeight: 700, fontSize: '12px', letterSpacing: '1.5px', marginBottom: '8px' }}>PROGRAMME / COURSE</label>
-                      <input
-                        type="text"
-                        value={form.course}
-                        onChange={e => setForm(p => ({ ...p, course: e.target.value }))}
-                        placeholder="e.g. BSc Mining Engineering"
-                        style={{ width: '100%', padding: '12px 16px', border: '2px solid #111', fontFamily: '"Space Grotesk", sans-serif', fontSize: '14px', outline: 'none', boxSizing: 'border-box' }}
-                      />
                     </div>
 
                     {/* Class Year */}
@@ -494,14 +475,22 @@ export default function ProfilePage() {
 
                     {/* Hostel */}
                     <div>
-                      <label style={{ display: 'block', fontWeight: 700, fontSize: '12px', letterSpacing: '1.5px', marginBottom: '8px' }}>HOSTEL / AREA</label>
+                      <label style={{ display: 'block', fontWeight: 700, fontSize: '12px', letterSpacing: '1.5px', marginBottom: '8px' }}>HOSTEL / RESIDENCE</label>
                       <select
                         value={form.hostel}
                         onChange={e => setForm(p => ({ ...p, hostel: e.target.value }))}
                         style={{ width: '100%', padding: '12px 16px', border: '2px solid #111', fontFamily: '"Space Grotesk", sans-serif', fontSize: '14px', background: '#fff', boxSizing: 'border-box' }}
                       >
                         <option value="">Select hostel</option>
-                        {HOSTELS.map(h => <option key={h} value={h}>{h}</option>)}
+                        <optgroup label="Main Halls of Residence">
+                          {HOSTELS.main.map(h => <option key={h} value={h}>{h}</option>)}
+                        </optgroup>
+                        <optgroup label="Private & Affiliated Hostels">
+                          {HOSTELS.private.map(h => <option key={h} value={h}>{h}</option>)}
+                        </optgroup>
+                        <optgroup label="Other">
+                          {HOSTELS.other.map(h => <option key={h} value={h}>{h}</option>)}
+                        </optgroup>
                       </select>
                     </div>
 
@@ -559,8 +548,7 @@ export default function ProfilePage() {
                       { label: 'FULL NAME', value: profile?.name },
                       { label: 'EMAIL', value: user.email },
                       { label: 'PHONE / WHATSAPP', value: profile?.phone },
-                      { label: 'DEPARTMENT', value: profile?.department },
-                      { label: 'PROGRAMME / COURSE', value: profile?.course },
+                      { label: 'PROGRAMME / COURSE', value: profile?.department },
                       { label: 'YEAR / LEVEL', value: profile?.class_year },
                       { label: 'HOSTEL', value: profile?.hostel },
                     ].map(field => (

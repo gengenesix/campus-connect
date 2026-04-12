@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/context/AuthContext'
 import { supabase } from '@/lib/supabase'
+import { FACULTIES, HOSTELS, CLASS_YEARS } from '@/lib/umat-data'
 
 async function signInWithGoogle() {
   await supabase.auth.signInWithOAuth({
@@ -12,20 +13,6 @@ async function signInWithGoogle() {
     options: { redirectTo: `${window.location.origin}/auth/callback` },
   })
 }
-
-const DEPARTMENTS = [
-  'Mining Engineering', 'Electrical/Electronic Engineering', 'Mechanical Engineering',
-  'Computer Science & Engineering', 'Geomatic Engineering', 'Petroleum Engineering',
-  'Metallurgical Engineering', 'Civil Engineering', 'Materials Engineering',
-  'Environmental & Safety Engineering', 'Other',
-]
-
-const HOSTELS = [
-  'Kwame Nkrumah Hall', 'Akuafo Hall', 'Mensah Sarbah Hall',
-  'Volta Hall', 'Commonwealth Hall', 'Off-Campus', 'Other',
-]
-
-const CLASS_YEARS = ['Year 1', 'Year 2', 'Year 3', 'Year 4', 'Year 5', 'Postgraduate', 'PhD']
 
 export default function RegisterPage() {
   const [step, setStep] = useState(1)
@@ -285,33 +272,24 @@ export default function RegisterPage() {
                   )}
                 </div>
 
-                {/* Department */}
+                {/* Programme / Course */}
                 <div style={{ marginBottom: '16px' }}>
                   <label style={{ display: 'block', fontWeight: 700, fontSize: '12px', letterSpacing: '1.5px', marginBottom: '8px' }}>
-                    DEPARTMENT {isSeller ? '*' : ''}
+                    PROGRAMME / COURSE {isSeller ? '*' : ''}
                   </label>
                   <select
                     value={form.department}
                     onChange={e => update('department', e.target.value)}
                     style={{ width: '100%', padding: '13px 16px', border: `2px solid ${isSeller && !form.department ? '#f59e0b' : '#111'}`, fontFamily: '"Space Grotesk", sans-serif', fontSize: '14px', background: '#fff', boxSizing: 'border-box', outline: 'none' }}
                   >
-                    <option value="">Select your department{isSeller ? ' (required)' : ' (optional)'}</option>
-                    {DEPARTMENTS.map(d => <option key={d} value={d}>{d}</option>)}
+                    <option value="">Select your programme{isSeller ? ' (required)' : ' (optional)'}</option>
+                    {FACULTIES.map(f => (
+                      <optgroup key={f.short} label={f.name}>
+                        {f.programmes.map(p => <option key={p} value={p}>{p}</option>)}
+                      </optgroup>
+                    ))}
                   </select>
                 </div>
-
-                {/* Course */}
-                <div style={{ marginBottom: '16px' }}>
-                  <label style={{ display: 'block', fontWeight: 700, fontSize: '12px', letterSpacing: '1.5px', marginBottom: '8px' }}>
-                    PROGRAMME / COURSE
-                  </label>
-                  <input
-                    type="text"
-                    value={form.course}
-                    onChange={e => update('course', e.target.value)}
-                    placeholder="e.g. BSc Mining Engineering"
-                    style={{ width: '100%', padding: '13px 16px', border: '2px solid #ddd', fontFamily: '"Space Grotesk", sans-serif', fontSize: '14px', outline: 'none', boxSizing: 'border-box' }}
-                  />
                 </div>
 
                 {/* Class Year */}
@@ -340,7 +318,15 @@ export default function RegisterPage() {
                     style={{ width: '100%', padding: '13px 16px', border: '2px solid #ddd', fontFamily: '"Space Grotesk", sans-serif', fontSize: '14px', background: '#fff', boxSizing: 'border-box', outline: 'none' }}
                   >
                     <option value="">Select hostel (optional)</option>
-                    {HOSTELS.map(h => <option key={h} value={h}>{h}</option>)}
+                    <optgroup label="Main Halls of Residence">
+                      {HOSTELS.main.map(h => <option key={h} value={h}>{h}</option>)}
+                    </optgroup>
+                    <optgroup label="Private & Affiliated Hostels">
+                      {HOSTELS.private.map(h => <option key={h} value={h}>{h}</option>)}
+                    </optgroup>
+                    <optgroup label="Other">
+                      {HOSTELS.other.map(h => <option key={h} value={h}>{h}</option>)}
+                    </optgroup>
                   </select>
                 </div>
 
