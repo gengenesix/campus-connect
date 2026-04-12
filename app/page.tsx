@@ -12,7 +12,7 @@ import { timeAgo } from "@/lib/utils"
 const SHOWCASE = [
   {
     label: 'BRAIDS',
-    sublabel: 'Cornrows, box braids & locs',
+    sublabel: 'Box braids, cornrows & locs',
     href: '/services',
     img: '/images/showcase/braids.jpg',
     tag: 'HAIR',
@@ -39,10 +39,24 @@ const SHOWCASE = [
     tag: 'FOOD',
   },
   {
+    label: 'SOBOLO',
+    sublabel: 'Cold & refreshing hibiscus drink',
+    href: '/goods',
+    img: '/images/showcase/sobolo.jpg',
+    tag: 'FOOD & DRINK',
+  },
+  {
     label: 'LOCAL DRINKS',
-    sublabel: 'Brukina, sobolo & more',
+    sublabel: 'Brukina, yoghurt & more',
     href: '/goods',
     img: '/images/showcase/drinks.jpg',
+    tag: 'FOOD & DRINK',
+  },
+  {
+    label: 'MILKSHAKES',
+    sublabel: 'Cold blends & smoothies',
+    href: '/goods',
+    img: '/images/showcase/milkshakes.jpg',
     tag: 'FOOD & DRINK',
   },
   {
@@ -53,10 +67,17 @@ const SHOWCASE = [
     tag: 'ELECTRONICS',
   },
   {
+    label: 'CALCULATORS',
+    sublabel: 'Casio, Sharp & scientific',
+    href: '/goods',
+    img: '/images/showcase/calculator.jpg',
+    tag: 'ACADEMICS',
+  },
+  {
     label: 'MAKEUPS',
     sublabel: 'Lip gloss, skincare & more',
     href: '/goods',
-    img: '/images/showcase/makeup.jpg',
+    img: '/images/showcase/lipcombo.jpg',
     tag: 'BEAUTY',
   },
   {
@@ -74,18 +95,32 @@ const SHOWCASE = [
     tag: 'BEAUTY',
   },
   {
-    label: 'TEXTBOOKS',
-    sublabel: 'All courses & levels',
+    label: 'JEWELLERY',
+    sublabel: 'Bracelets, rings & necklaces',
     href: '/goods',
-    img: '/images/showcase/books.jpg',
+    img: '/images/showcase/jewelry.jpg',
+    tag: 'FASHION',
+  },
+  {
+    label: 'DELIVERY',
+    sublabel: 'Fast campus delivery services',
+    href: '/services',
+    img: '/images/showcase/delivery.jpg',
+    tag: 'SERVICE',
+  },
+  {
+    label: 'TEXTBOOKS',
+    sublabel: 'All subjects & levels',
+    href: '/goods',
+    img: '/images/showcase/textbooks.jpg',
     tag: 'ACADEMICS',
   },
 ]
 
 const TICKER_ITEMS = [
-  'BRAIDS', 'NAIL ART', 'BARBER', 'CAMPUS FOOD', 'LOCAL DRINKS', 'PHONES & GADGETS',
-  'MAKEUPS', 'BAGS', 'PERFUMES', 'TEXTBOOKS', 'LAUNDRY', 'TUTORING',
-  'PHOTOGRAPHY', 'TECH REPAIR', 'GRAPHIC DESIGN', 'LAPTOPS', 'CLOTHING', 'JEWELLERY',
+  'BRAIDS', 'NAIL ART', 'BARBER', 'CAMPUS FOOD', 'SOBOLO', 'LOCAL DRINKS',
+  'MILKSHAKES', 'PHONES & GADGETS', 'CALCULATORS', 'MAKEUPS', 'BAGS',
+  'PERFUMES', 'JEWELLERY', 'DELIVERY', 'TEXTBOOKS', 'LAUNDRY', 'TUTORING', 'TECH REPAIR',
 ]
 
 const TESTIMONIALS = [
