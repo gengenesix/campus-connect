@@ -340,9 +340,9 @@ export default function HomePage() {
 
           <div className="social-proof">
             <div className="avatar-stack">
-              <img src="https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=100&h=100&fit=crop&crop=face" alt="Student" />
-              <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100&h=100&fit=crop&crop=face" alt="Student" />
-              <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&crop=face" alt="Student" />
+              <img src="/images/hero/avatar1.jpg" alt="UMaT Student" />
+              <img src="/images/hero/avatar2.jpg" alt="UMaT Student" />
+              <img src="/images/hero/avatar3.jpg" alt="UMaT Community" />
             </div>
             <div>
               <div className="social-proof-title">UMaT Campus Community</div>
@@ -358,21 +358,21 @@ export default function HomePage() {
           </svg>
           <div className="main-image-container">
             <img
-              src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
-              alt="UMaT students"
+              src="/images/hero/main.jpg"
+              alt="UMaT Engineering students"
             />
             <div className="price-tag" style={{ backgroundColor: '#1B5E20', color: '#fff' }}>FREE</div>
           </div>
           <div className="secondary-image">
             <img
-              src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
-              alt="Students connecting"
+              src="/images/hero/secondary.jpg"
+              alt="Campus students"
             />
           </div>
           <div className="sticker-graphic">
             <img
-              src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
-              alt="UMaT student"
+              src="/images/hero/sticker.jpg"
+              alt="Happy UMaT student"
             />
             <div className="hot-badge">LIVE</div>
           </div>
