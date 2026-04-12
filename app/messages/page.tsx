@@ -96,11 +96,17 @@ function MessagesInner() {
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null)
   const searchInputRef = useRef<HTMLInputElement>(null)
+  // Track whether we've done the one-time URL-param setup (withId pre-fill)
+  const didInitRef = useRef(false)
+  // Mirror activePartner in a ref so loadConversations doesn't need it as a dep
+  const activePartnerRef = useRef<string | null>(null)
+  useEffect(() => { activePartnerRef.current = activePartner }, [activePartner])
 
   useEffect(() => {
     if (!authLoading && !user) router.push('/auth/login?redirect=/messages')
   }, [user, authLoading, router])
 
+  // Load conversations — ONLY depends on user. Never on input/activePartner.
   const loadConversations = useCallback(async () => {
     if (!user) return
     setLoadingConvs(true)
@@ -127,7 +133,9 @@ function MessagesInner() {
     }
 
     const partnerIds = [...convMap.keys()]
-    const allIds = withId && !convMap.has(withId) ? [...partnerIds, withId] : partnerIds
+    // Include the ?with= partner even if no messages yet (to show their profile)
+    const extraId = withId && !convMap.has(withId) ? withId : null
+    const allIds = extraId ? [...partnerIds, extraId] : partnerIds
 
     let profileMap = new Map<string, { name: string; avatar_url: string | null; role: string }>()
     if (allIds.length > 0) {
@@ -143,22 +151,31 @@ function MessagesInner() {
 
     setConversations(convList)
 
-    if (withId && !activePartner) {
-      setActivePartner(withId)
-      setMobileView('chat')
-      const wp = profileMap.get(withId)
-      if (wp) setActivePartnerProfile({ name: wp.name, avatar_url: wp.avatar_url, role: wp.role })
-      if (productTitle && !input) {
-        setInput(`Hi, I'm interested in your listing: ${decodeURIComponent(productTitle)}`)
-      }
-    } else if (!withId && !activePartner && convList.length > 0) {
+    // Auto-open first conversation only when nothing is active yet
+    if (!activePartnerRef.current && !withId && convList.length > 0) {
       setActivePartner(convList[0].partner_id)
     }
 
     setLoadingConvs(false)
-  }, [user, withId, productTitle, activePartner, input])
+  }, [user, withId])   // ← NO input / activePartner in deps
 
   useEffect(() => { loadConversations() }, [loadConversations])
+
+  // One-time effect: handle ?with= URL param — set active partner + pre-fill input
+  useEffect(() => {
+    if (!withId || !user || didInitRef.current) return
+    didInitRef.current = true
+    setActivePartner(withId)
+    setMobileView('chat')
+    if (productTitle) {
+      setInput(`Hi, I'm interested in your listing: ${decodeURIComponent(productTitle)}`)
+    }
+    // Fetch partner profile so name/avatar shows immediately before convos load
+    supabase.from('profiles').select('id, name, avatar_url, role').eq('id', withId).single()
+      .then(({ data }) => {
+        if (data) setActivePartnerProfile({ name: data.name, avatar_url: data.avatar_url, role: data.role })
+      })
+  }, [withId, productTitle, user])
 
   const loadMessages = useCallback(async (partnerId: string) => {
     if (!user) return
