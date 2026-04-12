@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
       availability: availability.trim(),
       image_url: imageUrl ?? null,
       whatsapp: whatsapp?.trim() || null,
-      status: 'active',
+      status: 'pending',
     })
     .select('id')
     .single()

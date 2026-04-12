@@ -32,8 +32,10 @@ interface AdminProduct {
   condition: string
   category: string
   views: number
+  image_url: string | null
+  in_stock: boolean
   created_at: string
-  seller: { name: string | null } | null
+  seller: { name: string | null; id: string } | null
 }
 
 interface AdminService {
@@ -42,181 +44,196 @@ interface AdminService {
   category: string
   rate: string | null
   status: string
+  image_url: string | null
   total_bookings: number
   created_at: string
-  provider: { name: string | null } | null
+  provider: { name: string | null; id: string } | null
 }
 
 function initials(name: string | null) {
   return name ? name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() : '?'
 }
 
+function StatusBadge({ status }: { status: string }) {
+  const colors: Record<string, { bg: string; color: string }> = {
+    active:  { bg: '#dcfce7', color: '#15803d' },
+    pending: { bg: '#fff8e1', color: '#92400e' },
+    sold:    { bg: '#e0e7ff', color: '#4338ca' },
+    paused:  { bg: '#f3f4f6', color: '#6b7280' },
+    deleted: { bg: '#fee2e2', color: '#dc2626' },
+  }
+  const c = colors[status] || { bg: '#f3f4f6', color: '#666' }
+  return (
+    <span style={{
+      background: c.bg, color: c.color,
+      fontSize: '10px', fontWeight: 800, padding: '3px 10px',
+      letterSpacing: '0.5px', border: `1px solid ${c.color}44`,
+      whiteSpace: 'nowrap',
+    }}>
+      {status.toUpperCase()}
+    </span>
+  )
+}
+
+function VerifiedBadgeInline() {
+  return (
+    <span title="Verified by Campus Connect admin" style={{
+      display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+      width: '18px', height: '18px', background: '#1d9bf0', borderRadius: '50%',
+      fontSize: '10px', color: '#fff', fontWeight: 900, flexShrink: 0,
+      boxShadow: '0 1px 3px rgba(29,155,240,0.4)',
+    }}>✓</span>
+  )
+}
+
 export default function AdminDashboard() {
   const { user, profile, loading, signOut } = useAuth()
   const router = useRouter()
 
-  const [activeTab, setActiveTab] = useState<'users' | 'listings' | 'services'>('users')
+  const [activeTab, setActiveTab] = useState<'pending' | 'users' | 'listings' | 'services'>('pending')
   const [users, setUsers] = useState<AdminUser[]>([])
   const [products, setProducts] = useState<AdminProduct[]>([])
   const [services, setServices] = useState<AdminService[]>([])
   const [loadingData, setLoadingData] = useState(true)
-  const [verifyingId, setVerifyingId] = useState<string | null>(null)
-  const [banningId, setBanningId] = useState<string | null>(null)
-  const [removingId, setRemovingId] = useState<string | null>(null)
+  const [actionId, setActionId] = useState<string | null>(null)
   const [search, setSearch] = useState('')
-  const [stats, setStats] = useState({ users: 0, verified: 0, listings: 0, services: 0 })
   const [toast, setToast] = useState('')
+  const [toastType, setToastType] = useState<'ok' | 'err'>('ok')
 
-  const showToast = (msg: string) => {
-    setToast(msg)
+  const showToast = (msg: string, type: 'ok' | 'err' = 'ok') => {
+    setToast(msg); setToastType(type)
     setTimeout(() => setToast(''), 3500)
   }
 
   useEffect(() => {
-    if (!loading && (!user || profile?.role !== 'admin')) {
-      router.replace('/')
-    }
+    if (!loading && (!user || profile?.role !== 'admin')) router.replace('/')
   }, [user, profile, loading, router])
 
   const loadData = useCallback(async () => {
     if (!user || profile?.role !== 'admin') return
     setLoadingData(true)
-
     const [usersRes, productsRes, servicesRes] = await Promise.all([
       supabase.from('profiles').select('*').order('created_at', { ascending: false }),
       supabase.from('products')
-        .select('id, title, price, status, condition, category, views, created_at, seller:profiles!seller_id(name)')
+        .select('id, title, price, status, condition, category, views, image_url, in_stock, created_at, seller:profiles!seller_id(id, name)')
         .neq('status', 'deleted')
         .order('created_at', { ascending: false }),
       supabase.from('services')
-        .select('id, name, category, rate, status, total_bookings, created_at, provider:profiles!provider_id(name)')
+        .select('id, name, category, rate, status, image_url, total_bookings, created_at, provider:profiles!provider_id(id, name)')
         .neq('status', 'deleted')
         .order('created_at', { ascending: false }),
     ])
-
-    const allUsers = (usersRes.data as AdminUser[]) ?? []
-    const allProducts = (productsRes.data as unknown as AdminProduct[]) ?? []
-    const allServices = (servicesRes.data as unknown as AdminService[]) ?? []
-    setUsers(allUsers)
-    setProducts(allProducts)
-    setServices(allServices)
-    setStats({
-      users: allUsers.length,
-      verified: allUsers.filter(u => u.is_verified).length,
-      listings: allProducts.length,
-      services: allServices.length,
-    })
+    setUsers((usersRes.data as AdminUser[]) ?? [])
+    setProducts((productsRes.data as unknown as AdminProduct[]) ?? [])
+    setServices((servicesRes.data as unknown as AdminService[]) ?? [])
     setLoadingData(false)
   }, [user, profile])
 
   useEffect(() => { loadData() }, [loadData])
 
-  const toggleVerify = async (userId: string, currentState: boolean) => {
-    setVerifyingId(userId)
-    const { error } = await supabase
-      .from('profiles')
-      .update({ is_verified: !currentState })
-      .eq('id', userId)
-
-    if (!error) {
-      setUsers(prev => prev.map(u => u.id === userId ? { ...u, is_verified: !currentState } : u))
-      setStats(prev => ({ ...prev, verified: prev.verified + (currentState ? -1 : 1) }))
-      showToast(currentState ? 'Verification removed.' : '✓ User verified!')
-    } else {
-      showToast(`Error: ${error.message}`)
-    }
-    setVerifyingId(null)
+  const approveProduct = async (id: string) => {
+    setActionId(id)
+    const { error } = await supabase.from('products').update({ status: 'active' }).eq('id', id)
+    if (!error) { setProducts(prev => prev.map(p => p.id === id ? { ...p, status: 'active' } : p)); showToast('✓ Listing approved and is now live!') }
+    else showToast(error.message, 'err')
+    setActionId(null)
   }
 
-  const toggleBan = async (userId: string, currentState: boolean) => {
-    if (!confirm(currentState ? 'Unban this user?' : 'Ban this user? They will no longer be able to create listings.')) return
-    setBanningId(userId)
-    const { error } = await supabase
-      .from('profiles')
-      .update({ is_banned: !currentState })
-      .eq('id', userId)
-
-    if (!error) {
-      setUsers(prev => prev.map(u => u.id === userId ? { ...u, is_banned: !currentState } : u))
-      showToast(currentState ? 'User unbanned.' : '🚫 User banned.')
-    } else {
-      showToast(`Error: ${error.message}`)
-    }
-    setBanningId(null)
+  const rejectProduct = async (id: string) => {
+    if (!confirm('Reject and remove this listing?')) return
+    setActionId(id)
+    const { error } = await supabase.from('products').update({ status: 'deleted' }).eq('id', id)
+    if (!error) { setProducts(prev => prev.filter(p => p.id !== id)); showToast('Listing rejected.') }
+    else showToast(error.message, 'err')
+    setActionId(null)
   }
 
-  const removeListing = async (productId: string) => {
-    if (!confirm('Remove this listing? This cannot be undone.')) return
-    setRemovingId(productId)
-    const { error } = await supabase
-      .from('products')
-      .update({ status: 'deleted' })
-      .eq('id', productId)
-
-    if (!error) {
-      setProducts(prev => prev.filter(p => p.id !== productId))
-      setStats(prev => ({ ...prev, listings: prev.listings - 1 }))
-      showToast('Listing removed.')
-    } else {
-      showToast(`Error: ${error.message}`)
-    }
-    setRemovingId(null)
+  const approveService = async (id: string) => {
+    setActionId(id)
+    const { error } = await supabase.from('services').update({ status: 'active' }).eq('id', id)
+    if (!error) { setServices(prev => prev.map(s => s.id === id ? { ...s, status: 'active' } : s)); showToast('✓ Service approved and is now live!') }
+    else showToast(error.message, 'err')
+    setActionId(null)
   }
 
-  const removeService = async (serviceId: string) => {
-    if (!confirm('Remove this service? This cannot be undone.')) return
-    setRemovingId(serviceId)
-    const { error } = await supabase
-      .from('services')
-      .update({ status: 'deleted' })
-      .eq('id', serviceId)
-
-    if (!error) {
-      setServices(prev => prev.filter(s => s.id !== serviceId))
-      setStats(prev => ({ ...prev, services: prev.services - 1 }))
-      showToast('Service removed.')
-    } else {
-      showToast(`Error: ${error.message}`)
-    }
-    setRemovingId(null)
+  const rejectService = async (id: string) => {
+    if (!confirm('Reject and remove this service?')) return
+    setActionId(id)
+    const { error } = await supabase.from('services').update({ status: 'deleted' }).eq('id', id)
+    if (!error) { setServices(prev => prev.filter(s => s.id !== id)); showToast('Service rejected.') }
+    else showToast(error.message, 'err')
+    setActionId(null)
   }
+
+  const toggleVerify = async (userId: string, current: boolean) => {
+    setActionId(userId)
+    const { error } = await supabase.from('profiles').update({ is_verified: !current }).eq('id', userId)
+    if (!error) { setUsers(prev => prev.map(u => u.id === userId ? { ...u, is_verified: !current } : u)); showToast(current ? 'Verification removed.' : '✓ User verified!') }
+    else showToast(error.message, 'err')
+    setActionId(null)
+  }
+
+  const toggleBan = async (userId: string, current: boolean) => {
+    if (!confirm(current ? 'Unban this user?' : 'Ban this user?')) return
+    setActionId(userId)
+    const { error } = await supabase.from('profiles').update({ is_banned: !current }).eq('id', userId)
+    if (!error) { setUsers(prev => prev.map(u => u.id === userId ? { ...u, is_banned: !current } : u)); showToast(current ? 'User unbanned.' : '🚫 User banned.') }
+    else showToast(error.message, 'err')
+    setActionId(null)
+  }
+
+  const removeProduct = async (id: string) => {
+    if (!confirm('Remove this listing?')) return
+    setActionId(id)
+    const { error } = await supabase.from('products').update({ status: 'deleted' }).eq('id', id)
+    if (!error) { setProducts(prev => prev.filter(p => p.id !== id)); showToast('Listing removed.') }
+    else showToast(error.message, 'err')
+    setActionId(null)
+  }
+
+  const removeService = async (id: string) => {
+    if (!confirm('Remove this service?')) return
+    setActionId(id)
+    const { error } = await supabase.from('services').update({ status: 'deleted' }).eq('id', id)
+    if (!error) { setServices(prev => prev.filter(s => s.id !== id)); showToast('Service removed.') }
+    else showToast(error.message, 'err')
+    setActionId(null)
+  }
+
+  const pendingProducts = products.filter(p => p.status === 'pending')
+  const pendingServices = services.filter(s => s.status === 'pending')
+  const pendingCount = pendingProducts.length + pendingServices.length
+  const bannedCount = users.filter(u => u.is_banned).length
+  const verifiedCount = users.filter(u => u.is_verified).length
 
   const filteredUsers = users.filter(u => {
     if (!search) return true
     const q = search.toLowerCase()
-    return (
-      (u.name?.toLowerCase().includes(q) ?? false) ||
-      u.email.toLowerCase().includes(q) ||
-      (u.department?.toLowerCase().includes(q) ?? false) ||
-      (u.course?.toLowerCase().includes(q) ?? false)
-    )
+    return (u.name?.toLowerCase().includes(q) ?? false) || u.email.toLowerCase().includes(q) || (u.department?.toLowerCase().includes(q) ?? false)
   })
 
-  const unverifiedCount = filteredUsers.filter(u => !u.is_verified && !u.is_banned).length
-  const bannedCount = users.filter(u => u.is_banned).length
-
-  // Show a branded loading screen while auth initialises — never a white screen
   if (loading) {
     return (
       <div style={{ background: '#111', minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '16px' }}>
-        <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '28px', color: '#fff', letterSpacing: '-0.5px', opacity: 0.9 }}>
-          ADMIN PANEL
-        </div>
+        <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '28px', color: '#fff', letterSpacing: '-0.5px' }}>ADMIN PANEL</div>
         <div style={{ display: 'flex', gap: '8px' }}>
           {[0, 1, 2].map(i => (
-            <div key={i} style={{
-              width: '8px', height: '8px', background: '#ff3366', borderRadius: '50%',
-              animation: `bounce 0.9s ease-in-out ${i * 0.15}s infinite alternate`,
-            }} />
+            <div key={i} style={{ width: '8px', height: '8px', background: '#ff3366', borderRadius: '50%', animation: `bounce 0.9s ease-in-out ${i * 0.15}s infinite alternate` }} />
           ))}
         </div>
-        <style>{`@keyframes bounce { from { opacity: 0.2; transform: translateY(0); } to { opacity: 1; transform: translateY(-6px); } }`}</style>
+        <style>{`@keyframes bounce { from { opacity:0.2; transform:translateY(0); } to { opacity:1; transform:translateY(-6px); } }`}</style>
       </div>
     )
   }
 
-  // Middleware blocks non-admins server-side — this is a client-side safety net only
   if (!user || profile?.role !== 'admin') return null
+
+  const tabs = [
+    { key: 'pending' as const, label: pendingCount > 0 ? `⚠ PENDING (${pendingCount})` : 'PENDING', urgent: pendingCount > 0 },
+    { key: 'users' as const,   label: `USERS (${users.length})`, urgent: false },
+    { key: 'listings' as const, label: `LISTINGS (${products.filter(p => p.status !== 'pending').length})`, urgent: false },
+    { key: 'services' as const, label: `SERVICES (${services.filter(s => s.status !== 'pending').length})`, urgent: false },
+  ]
 
   return (
     <div style={{ background: '#f8f8f8', minHeight: '100vh' }}>
@@ -225,31 +242,23 @@ export default function AdminDashboard() {
       <div style={{ background: '#111', color: '#fff', padding: '28px 20px' }}>
         <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px' }}>
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '4px' }}>
-              <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '32px', letterSpacing: '-1px' }}>
-                ADMIN PANEL
-              </div>
-              <span style={{ background: '#ff3366', color: '#fff', fontSize: '11px', fontWeight: 700, padding: '3px 10px', letterSpacing: '1px' }}>
-                SUPER ADMIN
-              </span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '4px', flexWrap: 'wrap' }}>
+              <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '32px', letterSpacing: '-1px' }}>ADMIN PANEL</div>
+              <span style={{ background: '#ff3366', color: '#fff', fontSize: '11px', fontWeight: 700, padding: '3px 10px', letterSpacing: '1px' }}>SUPER ADMIN</span>
+              {pendingCount > 0 && (
+                <span style={{ background: '#f59e0b', color: '#000', fontSize: '11px', fontWeight: 900, padding: '3px 10px', letterSpacing: '1px' }}>
+                  ⚠ {pendingCount} AWAITING APPROVAL
+                </span>
+              )}
             </div>
-            <p style={{ color: '#666', fontSize: '13px' }}>
-              Campus Connect · {profile?.name ?? user.email}
-            </p>
+            <p style={{ color: '#666', fontSize: '13px' }}>Campus Connect · {profile?.name ?? user.email}</p>
           </div>
           <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-            <Link
-              href="/dashboard"
-              style={{ padding: '10px 20px', border: '2px solid #444', color: '#ccc', fontFamily: '"Archivo Black", sans-serif', fontSize: '12px', textDecoration: 'none', letterSpacing: '0.5px' }}
-            >
-              ← DASHBOARD
-            </Link>
+            <Link href="/dashboard" style={{ padding: '10px 20px', border: '2px solid #444', color: '#ccc', fontFamily: '"Archivo Black", sans-serif', fontSize: '12px', textDecoration: 'none' }}>← DASHBOARD</Link>
             <button
               onClick={async () => { await signOut(); router.replace('/') }}
-              style={{ padding: '10px 20px', border: '2px solid #dc2626', color: '#dc2626', background: 'transparent', fontFamily: '"Archivo Black", sans-serif', fontSize: '12px', cursor: 'pointer', letterSpacing: '0.5px' }}
-            >
-              SIGN OUT
-            </button>
+              style={{ padding: '10px 20px', border: '2px solid #dc2626', color: '#dc2626', background: 'transparent', fontFamily: '"Archivo Black", sans-serif', fontSize: '12px', cursor: 'pointer' }}
+            >SIGN OUT</button>
           </div>
         </div>
       </div>
@@ -257,319 +266,275 @@ export default function AdminDashboard() {
       {/* Toast */}
       {toast && (
         <div style={{
-          background: toast.startsWith('Error') ? '#fee2e2' : '#dcfce7',
-          borderBottom: `2px solid ${toast.startsWith('Error') ? '#ef4444' : '#16a34a'}`,
+          background: toastType === 'err' ? '#fee2e2' : '#dcfce7',
+          borderBottom: `3px solid ${toastType === 'err' ? '#ef4444' : '#16a34a'}`,
           padding: '10px 24px', textAlign: 'center', fontWeight: 700, fontSize: '14px',
-          color: toast.startsWith('Error') ? '#dc2626' : '#15803d',
-        }}>
-          {toast}
-        </div>
+          color: toastType === 'err' ? '#dc2626' : '#15803d',
+        }}>{toast}</div>
       )}
 
       <div className="container" style={{ paddingTop: '28px', paddingBottom: '60px' }}>
 
-        {/* Stats */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '16px', marginBottom: '32px' }}>
+        {/* Stats grid */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(110px, 1fr))', gap: '16px', marginBottom: '32px' }}>
           {[
-            { label: 'TOTAL USERS', value: stats.users, color: '#5d3fd3' },
-            { label: 'VERIFIED', value: stats.verified, color: '#1B5E20' },
-            { label: 'BANNED', value: bannedCount, color: '#dc2626' },
-            { label: 'LISTINGS', value: stats.listings, color: '#111' },
-            { label: 'SERVICES', value: stats.services, color: '#ff3366' },
+            { label: 'TOTAL USERS',    value: users.length,                                    color: '#5d3fd3' },
+            { label: 'VERIFIED',       value: verifiedCount,                                   color: '#1B5E20' },
+            { label: 'BANNED',         value: bannedCount,                                     color: '#dc2626' },
+            { label: 'PENDING',        value: pendingCount,                                    color: '#f59e0b' },
+            { label: 'LIVE LISTINGS',  value: products.filter(p => p.status === 'active').length, color: '#111'    },
+            { label: 'LIVE SERVICES',  value: services.filter(s => s.status === 'active').length, color: '#ff3366' },
           ].map(stat => (
-            <div key={stat.label} style={{ border: '2px solid #111', background: '#fff', padding: '20px', boxShadow: '4px 4px 0 #111' }}>
-              <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '36px', color: stat.color, lineHeight: 1 }}>
-                {stat.value}
-              </div>
-              <div style={{ fontSize: '11px', fontWeight: 700, color: '#888', letterSpacing: '1px', marginTop: '6px' }}>
-                {stat.label}
-              </div>
+            <div key={stat.label} style={{ border: '2px solid #111', background: '#fff', padding: '16px', boxShadow: '4px 4px 0 #111' }}>
+              <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '30px', color: stat.color, lineHeight: 1 }}>{stat.value}</div>
+              <div style={{ fontSize: '10px', fontWeight: 700, color: '#888', letterSpacing: '1px', marginTop: '6px' }}>{stat.label}</div>
             </div>
           ))}
         </div>
 
-        {/* Admin note */}
-        <div style={{ background: '#fff8e1', border: '2px solid #f59e0b', padding: '12px 16px', marginBottom: '24px', fontSize: '13px', color: '#92400e' }}>
-          <strong>How to give someone admin access:</strong> Go to Supabase → Table Editor → profiles → find the user → set <code>role = 'admin'</code>. They will then see this panel.
-        </div>
-
         {/* Tabs */}
-        <div style={{ display: 'flex', borderBottom: '2px solid #111', marginBottom: '24px' }}>
-          {([
-            { key: 'users', label: `USERS (${stats.users})` },
-            { key: 'listings', label: `LISTINGS (${stats.listings})` },
-            { key: 'services', label: `SERVICES (${stats.services})` },
-          ] as const).map(tab => (
-            <button
-              key={tab.key}
-              onClick={() => setActiveTab(tab.key)}
-              style={{
-                padding: '12px 28px',
-                background: activeTab === tab.key ? '#111' : '#fff',
-                color: activeTab === tab.key ? '#fff' : '#666',
-                border: '2px solid #111', borderBottom: 'none',
-                fontFamily: '"Archivo Black", sans-serif',
-                fontSize: '12px', letterSpacing: '1px',
-                cursor: 'pointer', marginBottom: '-2px',
-              }}
-            >
+        <div style={{ display: 'flex', borderBottom: '2px solid #111', marginBottom: '24px', flexWrap: 'wrap' }}>
+          {tabs.map(tab => (
+            <button key={tab.key} onClick={() => setActiveTab(tab.key)} style={{
+              padding: '12px 22px',
+              background: activeTab === tab.key ? (tab.urgent ? '#f59e0b' : '#111') : '#fff',
+              color: activeTab === tab.key ? '#fff' : tab.urgent ? '#92400e' : '#666',
+              border: '2px solid #111', borderBottom: 'none',
+              fontFamily: '"Archivo Black", sans-serif', fontSize: '11px', letterSpacing: '0.8px',
+              cursor: 'pointer', marginBottom: '-2px', fontWeight: 700,
+            }}>
               {tab.label}
             </button>
           ))}
         </div>
 
-        {loadingData && (
-          <div style={{ textAlign: 'center', padding: '60px', color: '#888', fontWeight: 600 }}>
-            Loading data...
-          </div>
+        {loadingData && <div style={{ textAlign: 'center', padding: '60px', color: '#888', fontWeight: 600 }}>Loading data...</div>}
+
+        {/* ── PENDING TAB ── */}
+        {!loadingData && activeTab === 'pending' && (
+          pendingCount === 0 ? (
+            <div style={{ textAlign: 'center', padding: '80px 20px', border: '2px solid #111', background: '#fff', boxShadow: '6px 6px 0 #111' }}>
+              <div style={{ fontSize: '56px', marginBottom: '16px' }}>✅</div>
+              <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '24px', marginBottom: '10px' }}>ALL CLEAR</div>
+              <p style={{ color: '#888' }}>No listings or services awaiting approval.</p>
+            </div>
+          ) : (
+            <>
+              {pendingProducts.length > 0 && (
+                <div style={{ marginBottom: '36px' }}>
+                  <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '15px', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '10px', color: '#111' }}>
+                    PENDING LISTINGS
+                    <span style={{ background: '#f59e0b', color: '#000', fontSize: '11px', fontWeight: 800, padding: '2px 10px' }}>{pendingProducts.length}</span>
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    {pendingProducts.map(p => (
+                      <div key={p.id} style={{ background: '#fff', border: '2px solid #f59e0b', borderLeft: '5px solid #f59e0b', padding: '16px', display: 'grid', gridTemplateColumns: '60px 1fr auto', gap: '16px', alignItems: 'center' }}>
+                        {p.image_url
+                          ? <Image src={p.image_url} alt={p.title} width={60} height={60} style={{ objectFit: 'cover', border: '1px solid #eee' }} />
+                          : <div style={{ width: '60px', height: '60px', background: '#f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px' }}>📦</div>
+                        }
+                        <div>
+                          <div style={{ fontWeight: 700, fontSize: '15px', marginBottom: '4px' }}>{p.title}</div>
+                          <div style={{ fontSize: '12px', color: '#666' }}>
+                            by <strong>{(p.seller as any)?.name ?? 'Unknown'}</strong> · GHS {p.price} · {p.condition} · {p.category}
+                          </div>
+                          <div style={{ fontSize: '11px', color: '#999', marginTop: '3px' }}>
+                            {p.in_stock ? '✓ In stock' : '✕ Out of stock'} · {new Date(p.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                          </div>
+                          <Link href={`/goods/${p.id}`} target="_blank" style={{ fontSize: '11px', color: '#5d3fd3', fontWeight: 700, textDecoration: 'none', display: 'inline-block', marginTop: '4px' }}>
+                            PREVIEW →
+                          </Link>
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', flexShrink: 0 }}>
+                          <button onClick={() => approveProduct(p.id)} disabled={actionId === p.id} style={{ padding: '10px 18px', background: '#1B5E20', color: '#fff', border: '2px solid #111', fontFamily: '"Archivo Black", sans-serif', fontSize: '12px', cursor: actionId === p.id ? 'not-allowed' : 'pointer', boxShadow: '3px 3px 0 #111', opacity: actionId === p.id ? 0.6 : 1 }}>
+                            {actionId === p.id ? '...' : '✓ APPROVE'}
+                          </button>
+                          <button onClick={() => rejectProduct(p.id)} disabled={actionId === p.id} style={{ padding: '10px 18px', background: '#fff', color: '#dc2626', border: '2px solid #dc2626', fontFamily: '"Archivo Black", sans-serif', fontSize: '12px', cursor: actionId === p.id ? 'not-allowed' : 'pointer', opacity: actionId === p.id ? 0.6 : 1 }}>
+                            ✕ REJECT
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {pendingServices.length > 0 && (
+                <div>
+                  <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '15px', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '10px', color: '#111' }}>
+                    PENDING SERVICES
+                    <span style={{ background: '#f59e0b', color: '#000', fontSize: '11px', fontWeight: 800, padding: '2px 10px' }}>{pendingServices.length}</span>
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    {pendingServices.map(s => (
+                      <div key={s.id} style={{ background: '#fff', border: '2px solid #f59e0b', borderLeft: '5px solid #f59e0b', padding: '16px', display: 'grid', gridTemplateColumns: '60px 1fr auto', gap: '16px', alignItems: 'center' }}>
+                        {s.image_url
+                          ? <Image src={s.image_url} alt={s.name} width={60} height={60} style={{ objectFit: 'cover', border: '1px solid #eee' }} />
+                          : <div style={{ width: '60px', height: '60px', background: '#f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px' }}>🛠</div>
+                        }
+                        <div>
+                          <div style={{ fontWeight: 700, fontSize: '15px', marginBottom: '4px' }}>{s.name}</div>
+                          <div style={{ fontSize: '12px', color: '#666' }}>
+                            by <strong>{(s.provider as any)?.name ?? 'Unknown'}</strong> · {s.category} · {s.rate ?? 'No rate'}
+                          </div>
+                          <div style={{ fontSize: '11px', color: '#999', marginTop: '3px' }}>
+                            {new Date(s.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                          </div>
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', flexShrink: 0 }}>
+                          <button onClick={() => approveService(s.id)} disabled={actionId === s.id} style={{ padding: '10px 18px', background: '#1B5E20', color: '#fff', border: '2px solid #111', fontFamily: '"Archivo Black", sans-serif', fontSize: '12px', cursor: actionId === s.id ? 'not-allowed' : 'pointer', boxShadow: '3px 3px 0 #111', opacity: actionId === s.id ? 0.6 : 1 }}>
+                            {actionId === s.id ? '...' : '✓ APPROVE'}
+                          </button>
+                          <button onClick={() => rejectService(s.id)} disabled={actionId === s.id} style={{ padding: '10px 18px', background: '#fff', color: '#dc2626', border: '2px solid #dc2626', fontFamily: '"Archivo Black", sans-serif', fontSize: '12px', cursor: actionId === s.id ? 'not-allowed' : 'pointer', opacity: actionId === s.id ? 0.6 : 1 }}>
+                            ✕ REJECT
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </>
+          )
         )}
 
+        {/* ── USERS TAB ── */}
         {!loadingData && activeTab === 'users' && (
           <>
-            {/* Search */}
             <div style={{ display: 'flex', gap: '12px', alignItems: 'center', marginBottom: '16px' }}>
               <input
                 type="text"
-                placeholder="Search by name, email, department, course..."
+                placeholder="Search by name, email, department..."
                 value={search}
                 onChange={e => setSearch(e.target.value)}
                 style={{ flex: 1, padding: '10px 14px', border: '2px solid #111', fontFamily: '"Space Grotesk", sans-serif', fontSize: '14px', outline: 'none' }}
               />
-              <span style={{ fontWeight: 700, fontSize: '13px', color: '#888', whiteSpace: 'nowrap' }}>
-                {filteredUsers.length} users
-              </span>
+              <span style={{ fontWeight: 700, fontSize: '13px', color: '#888', whiteSpace: 'nowrap' }}>{filteredUsers.length} user{filteredUsers.length !== 1 ? 's' : ''}</span>
             </div>
-
-            {unverifiedCount > 0 && (
-              <div style={{ background: '#fff8e1', border: '2px solid #f59e0b', padding: '10px 16px', marginBottom: '16px', fontSize: '13px', fontWeight: 700, color: '#92400e' }}>
-                ⚠️ {unverifiedCount} user{unverifiedCount !== 1 ? 's' : ''} awaiting verification
-              </div>
-            )}
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               {filteredUsers.map(u => (
-                <div
-                  key={u.id}
-                  style={{
-                    display: 'grid',
-                    gridTemplateColumns: '52px 1fr auto',
-                    gap: '16px',
-                    alignItems: 'center',
-                    background: u.is_banned ? '#fff5f5' : '#fff',
-                    border: u.is_banned ? '2px solid #fca5a5' : u.is_verified ? '2px solid #e0e0e0' : '2px solid #fbbf24',
-                    padding: '14px 16px',
-                    borderLeft: u.is_banned ? '4px solid #dc2626' : u.is_verified ? '4px solid #1B5E20' : '4px solid #f59e0b',
-                  }}
-                >
-                  {/* Avatar */}
-                  <div style={{ flexShrink: 0 }}>
-                    {u.avatar_url ? (
-                      <Image
-                        src={u.avatar_url}
-                        alt={u.name ?? ''}
-                        width={44}
-                        height={44}
-                        style={{ borderRadius: '50%', objectFit: 'cover', border: '2px solid #eee' }}
-                      />
-                    ) : (
-                      <div style={{ width: '44px', height: '44px', borderRadius: '50%', background: '#1B5E20', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '14px' }}>
-                        {initials(u.name)}
-                      </div>
-                    )}
+                <div key={u.id} style={{
+                  display: 'grid', gridTemplateColumns: '52px 1fr auto', gap: '16px', alignItems: 'center',
+                  background: u.is_banned ? '#fff5f5' : '#fff',
+                  border: '2px solid #e0e0e0', padding: '14px 16px',
+                  borderLeft: `4px solid ${u.is_banned ? '#dc2626' : u.is_verified ? '#1B5E20' : '#f59e0b'}`,
+                }}>
+                  <div>
+                    {u.avatar_url
+                      ? <Image src={u.avatar_url} alt={u.name ?? ''} width={44} height={44} style={{ borderRadius: '50%', objectFit: 'cover', border: '2px solid #eee' }} />
+                      : <div style={{ width: '44px', height: '44px', borderRadius: '50%', background: '#1B5E20', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '14px' }}>{initials(u.name)}</div>
+                    }
                   </div>
-
-                  {/* Info */}
                   <div style={{ minWidth: 0 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', marginBottom: '3px' }}>
-                      <span style={{ fontWeight: 700, fontSize: '15px', color: '#111' }}>
-                        {u.name ?? 'No name set'}
-                      </span>
-                      {u.is_verified && (
-                        <span
-                          title="Verified"
-                          style={{
-                            display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                            width: '17px', height: '17px',
-                            background: '#1d9bf0', borderRadius: '50%',
-                            fontSize: '10px', color: '#fff', fontWeight: 900,
-                          }}
-                        >✓</span>
-                      )}
-                      <span style={{
-                        background: u.role === 'admin' ? '#ff3366' : u.role === 'seller' ? '#5d3fd3' : u.role === 'provider' ? '#1B5E20' : '#888',
-                        color: '#fff', fontSize: '10px', fontWeight: 700,
-                        padding: '2px 8px', letterSpacing: '0.5px',
-                      }}>
+                      <span style={{ fontWeight: 700, fontSize: '15px', color: '#111' }}>{u.name ?? 'No name'}</span>
+                      {u.is_verified && <VerifiedBadgeInline />}
+                      <span style={{ background: u.role === 'admin' ? '#ff3366' : u.role === 'seller' ? '#5d3fd3' : u.role === 'provider' ? '#1B5E20' : '#888', color: '#fff', fontSize: '10px', fontWeight: 700, padding: '2px 8px' }}>
                         {u.role.toUpperCase()}
                       </span>
-                      {u.is_banned && (
-                        <span style={{ background: '#dc2626', color: '#fff', fontSize: '10px', fontWeight: 700, padding: '2px 8px', letterSpacing: '0.5px' }}>
-                          BANNED
-                        </span>
-                      )}
+                      {u.is_banned && <span style={{ background: '#dc2626', color: '#fff', fontSize: '10px', fontWeight: 700, padding: '2px 8px' }}>BANNED</span>}
                     </div>
                     <div style={{ fontSize: '12px', color: '#666' }}>{u.email}</div>
                     <div style={{ fontSize: '11px', color: '#999', marginTop: '2px' }}>
-                      {[u.department, u.course, u.class_year, u.phone ? `📱 ${u.phone}` : null]
-                        .filter(Boolean).join(' · ')}
-                    </div>
-                    <div style={{ fontSize: '10px', color: '#bbb', marginTop: '2px' }}>
-                      Joined {new Date(u.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                      {[u.department, u.course, u.class_year].filter(Boolean).join(' · ')}
                     </div>
                   </div>
-
-                  {/* Actions */}
                   <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', gap: '6px' }}>
                     <button
                       onClick={() => toggleVerify(u.id, u.is_verified)}
-                      disabled={verifyingId === u.id || u.role === 'admin' || u.is_banned}
+                      disabled={actionId === u.id || u.role === 'admin' || u.is_banned}
                       style={{
                         padding: '7px 14px',
-                        background: u.is_verified ? '#fff' : '#1d9bf0',
-                        color: u.is_verified ? '#dc2626' : '#fff',
+                        background: u.is_verified ? '#fff' : '#1d9bf0', color: u.is_verified ? '#dc2626' : '#fff',
                         border: u.is_verified ? '2px solid #dc2626' : '2px solid #1d9bf0',
-                        fontFamily: '"Archivo Black", sans-serif',
-                        fontSize: '10px', letterSpacing: '0.5px',
-                        cursor: (verifyingId === u.id || u.role === 'admin' || u.is_banned) ? 'not-allowed' : 'pointer',
-                        whiteSpace: 'nowrap',
-                        opacity: (u.role === 'admin' || u.is_banned) ? 0.4 : 1,
+                        fontFamily: '"Archivo Black", sans-serif', fontSize: '10px',
+                        cursor: (actionId === u.id || u.role === 'admin' || u.is_banned) ? 'not-allowed' : 'pointer',
+                        whiteSpace: 'nowrap', opacity: (u.role === 'admin' || u.is_banned) ? 0.4 : 1,
                       }}
                     >
-                      {verifyingId === u.id ? '...' : u.is_verified ? '✕ REVOKE' : '✓ VERIFY'}
+                      {actionId === u.id ? '...' : u.is_verified ? '✕ REVOKE' : '✓ VERIFY'}
                     </button>
                     {u.role !== 'admin' && (
                       <button
                         onClick={() => toggleBan(u.id, u.is_banned ?? false)}
-                        disabled={banningId === u.id}
+                        disabled={actionId === u.id}
                         style={{
                           padding: '7px 14px',
-                          background: u.is_banned ? '#e8f5e9' : '#fee2e2',
-                          color: u.is_banned ? '#1B5E20' : '#dc2626',
+                          background: u.is_banned ? '#e8f5e9' : '#fee2e2', color: u.is_banned ? '#1B5E20' : '#dc2626',
                           border: u.is_banned ? '2px solid #1B5E20' : '2px solid #dc2626',
-                          fontFamily: '"Archivo Black", sans-serif',
-                          fontSize: '10px', letterSpacing: '0.5px',
-                          cursor: banningId === u.id ? 'not-allowed' : 'pointer',
-                          whiteSpace: 'nowrap',
+                          fontFamily: '"Archivo Black", sans-serif', fontSize: '10px',
+                          cursor: actionId === u.id ? 'not-allowed' : 'pointer', whiteSpace: 'nowrap',
                         }}
                       >
-                        {banningId === u.id ? '...' : u.is_banned ? '↩ UNBAN' : '🚫 BAN'}
+                        {actionId === u.id ? '...' : u.is_banned ? '↩ UNBAN' : '🚫 BAN'}
                       </button>
                     )}
                   </div>
                 </div>
               ))}
-
-              {filteredUsers.length === 0 && (
-                <div style={{ textAlign: 'center', padding: '60px', color: '#888' }}>
-                  No users match your search.
-                </div>
-              )}
+              {filteredUsers.length === 0 && <div style={{ textAlign: 'center', padding: '60px', color: '#888' }}>No users match your search.</div>}
             </div>
           </>
         )}
 
+        {/* ── LISTINGS TAB ── */}
         {!loadingData && activeTab === 'listings' && (
           <>
             <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '18px', marginBottom: '16px' }}>
-              ALL LISTINGS ({products.length})
+              LIVE LISTINGS ({products.filter(p => p.status !== 'pending').length})
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              {products.map(p => (
+              {products.filter(p => p.status !== 'pending').map(p => (
                 <div key={p.id} style={{ background: '#fff', border: '2px solid #eee', padding: '14px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '16px' }}>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontWeight: 700, fontSize: '15px', marginBottom: '3px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {p.title}
-                    </div>
-                    <div style={{ fontSize: '12px', color: '#666' }}>
-                      by {(p.seller as any)?.name ?? 'Unknown'} · GHS {p.price} · {p.condition} · {p.category}
-                    </div>
-                    <div style={{ fontSize: '11px', color: '#999', marginTop: '2px' }}>
-                      {p.views} views · {new Date(p.created_at).toLocaleDateString('en-GB')}
+                  <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flex: 1, minWidth: 0 }}>
+                    {p.image_url
+                      ? <Image src={p.image_url} alt={p.title} width={52} height={52} style={{ objectFit: 'cover', border: '1px solid #eee', flexShrink: 0 }} />
+                      : <div style={{ width: '52px', height: '52px', background: '#f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', flexShrink: 0 }}>📦</div>
+                    }
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontWeight: 700, fontSize: '14px', marginBottom: '3px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.title}</div>
+                      <div style={{ fontSize: '12px', color: '#666' }}>by {(p.seller as any)?.name ?? 'Unknown'} · GHS {p.price} · {p.condition} · {p.category}</div>
+                      <div style={{ fontSize: '11px', color: '#999', marginTop: '2px' }}>{p.views} views · {new Date(p.created_at).toLocaleDateString('en-GB')}</div>
                     </div>
                   </div>
                   <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexShrink: 0 }}>
-                    <span style={{
-                      background: p.status === 'active' ? '#dcfce7' : '#fee2e2',
-                      color: p.status === 'active' ? '#15803d' : '#dc2626',
-                      fontSize: '11px', fontWeight: 700, padding: '3px 10px',
-                      border: '1px solid currentColor',
-                    }}>
-                      {p.status.toUpperCase()}
-                    </span>
-                    <Link
-                      href={`/goods/${p.id}`}
-                      style={{ fontSize: '12px', color: '#5d3fd3', fontWeight: 700, textDecoration: 'none' }}
-                    >
-                      VIEW →
-                    </Link>
-                    <button
-                      onClick={() => removeListing(p.id)}
-                      disabled={removingId === p.id}
-                      style={{ fontSize: '12px', color: '#dc2626', fontWeight: 700, background: 'none', border: 'none', cursor: removingId === p.id ? 'not-allowed' : 'pointer', fontFamily: '"Space Grotesk", sans-serif', opacity: removingId === p.id ? 0.5 : 1 }}
-                    >
-                      {removingId === p.id ? '...' : 'REMOVE'}
+                    <StatusBadge status={p.status} />
+                    <Link href={`/goods/${p.id}`} style={{ fontSize: '12px', color: '#5d3fd3', fontWeight: 700, textDecoration: 'none' }}>VIEW →</Link>
+                    <button onClick={() => removeProduct(p.id)} disabled={actionId === p.id} style={{ fontSize: '12px', color: '#dc2626', fontWeight: 700, background: 'none', border: 'none', cursor: actionId === p.id ? 'not-allowed' : 'pointer', fontFamily: '"Space Grotesk", sans-serif', opacity: actionId === p.id ? 0.5 : 1 }}>
+                      {actionId === p.id ? '...' : 'REMOVE'}
                     </button>
                   </div>
                 </div>
               ))}
-              {products.length === 0 && (
-                <div style={{ textAlign: 'center', padding: '60px', color: '#888' }}>
-                  No listings yet.
-                </div>
-              )}
+              {products.filter(p => p.status !== 'pending').length === 0 && <div style={{ textAlign: 'center', padding: '60px', color: '#888' }}>No live listings yet.</div>}
             </div>
           </>
         )}
 
+        {/* ── SERVICES TAB ── */}
         {!loadingData && activeTab === 'services' && (
           <>
             <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '18px', marginBottom: '16px' }}>
-              ALL SERVICES ({services.length})
+              LIVE SERVICES ({services.filter(s => s.status !== 'pending').length})
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              {services.map(s => (
+              {services.filter(s => s.status !== 'pending').map(s => (
                 <div key={s.id} style={{ background: '#fff', border: '2px solid #eee', padding: '14px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '16px' }}>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontWeight: 700, fontSize: '15px', marginBottom: '3px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {s.name}
-                    </div>
-                    <div style={{ fontSize: '12px', color: '#666' }}>
-                      by {(s.provider as any)?.name ?? 'Unknown'} · {s.category} · {s.rate ?? 'No rate set'}
-                    </div>
-                    <div style={{ fontSize: '11px', color: '#999', marginTop: '2px' }}>
-                      {s.total_bookings} bookings · {new Date(s.created_at).toLocaleDateString('en-GB')}
-                    </div>
+                    <div style={{ fontWeight: 700, fontSize: '14px', marginBottom: '3px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.name}</div>
+                    <div style={{ fontSize: '12px', color: '#666' }}>by {(s.provider as any)?.name ?? 'Unknown'} · {s.category} · {s.rate ?? 'No rate'}</div>
+                    <div style={{ fontSize: '11px', color: '#999', marginTop: '2px' }}>{s.total_bookings} bookings · {new Date(s.created_at).toLocaleDateString('en-GB')}</div>
                   </div>
                   <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexShrink: 0 }}>
-                    <span style={{
-                      background: s.status === 'active' ? '#dcfce7' : '#fee2e2',
-                      color: s.status === 'active' ? '#15803d' : '#dc2626',
-                      fontSize: '11px', fontWeight: 700, padding: '3px 10px',
-                      border: '1px solid currentColor',
-                    }}>
-                      {s.status.toUpperCase()}
-                    </span>
-                    <Link
-                      href={`/services/${s.id}`}
-                      style={{ fontSize: '12px', color: '#1B5E20', fontWeight: 700, textDecoration: 'none' }}
-                    >
-                      VIEW →
-                    </Link>
-                    <button
-                      onClick={() => removeService(s.id)}
-                      disabled={removingId === s.id}
-                      style={{ fontSize: '12px', color: '#dc2626', fontWeight: 700, background: 'none', border: 'none', cursor: removingId === s.id ? 'not-allowed' : 'pointer', fontFamily: '"Space Grotesk", sans-serif', opacity: removingId === s.id ? 0.5 : 1 }}
-                    >
-                      {removingId === s.id ? '...' : 'REMOVE'}
+                    <StatusBadge status={s.status} />
+                    <button onClick={() => removeService(s.id)} disabled={actionId === s.id} style={{ fontSize: '12px', color: '#dc2626', fontWeight: 700, background: 'none', border: 'none', cursor: actionId === s.id ? 'not-allowed' : 'pointer', fontFamily: '"Space Grotesk", sans-serif', opacity: actionId === s.id ? 0.5 : 1 }}>
+                      {actionId === s.id ? '...' : 'REMOVE'}
                     </button>
                   </div>
                 </div>
               ))}
-              {services.length === 0 && (
-                <div style={{ textAlign: 'center', padding: '60px', color: '#888' }}>
-                  No services yet.
-                </div>
-              )}
+              {services.filter(s => s.status !== 'pending').length === 0 && <div style={{ textAlign: 'center', padding: '60px', color: '#888' }}>No live services yet.</div>}
             </div>
           </>
         )}

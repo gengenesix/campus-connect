@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
   }
 
   const body = await req.json()
-  const { title, description, price, category, condition, imageUrl, whatsapp } = body
+  const { title, description, price, category, condition, imageUrl, whatsapp, inStock } = body
 
   if (!title?.trim() || !category || !condition || !price) {
     return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
@@ -52,7 +52,8 @@ export async function POST(req: NextRequest) {
       condition,
       image_url: imageUrl ?? null,
       whatsapp: whatsapp?.trim() || null,
-      status: 'active',
+      in_stock: inStock !== false,
+      status: 'pending',
     })
     .select('id')
     .single()

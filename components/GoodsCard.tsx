@@ -76,6 +76,22 @@ export default function GoodsCard({ good }: { good: Good }) {
           }}>
             {good.views} 👁
           </span>
+
+          {/* Out of stock overlay */}
+          {good.inStock === false && (
+            <div style={{
+              position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.55)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              pointerEvents: 'none',
+            }}>
+              <span style={{
+                background: '#dc2626', color: '#fff',
+                fontFamily: '"Archivo Black", sans-serif',
+                fontSize: '13px', letterSpacing: '1px',
+                padding: '8px 20px', border: '2px solid #fff',
+              }}>OUT OF STOCK</span>
+            </div>
+          )}
         </div>
 
         {/* Body */}

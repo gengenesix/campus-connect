@@ -30,15 +30,27 @@ export async function POST(req: NextRequest) {
   }
 
   const body = await req.json()
-  const { receiverId, content } = body
+  const { receiverId, content, productId } = body
 
   if (!receiverId || !content?.trim()) {
     return NextResponse.json({ error: 'receiverId and content are required' }, { status: 400 })
   }
 
+  // Block sending to yourself
+  if (receiverId === user.id) {
+    return NextResponse.json({ error: 'Cannot message yourself' }, { status: 400 })
+  }
+
+  const insertPayload: Record<string, unknown> = {
+    sender_id: user.id,
+    receiver_id: receiverId,
+    content: content.trim(),
+  }
+  if (productId) insertPayload.product_id = productId
+
   const { data, error } = await supabase
     .from('messages')
-    .insert({ sender_id: user.id, receiver_id: receiverId, content: content.trim() })
+    .insert(insertPayload)
     .select()
     .single()
 

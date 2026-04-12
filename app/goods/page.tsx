@@ -17,6 +17,7 @@ interface Product {
   description: string
   created_at: string
   whatsapp: string | null
+  in_stock: boolean
   seller: {
     name: string
     avatar_url: string | null
@@ -58,10 +59,10 @@ export default function GoodsPage() {
       let query = supabase
         .from('products')
         .select(`
-          id, seller_id, title, price, condition, category, image_url, views, description, created_at, whatsapp,
+          id, seller_id, title, price, condition, category, image_url, views, description, created_at, whatsapp, in_stock,
           seller:profiles!seller_id (name, avatar_url, rating, is_verified)
         `)
-        .neq('status', 'deleted')
+        .eq('status', 'active')
 
       // Full-text search via GIN index (much faster than ILIKE at scale)
       if (debouncedSearch.trim()) {
@@ -258,6 +259,7 @@ export default function GoodsPage() {
                   description: product.description ?? '',
                   createdAt: timeAgo(product.created_at),
                   views: product.views,
+                  inStock: product.in_stock,
                 }} />
               ))}
             </div>

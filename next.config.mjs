@@ -34,12 +34,23 @@ const nextConfig = {
           { key: 'X-Content-Type-Options', value: 'nosniff' },
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
           { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
-          // Force HTTPS for 1 year (Vercel already does this, belt-and-suspenders)
           { key: 'Strict-Transport-Security', value: 'max-age=31536000; includeSubDomains' },
-          // Prevent cross-origin data leaks
           { key: 'X-Permitted-Cross-Domain-Policies', value: 'none' },
-          // Allow Google OAuth popup to work while blocking clickjacking
           { key: 'Cross-Origin-Opener-Policy', value: 'same-origin-allow-popups' },
+          {
+            key: 'Content-Security-Policy',
+            value: [
+              "default-src 'self'",
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval'", // unsafe-eval needed by Next.js dev; tighten in prod if possible
+              "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+              "font-src 'self' https://fonts.gstatic.com",
+              "img-src 'self' data: blob: https://*.supabase.co https://lh3.googleusercontent.com https://*.googleusercontent.com",
+              "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://wa.me",
+              "frame-ancestors 'none'",
+              "base-uri 'self'",
+              "form-action 'self'",
+            ].join('; '),
+          },
         ],
       },
       // Long-lived cache for static assets (immutable — fingerprinted by Next.js)

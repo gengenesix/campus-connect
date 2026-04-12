@@ -50,9 +50,10 @@ export async function middleware(request: NextRequest) {
     return r
   }
   // Logged in but not admin → 404 (hides that /admin even exists)
+  // gengenesix@gmail.com is hardcoded as admin regardless of DB role
   if (user && path.startsWith('/admin')) {
-    const role = await getRole()
-    if (role !== 'admin') {
+    const isAdmin = user.email === 'gengenesix@gmail.com' || (await getRole()) === 'admin'
+    if (!isAdmin) {
       return NextResponse.rewrite(new URL('/not-found', request.url))
     }
   }
@@ -70,9 +71,9 @@ export async function middleware(request: NextRequest) {
 
   // ── Auth pages: redirect already-logged-in users ──────────────────────────
   if (user && AUTH_PATHS.some(p => path.startsWith(p))) {
-    const role = await getRole()
+    const isAdmin = user.email === 'gengenesix@gmail.com' || (await getRole()) === 'admin'
     const url = request.nextUrl.clone()
-    url.pathname = role === 'admin' ? '/admin' : '/dashboard'
+    url.pathname = isAdmin ? '/admin' : '/dashboard'
     const r = NextResponse.redirect(url)
     copySessionCookies(r)
     return r

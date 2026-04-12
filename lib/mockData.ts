@@ -16,6 +16,7 @@ export interface Good {
   description: string
   createdAt: string
   views: number
+  inStock?: boolean
 }
 
 export interface Service {
