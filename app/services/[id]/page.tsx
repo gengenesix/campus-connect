@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/context/AuthContext'
 
@@ -36,6 +36,7 @@ interface RelatedService {
 
 export default function ServiceDetailPage() {
   const params = useParams<{ id: string }>()
+  const router = useRouter()
   const { user } = useAuth()
   const [service, setService] = useState<Service | null>(null)
   const [related, setRelated] = useState<RelatedService[]>([])
@@ -200,20 +201,38 @@ export default function ServiceDetailPage() {
             {/* Book */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '24px' }}>
               {user ? (
-                <a
-                  href={whatsappHref}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{
-                    textAlign: 'center', display: 'block', textDecoration: 'none',
-                    padding: '18px 40px', background: '#1B5E20', color: '#fff',
-                    fontFamily: '"Archivo Black", sans-serif', fontSize: '16px',
-                    border: '2px solid #111', boxShadow: '4px 4px 0 #111',
-                    transition: 'all 0.2s',
-                  }}
-                >
-                  📅 BOOK NOW
-                </a>
+                <>
+                  {service.provider && service.provider.id !== user.id && (
+                    <button
+                      onClick={() => router.push(`/messages?with=${service.provider!.id}&title=${encodeURIComponent(service.name)}`)}
+                      style={{
+                        textAlign: 'center', display: 'block', width: '100%', cursor: 'pointer',
+                        padding: '18px 40px', background: '#111', color: '#fff',
+                        fontFamily: '"Archivo Black", sans-serif', fontSize: '16px',
+                        border: '2px solid #111', boxShadow: '4px 4px 0 #1B5E20',
+                        transition: 'all 0.2s',
+                      }}
+                      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#1B5E20' }}
+                      onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#111' }}
+                    >
+                      💬 MESSAGE PROVIDER
+                    </button>
+                  )}
+                  <a
+                    href={whatsappHref}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      textAlign: 'center', display: 'block', textDecoration: 'none',
+                      padding: '18px 40px', background: '#1B5E20', color: '#fff',
+                      fontFamily: '"Archivo Black", sans-serif', fontSize: '16px',
+                      border: '2px solid #111', boxShadow: '4px 4px 0 #111',
+                      transition: 'all 0.2s',
+                    }}
+                  >
+                    📅 BOOK VIA WHATSAPP
+                  </a>
+                </>
               ) : (
                 <Link
                   href={`/auth/login?redirect=/services/${service.id}`}

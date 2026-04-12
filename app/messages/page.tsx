@@ -275,31 +275,31 @@ function MessagesInner() {
     setInput('')
 
     try {
-      const res = await fetch('/api/messages', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ receiverId: activePartner, content, productId: productId ?? undefined }),
-      })
+      const insertPayload: Record<string, unknown> = {
+        sender_id: user.id,
+        receiver_id: activePartner,
+        content,
+      }
+      if (productId) insertPayload.product_id = productId
 
-      if (res.status === 429) {
+      const { data, error } = await supabase
+        .from('messages')
+        .insert(insertPayload)
+        .select()
+        .single()
+
+      if (error || !data) {
         setMessages(prev => prev.filter(m => m.id !== tempId))
         setInput(content)
-        setSending(false)
-        return
-      }
-
-      if (res.ok) {
-        const data: Message = await res.json()
-        setMessages(prev => prev.map(m => m.id === tempId ? data : m))
+      } else {
+        const savedMsg = data as Message
+        setMessages(prev => prev.map(m => m.id === tempId ? savedMsg : m))
         setConversations(prev => {
           const existing = prev.find(c => c.partner_id === activePartner)
-          if (existing) return prev.map(c => c.partner_id === activePartner ? { ...c, last_message: content, last_time: data.created_at } : c)
+          if (existing) return prev.map(c => c.partner_id === activePartner ? { ...c, last_message: content, last_time: savedMsg.created_at } : c)
           const partnerInfo = activePartnerProfile
-          return [{ partner_id: activePartner, partner_name: partnerInfo?.name ?? 'Unknown', partner_avatar: partnerInfo?.avatar_url ?? null, last_message: content, last_time: data.created_at, unread: 0 }, ...prev]
+          return [{ partner_id: activePartner, partner_name: partnerInfo?.name ?? 'Unknown', partner_avatar: partnerInfo?.avatar_url ?? null, last_message: content, last_time: savedMsg.created_at, unread: 0 }, ...prev]
         })
-      } else {
-        setMessages(prev => prev.filter(m => m.id !== tempId))
-        setInput(content)
       }
     } catch {
       setMessages(prev => prev.filter(m => m.id !== tempId))

@@ -144,6 +144,7 @@ export default function SiteNav() {
                         { href: '/my-listings', label: 'My Listings' },
                         { href: '/messages', label: 'Messages' },
                         { href: '/profile', label: 'Edit Profile' },
+                        ...(profile?.role === 'admin' ? [{ href: '/admin', label: '⚙ Admin Panel' }] : []),
                       ].map(item => (
                         <Link
                           key={item.href}

@@ -44,12 +44,16 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        {/* Font loading */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
           href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&family=Archivo+Black&display=swap"
           rel="stylesheet"
         />
+        {/* Preconnect to Supabase for faster first DB query */}
+        <link rel="preconnect" href="https://mmrzycgqnsuocpqalreg.supabase.co" />
+        <link rel="dns-prefetch" href="https://mmrzycgqnsuocpqalreg.supabase.co" />
       </head>
       <body>
         <AuthProvider>

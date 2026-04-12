@@ -106,7 +106,10 @@ export default function AdminDashboard() {
   }
 
   useEffect(() => {
-    if (!loading && (!user || profile?.role !== 'admin')) router.replace('/')
+    if (loading) return
+    if (!user) { router.replace('/'); return }
+    // Wait until profile is actually loaded before checking role
+    if (profile !== null && profile.role !== 'admin') router.replace('/')
   }, [user, profile, loading, router])
 
   const loadData = useCallback(async () => {
