@@ -20,9 +20,17 @@ grant execute on function public.increment_product_views(uuid) to anon, authenti
 -- ============================================================
 -- 2. Enable Realtime on products table (idempotent)
 -- ============================================================
--- Drop and re-add to ensure it's in the publication
-alter publication supabase_realtime drop table if exists public.products;
-alter publication supabase_realtime add table public.products;
+-- Use a DO block to safely drop then re-add (ALTER PUBLICATION has no IF EXISTS)
+do $$
+begin
+  begin
+    alter publication supabase_realtime drop table public.products;
+  exception when others then
+    null; -- table wasn't in publication yet, that's fine
+  end;
+  alter publication supabase_realtime add table public.products;
+end;
+$$;
 
 -- ============================================================
 -- 3. Ensure views column has a default of 0
