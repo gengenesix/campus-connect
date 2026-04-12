@@ -229,7 +229,14 @@ export default function AdminDashboard() {
     )
   }
 
-  if (!user || profile?.role !== 'admin') return null
+  // Show loading while redirect fires (prevents white screen flash)
+  if (!user || !profile || profile.role !== 'admin') {
+    return (
+      <div style={{ background: '#111', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '20px', color: '#666' }}>Loading...</div>
+      </div>
+    )
+  }
 
   const tabs = [
     { key: 'pending' as const, label: pendingCount > 0 ? `⚠ PENDING (${pendingCount})` : 'PENDING', urgent: pendingCount > 0 },

@@ -139,7 +139,11 @@ export default function OfferServicePage() {
     )
   }
 
-  if (!user) return null
+  if (!user) return (
+    <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ fontFamily: '"Archivo Black", sans-serif', color: '#888' }}>Loading...</div>
+    </div>
+  )
 
   if (success) {
     return (

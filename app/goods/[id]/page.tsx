@@ -269,6 +269,14 @@ export default function GoodDetailPage() {
                   <div style={{ fontSize: '13px', color: '#888', marginTop: '2px' }}>
                     {product.seller?.rating ? `⭐ ${product.seller.rating.toFixed(1)}/5` : '★ New seller'} · UMaT Student
                   </div>
+                  {product.seller?.id && !isMine && (
+                    <Link
+                      href={`/profile/${product.seller.id}`}
+                      style={{ display: 'inline-block', marginTop: '8px', fontSize: '11px', fontWeight: 700, color: '#1B5E20', textDecoration: 'none', letterSpacing: '0.5px', borderBottom: '1px solid #1B5E20' }}
+                    >
+                      VIEW PROFILE →
+                    </Link>
+                  )}
                 </div>
               </div>
             </div>

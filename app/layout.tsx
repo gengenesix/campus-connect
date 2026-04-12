@@ -6,6 +6,7 @@ import SiteNav from "@/components/SiteNav"
 import SiteFooter from "@/components/SiteFooter"
 import { AuthProvider } from "@/context/AuthContext"
 import { Toaster } from "sonner"
+import PWAInstallBanner from "@/components/PWAInstallBanner"
 
 export const metadata: Metadata = {
   title: "Campus Connect — UMaT Student Marketplace",
@@ -19,7 +20,7 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: "/icon.svg",
-    apple: "/apple-icon.png",
+    apple: "/pwa-icon-180.png",
   },
   manifest: "/manifest.webmanifest",
   appleWebApp: {
@@ -60,6 +61,7 @@ export default function RootLayout({
           <SiteNav />
           <div style={{ minHeight: '100vh' }}>{children}</div>
           <SiteFooter />
+          <PWAInstallBanner />
           <Toaster
             position="bottom-right"
             richColors

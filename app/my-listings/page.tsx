@@ -118,7 +118,11 @@ export default function MyListingsPage() {
     )
   }
 
-  if (!user) return null
+  if (!user) return (
+    <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ fontFamily: '"Archivo Black", sans-serif', color: '#888' }}>Loading...</div>
+    </div>
+  )
 
   return (
     <div style={{ background: '#f8f8f8', minHeight: '80vh' }}>

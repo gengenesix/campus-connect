@@ -194,6 +194,14 @@ export default function ServiceDetailPage() {
                   <div style={{ fontSize: '13px', color: '#888' }}>
                     {service.provider?.rating ? `⭐ ${service.provider.rating.toFixed(1)}/5` : '★ New provider'} · UMaT Provider
                   </div>
+                  {service.provider?.id && service.provider.id !== (user?.id ?? '') && (
+                    <Link
+                      href={`/profile/${service.provider.id}`}
+                      style={{ display: 'inline-block', marginTop: '8px', fontSize: '11px', fontWeight: 700, color: '#1B5E20', textDecoration: 'none', letterSpacing: '0.5px', borderBottom: '1px solid #1B5E20' }}
+                    >
+                      VIEW PROFILE →
+                    </Link>
+                  )}
                 </div>
               </div>
             </div>

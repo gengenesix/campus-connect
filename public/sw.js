@@ -1,7 +1,7 @@
 // Campus Connect — Service Worker v1
 // Provides offline support and installability (PWA)
 
-const CACHE = 'campus-connect-v1'
+const CACHE = 'campus-connect-v3'
 
 // Core pages to pre-cache on install
 const PRECACHE = ['/', '/goods', '/services', '/manifest.webmanifest']

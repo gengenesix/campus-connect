@@ -1,7 +1,8 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
-const PROTECTED_PATHS = ['/dashboard', '/sell', '/offer-service', '/messages', '/profile', '/my-listings', '/admin']
+// /profile (edit own profile) is protected, but /profile/[id] (view others) is public
+const PROTECTED_PATHS = ['/dashboard', '/sell', '/offer-service', '/messages', '/my-listings', '/admin']
 const AUTH_PATHS = ['/auth/login', '/auth/register']
 
 export async function middleware(request: NextRequest) {
@@ -59,8 +60,10 @@ export async function middleware(request: NextRequest) {
   }
 
   // ── Other protected pages ─────────────────────────────────────────────────
+  // /profile (exact) is protected; /profile/[id] is public
   const nonAdminProtected = PROTECTED_PATHS.filter(p => p !== '/admin')
-  if (!user && nonAdminProtected.some(p => path.startsWith(p))) {
+  const isProtected = nonAdminProtected.some(p => path.startsWith(p)) || path === '/profile'
+  if (!user && isProtected) {
     const url = request.nextUrl.clone()
     url.pathname = '/auth/login'
     url.searchParams.set('redirect', path)
