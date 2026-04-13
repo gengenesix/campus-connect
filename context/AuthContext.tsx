@@ -54,9 +54,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .select('*')
         .eq('id', userId)
         .single()
+      if (error) {
+        console.error('[Auth] Profile fetch error:', error.message, error.code)
+      }
       if (!error && data) setProfile(data as Profile)
-    } catch {
-      // Ignore network errors — profile will be null, user stays logged in
+    } catch (err: any) {
+      console.error('[Auth] Profile fetch exception:', err?.message ?? err)
     } finally {
       fetchingRef.current = null
     }

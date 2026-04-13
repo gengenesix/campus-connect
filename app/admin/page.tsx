@@ -94,7 +94,7 @@ export default function AdminDashboard() {
   const [users, setUsers] = useState<AdminUser[]>([])
   const [products, setProducts] = useState<AdminProduct[]>([])
   const [services, setServices] = useState<AdminService[]>([])
-  const [loadingData, setLoadingData] = useState(true)
+  const [loadingData, setLoadingData] = useState(false)
   const [loadError, setLoadError] = useState<string | null>(null)
   const [actionId, setActionId] = useState<string | null>(null)
   const [search, setSearch] = useState('')
@@ -106,15 +106,20 @@ export default function AdminDashboard() {
     setTimeout(() => setToast(''), 3500)
   }
 
+  // Auth guard: redirect non-admins
   useEffect(() => {
     if (loading) return
     if (!user) { router.replace('/'); return }
-    // Wait until profile is actually loaded before checking role
     if (profile !== null && profile.role !== 'admin') router.replace('/')
   }, [user, profile, loading, router])
 
+  // Data loading: fires when auth resolves and user is confirmed admin
   const loadData = useCallback(async () => {
-    if (!user || profile?.role !== 'admin') return
+    if (!user || !profile || profile.role !== 'admin') {
+      console.debug('[Admin] loadData skipped — not ready or not admin', { uid: user?.id, role: profile?.role })
+      return
+    }
+    console.debug('[Admin] loadData starting for', user.email)
     setLoadingData(true)
     setLoadError(null)
     try {
@@ -129,23 +134,41 @@ export default function AdminDashboard() {
           .neq('status', 'deleted')
           .order('created_at', { ascending: false }),
       ])
-      const errors = [usersRes.error, productsRes.error, servicesRes.error].filter(Boolean)
-      if (errors.length > 0) {
-        console.error('[Admin] Query errors:', errors)
-        setLoadError(errors.map(e => e!.message).join(' | '))
+
+      const errs = [
+        usersRes.error && `profiles: ${usersRes.error.message}`,
+        productsRes.error && `products: ${productsRes.error.message}`,
+        servicesRes.error && `services: ${servicesRes.error.message}`,
+      ].filter(Boolean) as string[]
+
+      if (errs.length > 0) {
+        console.error('[Admin] Query errors:', errs)
+        setLoadError(errs.join(' | '))
+      } else {
+        console.debug('[Admin] Loaded:', {
+          users: usersRes.data?.length,
+          products: productsRes.data?.length,
+          services: servicesRes.data?.length,
+        })
       }
+
       setUsers((usersRes.data as AdminUser[]) ?? [])
       setProducts((productsRes.data as unknown as AdminProduct[]) ?? [])
       setServices((servicesRes.data as unknown as AdminService[]) ?? [])
     } catch (err: any) {
       console.error('[Admin] loadData exception:', err)
-      setLoadError(err?.message ?? 'Failed to load admin data. Check your connection.')
+      setLoadError(err?.message ?? 'Network error — check your connection and retry.')
     } finally {
       setLoadingData(false)
     }
   }, [user, profile])
 
-  useEffect(() => { loadData() }, [loadData])
+  // Trigger load whenever auth state becomes ready
+  useEffect(() => {
+    if (loading || !user || !profile) return
+    loadData()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading, user?.id, profile?.role])
 
   const approveProduct = async (id: string) => {
     setActionId(id)
@@ -277,6 +300,11 @@ export default function AdminDashboard() {
             <p style={{ color: '#666', fontSize: '13px' }}>Campus Connect · {profile?.name ?? user.email}</p>
           </div>
           <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+            <button
+              onClick={() => loadData()}
+              disabled={loadingData}
+              style={{ padding: '10px 20px', border: '2px solid #555', color: loadingData ? '#555' : '#aaa', background: 'transparent', fontFamily: '"Archivo Black", sans-serif', fontSize: '12px', cursor: loadingData ? 'not-allowed' : 'pointer', opacity: loadingData ? 0.6 : 1 }}
+            >{loadingData ? '↻ LOADING...' : '↻ RELOAD'}</button>
             <Link href="/dashboard" style={{ padding: '10px 20px', border: '2px solid #444', color: '#ccc', fontFamily: '"Archivo Black", sans-serif', fontSize: '12px', textDecoration: 'none' }}>← DASHBOARD</Link>
             <button
               onClick={async () => { await signOut(); router.replace('/') }}
@@ -331,17 +359,18 @@ export default function AdminDashboard() {
           ))}
         </div>
 
-        {loadingData && <div style={{ textAlign: 'center', padding: '60px', color: '#888', fontWeight: 600 }}>Loading data...</div>}
-
-        {!loadingData && loadError && (
+        {/* Error banner — shown regardless of loading state */}
+        {loadError && (
           <div style={{ background: '#fee2e2', border: '2px solid #dc2626', borderLeft: '6px solid #dc2626', padding: '20px 24px', marginBottom: '24px' }}>
             <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '14px', color: '#dc2626', marginBottom: '8px' }}>DATA LOAD ERROR</div>
-            <div style={{ fontSize: '13px', color: '#7f1d1d', marginBottom: '12px', fontFamily: 'monospace' }}>{loadError}</div>
-            <button onClick={() => loadData()} style={{ padding: '8px 16px', background: '#dc2626', color: '#fff', border: 'none', fontFamily: '"Archivo Black", sans-serif', fontSize: '12px', cursor: 'pointer' }}>
-              RETRY
+            <div style={{ fontSize: '13px', color: '#7f1d1d', marginBottom: '12px', fontFamily: 'monospace', wordBreak: 'break-all' }}>{loadError}</div>
+            <button onClick={() => loadData()} disabled={loadingData} style={{ padding: '8px 16px', background: '#dc2626', color: '#fff', border: 'none', fontFamily: '"Archivo Black", sans-serif', fontSize: '12px', cursor: loadingData ? 'not-allowed' : 'pointer', opacity: loadingData ? 0.6 : 1 }}>
+              {loadingData ? 'RETRYING...' : 'RETRY'}
             </button>
           </div>
         )}
+
+        {loadingData && !loadError && <div style={{ textAlign: 'center', padding: '60px', color: '#888', fontWeight: 600 }}>Loading data...</div>}
 
         {/* ── PENDING TAB ── */}
         {!loadingData && activeTab === 'pending' && (
