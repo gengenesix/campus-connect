@@ -106,7 +106,7 @@ export default function OfferServicePage() {
           rate: form.rate.trim(),
           availability: form.availability.trim(),
           imageUrl,
-          whatsapp: form.whatsapp.trim() || profile.phone || null,
+          whatsapp: form.whatsapp.trim() ? '+233' + form.whatsapp.replace(/\D/g, '') : (profile.phone ?? null),
         }),
       })
 
@@ -330,13 +330,24 @@ export default function OfferServicePage() {
             {/* WhatsApp */}
             <div>
               <label style={{ display: 'block', fontWeight: 700, fontSize: '12px', letterSpacing: '1.5px', marginBottom: '8px' }}>WHATSAPP NUMBER (OPTIONAL)</label>
-              <input
-                type="tel"
-                value={form.whatsapp}
-                onChange={e => update('whatsapp', e.target.value)}
-                placeholder={profile?.phone ?? '+233 XX XXX XXXX'}
-                style={{ width: '100%', padding: '13px 16px', border: '2px solid #ddd', fontFamily: '"Space Grotesk", sans-serif', fontSize: '15px', outline: 'none', boxSizing: 'border-box' }}
-              />
+              <div style={{ position: 'relative' }}>
+                <span style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', fontSize: '13px', color: '#555', fontWeight: 700, pointerEvents: 'none', userSelect: 'none' }}>
+                  +233
+                </span>
+                <input
+                  type="tel"
+                  value={form.whatsapp}
+                  onChange={e => update('whatsapp', e.target.value.replace(/\D/g, ''))}
+                  placeholder="241234567"
+                  maxLength={9}
+                  style={{ width: '100%', padding: '13px 16px 13px 58px', border: '2px solid #ddd', fontFamily: '"Space Grotesk", sans-serif', fontSize: '15px', outline: 'none', boxSizing: 'border-box' }}
+                  onFocus={e => (e.currentTarget.style.borderColor = '#1B5E20')}
+                  onBlur={e => (e.currentTarget.style.borderColor = '#ddd')}
+                />
+              </div>
+              <p style={{ marginTop: '6px', fontSize: '12px', color: '#888' }}>
+                Ghana number — buyers can contact you on WhatsApp. Leave blank to use your profile number.
+              </p>
             </div>
 
             <button

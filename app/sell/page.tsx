@@ -27,7 +27,8 @@ function isValidGhanaPhone(val: string): boolean {
   if (!val.trim()) return true // optional
   const digits = val.replace(/\D/g, '')
   return (digits.startsWith('0') && digits.length === 10) ||
-    (digits.startsWith('233') && digits.length === 12)
+    (digits.startsWith('233') && digits.length === 12) ||
+    digits.length === 9  // user typed just the 9 digits after the +233 prefix
 }
 
 export default function SellPage() {
@@ -88,7 +89,7 @@ export default function SellPage() {
 
     const rawPhone = form.phone.trim() || profile.phone || ''
     if (rawPhone && !isValidGhanaPhone(rawPhone)) {
-      setError('Please enter a valid Ghana number (e.g. 0241234567 or +233241234567).')
+      setError('Please enter a valid Ghana number (e.g. 241234567 — the 9 digits after +233).')
       return
     }
 
@@ -357,8 +358,9 @@ export default function SellPage() {
                 <input
                   type="tel"
                   value={form.phone}
-                  onChange={e => update('phone', e.target.value)}
-                  placeholder={profile?.phone ? profile.phone.replace(/^\+233|^0/, '') : '24 123 4567'}
+                  onChange={e => update('phone', e.target.value.replace(/\D/g, ''))}
+                  placeholder={profile?.phone ? profile.phone.replace(/^\+?233|^0/, '') : '241234567'}
+                  maxLength={9}
                   style={{ width: '100%', padding: '13px 16px 13px 56px', border: '2px solid #ddd', fontFamily: '"Space Grotesk", sans-serif', fontSize: '15px', outline: 'none', boxSizing: 'border-box' }}
                   onFocus={e => (e.currentTarget.style.borderColor = '#25D366')}
                   onBlur={e => (e.currentTarget.style.borderColor = '#ddd')}

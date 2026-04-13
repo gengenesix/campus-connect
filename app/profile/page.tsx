@@ -44,7 +44,7 @@ export default function ProfilePage() {
         course: profile.course ?? '',
         class_year: profile.class_year ?? '',
         hostel: profile.hostel ?? '',
-        phone: profile.phone ?? '',
+        phone: profile.phone?.replace(/^\+?233|^0/, '') ?? '',
         bio: profile.bio ?? '',
         role: profile.role ?? 'buyer',
       })
@@ -128,7 +128,7 @@ export default function ProfilePage() {
         course: form.course || null,
         class_year: form.class_year || null,
         hostel: form.hostel || null,
-        phone: form.phone || null,
+        phone: form.phone ? '+233' + form.phone.replace(/\D/g, '') : null,
         bio: form.bio || null,
         role: roleToSave,
       } as any)
@@ -440,13 +440,20 @@ export default function ProfilePage() {
                     {/* Phone */}
                     <div>
                       <label style={{ display: 'block', fontWeight: 700, fontSize: '12px', letterSpacing: '1.5px', marginBottom: '8px' }}>PHONE / WHATSAPP</label>
-                      <input
-                        type="tel"
-                        value={form.phone}
-                        onChange={e => setForm(p => ({ ...p, phone: e.target.value }))}
-                        placeholder="+233 XX XXX XXXX"
-                        style={{ width: '100%', padding: '12px 16px', border: '2px solid #111', fontFamily: '"Space Grotesk", sans-serif', fontSize: '14px', outline: 'none', boxSizing: 'border-box' }}
-                      />
+                      <div style={{ position: 'relative' }}>
+                        <span style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', fontSize: '13px', color: '#555', fontWeight: 700, pointerEvents: 'none', userSelect: 'none' }}>
+                          +233
+                        </span>
+                        <input
+                          type="tel"
+                          value={form.phone}
+                          onChange={e => setForm(p => ({ ...p, phone: e.target.value.replace(/\D/g, '') }))}
+                          placeholder="241234567"
+                          maxLength={9}
+                          style={{ width: '100%', padding: '12px 16px 12px 58px', border: '2px solid #111', fontFamily: '"Space Grotesk", sans-serif', fontSize: '14px', outline: 'none', boxSizing: 'border-box' }}
+                        />
+                      </div>
+                      <p style={{ marginTop: '4px', fontSize: '11px', color: '#888' }}>Enter the 9 digits after +233</p>
                     </div>
 
                     {/* Programme / Course */}

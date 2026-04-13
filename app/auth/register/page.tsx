@@ -89,7 +89,7 @@ export default function RegisterPage() {
         course: form.course || null,
         class_year: form.class_year || null,
         hostel: form.hostel || null,
-        phone: form.phone || null,
+        phone: form.phone ? '+233' + form.phone.replace(/\D/g, '') : null,
         role: form.role,
       })
     }
@@ -336,18 +336,27 @@ export default function RegisterPage() {
                   <label style={{ display: 'block', fontWeight: 700, fontSize: '12px', letterSpacing: '1.5px', marginBottom: '8px' }}>
                     PHONE / WHATSAPP {isSeller ? '*' : '(OPTIONAL)'}
                   </label>
-                  <input
-                    type="tel"
-                    value={form.phone}
-                    onChange={e => update('phone', e.target.value)}
-                    placeholder="+233 XX XXX XXXX"
-                    style={{
-                      width: '100%', padding: '13px 16px',
-                      border: `2px solid ${isSeller && !form.phone ? '#f59e0b' : '#ddd'}`,
-                      fontFamily: '"Space Grotesk", sans-serif', fontSize: '15px',
-                      outline: 'none', boxSizing: 'border-box',
-                    }}
-                  />
+                  <div style={{ position: 'relative' }}>
+                    <span style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', fontSize: '13px', color: '#555', fontWeight: 700, pointerEvents: 'none', userSelect: 'none' }}>
+                      +233
+                    </span>
+                    <input
+                      type="tel"
+                      value={form.phone}
+                      onChange={e => update('phone', e.target.value.replace(/\D/g, ''))}
+                      placeholder="241234567"
+                      maxLength={9}
+                      style={{
+                        width: '100%', padding: '13px 16px 13px 58px',
+                        border: `2px solid ${isSeller && !form.phone ? '#f59e0b' : '#ddd'}`,
+                        fontFamily: '"Space Grotesk", sans-serif', fontSize: '15px',
+                        outline: 'none', boxSizing: 'border-box',
+                      }}
+                    />
+                  </div>
+                  <p style={{ marginTop: '4px', fontSize: '11px', color: '#888' }}>
+                    Ghana number — enter the 9 digits after +233
+                  </p>
                 </div>
 
                 <button

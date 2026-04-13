@@ -6,6 +6,7 @@ import Image from 'next/image'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useAuth } from '@/context/AuthContext'
 import { supabase } from '@/lib/supabase'
+import { toast } from 'sonner'
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -433,6 +434,12 @@ function MessagesInner() {
     const content = input.trim()
     if (content.length > 2000) return
 
+    // Block immediately if offline
+    if (!navigator.onLine) {
+      toast.error('No internet connection — reconnect and try again.')
+      return
+    }
+
     setSending(true)
     const tempId = `opt_${Date.now()}`
     const optimistic: Message = {
@@ -451,10 +458,16 @@ function MessagesInner() {
       })
 
       if (!res.ok) {
-        const err = await res.json().catch(() => ({ error: 'Send failed' }))
+        const err = await res.json().catch(() => ({ error: 'Failed to send' }))
         setMessages(prev => prev.filter(m => m.id !== tempId))
         setInput(content)
-        console.error('Send error:', err.error)
+        const msg = err.error ?? 'Failed to send message'
+        toast.error(
+          res.status === 401 ? 'Session expired — please sign in again.' :
+          res.status === 403 ? msg :
+          res.status === 429 ? 'Too many messages — slow down a bit.' :
+          msg
+        )
       } else {
         const savedMsg = await res.json() as Message
         setMessages(prev => prev.map(m => m.id === tempId ? savedMsg : m))
@@ -469,6 +482,7 @@ function MessagesInner() {
     } catch {
       setMessages(prev => prev.filter(m => m.id !== tempId))
       setInput(content)
+      toast.error(navigator.onLine ? 'Failed to send — try again.' : 'No internet connection.')
     }
     setSending(false)
   }
