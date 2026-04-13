@@ -19,7 +19,9 @@ export const metadata: Metadata = {
     type: "website",
   },
   icons: {
-    icon: "/icon.svg",
+    icon: [
+      { url: "/icon.svg", type: "image/svg+xml" },
+    ],
     apple: "/pwa-icon-180.png",
   },
   manifest: "/manifest.webmanifest",

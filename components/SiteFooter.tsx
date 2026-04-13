@@ -50,7 +50,7 @@ export default function SiteFooter() {
           </div>
         </div>
         <div style={{ paddingTop: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
-          <div style={{ color: '#555', fontSize: '13px' }}>© 2024 Campus Connect. UMaT, Tarkwa. All rights reserved.</div>
+          <div style={{ color: '#555', fontSize: '13px' }}>© 2026 Campus Connect. UMaT, Tarkwa. All rights reserved.</div>
           <div style={{ display: 'flex', gap: '20px' }}>
             <Link href="/about" style={{ color: '#555', fontSize: '13px', textDecoration: 'none' }}>Privacy</Link>
             <Link href="/about" style={{ color: '#555', fontSize: '13px', textDecoration: 'none' }}>Terms</Link>
