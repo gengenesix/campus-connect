@@ -9,16 +9,24 @@ import { Redis } from '@upstash/redis'
  * to your .env.local / Vercel environment variables.
  */
 export function getRateLimiter(requests: number, window: `${number} ${'ms' | 's' | 'm' | 'h' | 'd'}`) {
-  const url   = process.env.UPSTASH_REDIS_REST_URL
-  const token = process.env.UPSTASH_REDIS_REST_TOKEN
+  // Strip any accidental surrounding quotes (e.g. from Vercel copy-paste: ""https://..."")
+  const raw = (v: string | undefined) => v?.replace(/^["']+|["']+$/g, '').trim()
+
+  const url   = raw(process.env.UPSTASH_REDIS_REST_URL)
+  const token = raw(process.env.UPSTASH_REDIS_REST_TOKEN)
 
   if (!url || !token) return null
 
-  const redis = new Redis({ url, token })
-  return new Ratelimit({
-    redis,
-    limiter: Ratelimit.slidingWindow(requests, window),
-    analytics: false,
-    prefix: 'campus:rl',
-  })
+  try {
+    const redis = new Redis({ url, token })
+    return new Ratelimit({
+      redis,
+      limiter: Ratelimit.slidingWindow(requests, window),
+      analytics: false,
+      prefix: 'campus:rl',
+    })
+  } catch (e: any) {
+    console.warn('[ratelimit] Failed to initialise Upstash — rate limiting disabled:', e?.message)
+    return null
+  }
 }
