@@ -95,6 +95,7 @@ export default function AdminDashboard() {
   const [products, setProducts] = useState<AdminProduct[]>([])
   const [services, setServices] = useState<AdminService[]>([])
   const [loadingData, setLoadingData] = useState(true)
+  const [loadError, setLoadError] = useState<string | null>(null)
   const [actionId, setActionId] = useState<string | null>(null)
   const [search, setSearch] = useState('')
   const [toast, setToast] = useState('')
@@ -115,21 +116,33 @@ export default function AdminDashboard() {
   const loadData = useCallback(async () => {
     if (!user || profile?.role !== 'admin') return
     setLoadingData(true)
-    const [usersRes, productsRes, servicesRes] = await Promise.all([
-      supabase.from('profiles').select('*').order('created_at', { ascending: false }),
-      supabase.from('products')
-        .select('id, title, price, status, condition, category, views, image_url, in_stock, created_at, seller:profiles!seller_id(id, name)')
-        .neq('status', 'deleted')
-        .order('created_at', { ascending: false }),
-      supabase.from('services')
-        .select('id, name, category, rate, status, image_url, total_bookings, created_at, provider:profiles!provider_id(id, name)')
-        .neq('status', 'deleted')
-        .order('created_at', { ascending: false }),
-    ])
-    setUsers((usersRes.data as AdminUser[]) ?? [])
-    setProducts((productsRes.data as unknown as AdminProduct[]) ?? [])
-    setServices((servicesRes.data as unknown as AdminService[]) ?? [])
-    setLoadingData(false)
+    setLoadError(null)
+    try {
+      const [usersRes, productsRes, servicesRes] = await Promise.all([
+        supabase.from('profiles').select('*').order('created_at', { ascending: false }),
+        supabase.from('products')
+          .select('id, title, price, status, condition, category, views, image_url, in_stock, created_at, seller:profiles!seller_id(id, name)')
+          .neq('status', 'deleted')
+          .order('created_at', { ascending: false }),
+        supabase.from('services')
+          .select('id, name, category, rate, status, image_url, total_bookings, created_at, provider:profiles!provider_id(id, name)')
+          .neq('status', 'deleted')
+          .order('created_at', { ascending: false }),
+      ])
+      const errors = [usersRes.error, productsRes.error, servicesRes.error].filter(Boolean)
+      if (errors.length > 0) {
+        console.error('[Admin] Query errors:', errors)
+        setLoadError(errors.map(e => e!.message).join(' | '))
+      }
+      setUsers((usersRes.data as AdminUser[]) ?? [])
+      setProducts((productsRes.data as unknown as AdminProduct[]) ?? [])
+      setServices((servicesRes.data as unknown as AdminService[]) ?? [])
+    } catch (err: any) {
+      console.error('[Admin] loadData exception:', err)
+      setLoadError(err?.message ?? 'Failed to load admin data. Check your connection.')
+    } finally {
+      setLoadingData(false)
+    }
   }, [user, profile])
 
   useEffect(() => { loadData() }, [loadData])
@@ -319,6 +332,16 @@ export default function AdminDashboard() {
         </div>
 
         {loadingData && <div style={{ textAlign: 'center', padding: '60px', color: '#888', fontWeight: 600 }}>Loading data...</div>}
+
+        {!loadingData && loadError && (
+          <div style={{ background: '#fee2e2', border: '2px solid #dc2626', borderLeft: '6px solid #dc2626', padding: '20px 24px', marginBottom: '24px' }}>
+            <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '14px', color: '#dc2626', marginBottom: '8px' }}>DATA LOAD ERROR</div>
+            <div style={{ fontSize: '13px', color: '#7f1d1d', marginBottom: '12px', fontFamily: 'monospace' }}>{loadError}</div>
+            <button onClick={() => loadData()} style={{ padding: '8px 16px', background: '#dc2626', color: '#fff', border: 'none', fontFamily: '"Archivo Black", sans-serif', fontSize: '12px', cursor: 'pointer' }}>
+              RETRY
+            </button>
+          </div>
+        )}
 
         {/* ── PENDING TAB ── */}
         {!loadingData && activeTab === 'pending' && (
