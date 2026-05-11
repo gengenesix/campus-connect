@@ -4,11 +4,13 @@ import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import crypto from 'crypto'
 
-const serviceSupabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  { auth: { autoRefreshToken: false, persistSession: false } }
-)
+function getServiceClient() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    { auth: { autoRefreshToken: false, persistSession: false } }
+  )
+}
 
 function hashOtp(otp: string): string {
   return crypto.createHash('sha256').update(otp).digest('hex')
@@ -63,10 +65,10 @@ export async function POST(request: NextRequest) {
       const expiresAt = new Date(Date.now() + 15 * 60 * 1000).toISOString()
 
       // Remove any existing OTPs for this user
-      await serviceSupabase.from('email_otps').delete().eq('user_id', user.id)
+      await getServiceClient().from('email_otps').delete().eq('user_id', user.id)
 
       // Store new OTP
-      const { error: insertError } = await serviceSupabase.from('email_otps').insert({
+      const { error: insertError } = await getServiceClient().from('email_otps').insert({
         user_id: user.id,
         email: email.toLowerCase(),
         otp_hash: hash,
@@ -122,7 +124,7 @@ export async function POST(request: NextRequest) {
 
       const hash = hashOtp(otp)
 
-      const { data: otpRow } = await serviceSupabase
+      const { data: otpRow } = await getServiceClient()
         .from('email_otps')
         .select('id, expires_at, used')
         .eq('user_id', user.id)
@@ -139,10 +141,10 @@ export async function POST(request: NextRequest) {
       }
 
       // Consume the OTP
-      await serviceSupabase.from('email_otps').update({ used: true }).eq('id', otpRow.id)
+      await getServiceClient().from('email_otps').update({ used: true }).eq('id', otpRow.id)
 
       // Update profile
-      const { error: updateError } = await serviceSupabase
+      const { error: updateError } = await getServiceClient()
         .from('profiles')
         .update({ university_email: email.toLowerCase(), university_email_verified: true })
         .eq('id', user.id)

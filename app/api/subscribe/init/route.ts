@@ -4,11 +4,13 @@ import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import crypto from 'crypto'
 
-const serviceSupabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  { auth: { autoRefreshToken: false, persistSession: false } }
-)
+function getServiceClient() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    { auth: { autoRefreshToken: false, persistSession: false } }
+  )
+}
 
 async function getAuthUser(request: NextRequest) {
   const cookieStore = await cookies()
@@ -41,7 +43,7 @@ export async function POST(request: NextRequest) {
       if (process.env.NODE_ENV === 'development') {
         // Activate subscription directly in dev
         const newExpiry = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
-        await serviceSupabase
+        await getServiceClient()
           .from('profiles')
           .update({ subscription_expires_at: newExpiry })
           .eq('id', user.id)
@@ -55,7 +57,7 @@ export async function POST(request: NextRequest) {
     const reference = `CC_SUB_${user.id.slice(0, 8)}_${crypto.randomBytes(6).toString('hex').toUpperCase()}`
 
     // ── Create pending subscription row ───────────────────────────────────
-    await serviceSupabase.from('subscriptions').insert({
+    await getServiceClient().from('subscriptions').insert({
       user_id: user.id,
       status: 'pending',
       paystack_ref: reference,

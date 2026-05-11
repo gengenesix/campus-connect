@@ -2,11 +2,13 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import crypto from 'crypto'
 
-const serviceSupabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  { auth: { autoRefreshToken: false, persistSession: false } }
-)
+function getServiceClient() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    { auth: { autoRefreshToken: false, persistSession: false } }
+  )
+}
 
 // POST /api/webhooks/paystack
 // Backup confirmation from Paystack when payment completes.
@@ -41,7 +43,7 @@ export async function POST(request: NextRequest) {
   }
 
   // Look up subscription
-  const { data: sub } = await serviceSupabase
+  const { data: sub } = await getServiceClient()
     .from('subscriptions')
     .select('id, user_id, status')
     .eq('paystack_ref', reference)
@@ -58,7 +60,7 @@ export async function POST(request: NextRequest) {
 
   // Activate subscription
   const currentExpiry = null // fetch fresh
-  const { data: prof } = await serviceSupabase
+  const { data: prof } = await getServiceClient()
     .from('profiles')
     .select('subscription_expires_at')
     .eq('id', sub.user_id)

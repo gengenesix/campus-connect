@@ -1,15 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 
-const serviceSupabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  { auth: { autoRefreshToken: false, persistSession: false } }
-)
-
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://campusconnect.gh'
 
+function getServiceClient() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    { auth: { autoRefreshToken: false, persistSession: false } }
+  )
+}
+
 async function activateSubscription(userId: string, reference: string) {
+  const serviceSupabase = getServiceClient()
   // Extend from current expiry if still active, otherwise from now
   const { data: prof } = await serviceSupabase
     .from('profiles')
@@ -44,6 +47,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(`${SITE_URL}/subscribe?error=missing_reference`)
   }
 
+  const serviceSupabase = getServiceClient()
   // Look up pending subscription to get user_id
   const { data: sub } = await serviceSupabase
     .from('subscriptions')
