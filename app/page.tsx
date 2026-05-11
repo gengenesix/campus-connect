@@ -40,13 +40,6 @@ const TYPE_COLOR: Record<UniversityType, string> = {
   private: '#b45309',
 }
 
-const HERO_PHOTOS = [
-  { src: '/images/showcase/braids.jpg', alt: 'Braids service' },
-  { src: '/images/showcase/nails.jpg', alt: 'Nail art' },
-  { src: '/images/showcase/food.jpg', alt: 'Campus food' },
-  { src: '/images/showcase/phones.jpg', alt: 'Phones & gadgets' },
-]
-
 const INITIAL_UNI_COUNT = 8
 
 export default function HomePage() {
@@ -134,7 +127,6 @@ export default function HomePage() {
         .how-card { transition: all 0.2s; }
         .uni-card { transition: transform 0.15s, box-shadow 0.15s; cursor: pointer; }
         .uni-card:hover { transform: translate(-2px, -2px); box-shadow: 5px 5px 0 #111 !important; }
-        .hero-photo-mosaic { animation: heroPhotoIn 0.7s ease 0.4s both; }
         .uni-expand-btn {
           padding: 12px 32px; border: 2px solid #111; background: #fff;
           font-family: "Archivo Black", sans-serif; font-size: 12px;
@@ -149,7 +141,6 @@ export default function HomePage() {
         }
         .showcase-inner { display: flex; gap: 14px; width: max-content; }
         .showcase-item { width: 210px; height: 310px; flex-shrink: 0; }
-        .hero-mobile-strip { display: none; }
         @media (max-width: 768px) {
           .showcase-scroll { overflow-x: visible; padding-left: 16px; padding-right: 16px; padding-bottom: 0; }
           .showcase-inner { display: grid; grid-template-columns: 1fr 1fr; width: 100%; gap: 10px; }
@@ -160,8 +151,6 @@ export default function HomePage() {
           .uni-grid { grid-template-columns: repeat(2, 1fr) !important; }
           .trust-grid { grid-template-columns: 1fr 1fr !important; gap: 20px !important; }
           .how-grid { grid-template-columns: 1fr !important; }
-          .hero-photo-mosaic { display: none !important; }
-          .hero-mobile-strip { display: block !important; width: 100%; }
         }
         @media (min-width: 769px) and (max-width: 1024px) {
           .showcase-item { width: 175px; height: 260px; }
@@ -211,67 +200,49 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* RIGHT — 2×2 photo mosaic (desktop full, mobile strip) */}
-        <div className="hero-visuals" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          {/* Desktop mosaic */}
-          <div className="hero-photo-mosaic" style={{ position: 'relative', width: '100%', maxWidth: '460px' }}>
+        {/* RIGHT — original overlapping collage */}
+        <div className="hero-visuals">
+          {/* Abstract green circle background */}
+          <div className="abstract-shape">
+            <svg width="520" height="520" viewBox="0 0 520 520" fill="none">
+              <circle cx="260" cy="260" r="250" fill="#1B5E20" opacity="0.07" />
+              <circle cx="260" cy="260" r="195" fill="#1B5E20" opacity="0.05" />
+            </svg>
+          </div>
+
+          {/* Decorative green star */}
+          <div className="decorative-star">
+            <svg width="72" height="72" viewBox="0 0 72 72" fill="none">
+              <path d="M36 2 L43 26 L68 26 L48 41 L55 65 L36 51 L17 65 L24 41 L4 26 L29 26 Z" fill="#1B5E20" opacity="0.85" />
+            </svg>
+          </div>
+
+          {/* Main large photo */}
+          <div className="main-image-container">
+            <img src="/images/hero/main.jpg" alt="Campus marketplace" onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/placeholder.jpg' }} />
+            {/* LIVE badge */}
             <div style={{
-              display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px',
-              transform: 'rotate(1.5deg)',
+              position: 'absolute', top: '20px', left: '-14px',
+              background: '#ff3366', color: '#fff',
+              fontFamily: '"Archivo Black", sans-serif', fontSize: '11px',
+              letterSpacing: '2px', padding: '7px 16px',
+              border: '2px solid #111', boxShadow: '3px 3px 0 #111',
             }}>
-              {HERO_PHOTOS.map((photo, i) => (
-                <div
-                  key={i}
-                  style={{
-                    height: 'clamp(130px, 16vw, 205px)',
-                    border: '2px solid #111', overflow: 'hidden',
-                    boxShadow: i === 0 ? '4px 4px 0 #111' : i === 3 ? '3px 3px 0 #5d3fd3' : 'none',
-                    marginTop: i === 1 ? '22px' : i === 3 ? '-22px' : '0',
-                    position: 'relative',
-                  }}
-                >
-                  <img
-                    src={photo.src} alt={photo.alt}
-                    style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', transition: 'transform 0.4s ease' }}
-                    onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/placeholder.jpg' }}
-                    onMouseEnter={e => { (e.currentTarget as HTMLImageElement).style.transform = 'scale(1.06)' }}
-                    onMouseLeave={e => { (e.currentTarget as HTMLImageElement).style.transform = 'scale(1)' }}
-                  />
-                  {i === 0 && (
-                    <div style={{ position: 'absolute', top: 8, left: 8, background: '#1B5E20', color: '#fff', fontSize: '9px', fontWeight: 700, letterSpacing: '1.5px', padding: '3px 8px', fontFamily: '"Space Grotesk", sans-serif' }}>
-                      SERVICES
-                    </div>
-                  )}
-                  {i === 2 && (
-                    <div style={{ position: 'absolute', top: 8, left: 8, background: '#5d3fd3', color: '#fff', fontSize: '9px', fontWeight: 700, letterSpacing: '1.5px', padding: '3px 8px', fontFamily: '"Space Grotesk", sans-serif' }}>
-                      GOODS
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-            <div style={{
-              position: 'absolute', bottom: '-10px', right: '4px',
-              background: '#111', color: '#fff',
-              fontFamily: '"Archivo Black", sans-serif', fontSize: '10px',
-              letterSpacing: '2px', padding: '6px 14px', border: '2px solid #111',
-            }}>
-              43 UNIS · ZERO FEES
+              LIVE
             </div>
           </div>
 
-          {/* Mobile hero image strip — shows below text on small screens */}
-          <div className="hero-mobile-strip">
-            <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', scrollbarWidth: 'none', paddingBottom: '4px' }}>
-              {HERO_PHOTOS.map((photo, i) => (
-                <div key={i} style={{ flexShrink: 0, width: '42vw', maxWidth: '160px', height: '130px', border: '2px solid #111', overflow: 'hidden', position: 'relative' }}>
-                  <img src={photo.src} alt={photo.alt} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/placeholder.jpg' }} />
-                  {i === 0 && <div style={{ position: 'absolute', bottom: 6, left: 6, background: '#1B5E20', color: '#fff', fontSize: '8px', fontWeight: 700, letterSpacing: '1px', padding: '2px 6px', fontFamily: '"Space Grotesk", sans-serif' }}>SERVICES</div>}
-                  {i === 2 && <div style={{ position: 'absolute', bottom: 6, left: 6, background: '#5d3fd3', color: '#fff', fontSize: '8px', fontWeight: 700, letterSpacing: '1px', padding: '2px 6px', fontFamily: '"Space Grotesk", sans-serif' }}>GOODS</div>}
-                </div>
-              ))}
+          {/* Secondary overlapping image */}
+          <div className="secondary-image">
+            <img src="/images/hero/secondary.jpg" alt="Student services" onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/placeholder.jpg' }} />
+          </div>
+
+          {/* Circular sticker photo with FREE badge */}
+          <div className="sticker-graphic">
+            <div className="hot-badge" style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '10px', letterSpacing: '0.5px' }}>
+              FREE
             </div>
-            <div style={{ marginTop: '8px', fontSize: '11px', color: '#999', fontWeight: 600, letterSpacing: '0.5px' }}>43 UNIS · ZERO FEES · ZERO COMMISSION</div>
+            <img src="/images/hero/sticker.jpg" alt="Campus student" onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/placeholder.jpg' }} />
           </div>
         </div>
       </section>
