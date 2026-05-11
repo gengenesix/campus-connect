@@ -28,6 +28,19 @@ export default function SiteNav() {
   const pathname = usePathname()
   const router = useRouter()
   const { user, profile, signOut, loading } = useAuth()
+  const [campusShortName, setCampusShortName] = useState<string>('')
+
+  // Fetch campus short name when user has a university_id
+  useEffect(() => {
+    if (!profile?.university_id) { setCampusShortName(''); return }
+    fetch('/api/universities')
+      .then(r => r.json())
+      .then(({ universities }) => {
+        const found = (universities ?? []).find((u: any) => u.id === profile.university_id)
+        if (found?.short_name) setCampusShortName(found.short_name)
+      })
+      .catch(() => {})
+  }, [profile?.university_id])
 
   // Instant search: debounced fetch as user types
   useEffect(() => {
@@ -101,11 +114,23 @@ export default function SiteNav() {
 
       {/* Navigation */}
       <nav className="navigation" style={{ borderBottom: '2px solid #eee' }}>
-        <div className="logo">
+        <div className="logo" style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
           <Link href="/">
             CAMPUS<span>.</span>CONNECT
           </Link>
           <div className="beta-badge">BETA</div>
+          {campusShortName && (
+            <span style={{
+              display: 'inline-flex', alignItems: 'center', gap: '5px',
+              background: '#1B5E20', color: '#fff',
+              padding: '3px 10px', fontSize: '10px', fontWeight: 700,
+              letterSpacing: '0.8px', fontFamily: '"Space Grotesk", sans-serif',
+              border: '1.5px solid #111', whiteSpace: 'nowrap',
+            }}>
+              <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#a78bfa', display: 'inline-block', flexShrink: 0 }} />
+              {campusShortName}
+            </span>
+          )}
         </div>
 
         <div className="nav-links">

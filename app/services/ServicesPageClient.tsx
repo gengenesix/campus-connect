@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import ServiceCard from '@/components/ServiceCard'
 import { supabase } from '@/lib/supabase'
+import { useAuth } from '@/context/AuthContext'
 
 interface Service {
   id: string
@@ -27,16 +28,20 @@ export default function ServicesPageClient({
   sp,
 }: {
   initialServices: Service[]
-  sp: { q: string; category: string }
+  sp: { q: string; category: string; university_id: string }
 }) {
   const router = useRouter()
+  const { profile } = useAuth()
   const [search, setSearch] = useState(sp.q)
   const [category, setCategory] = useState(sp.category)
+  const [campusOnly, setCampusOnly] = useState(!!sp.university_id)
   const [services, setServices] = useState(initialServices)
   const [hasMore, setHasMore] = useState(initialServices.length === PAGE_SIZE)
   const [loadingMore, setLoadingMore] = useState(false)
   const offsetRef = useRef(initialServices.length)
   const isFirstRender = useRef(true)
+
+  const userUniversityId = profile?.university_id ?? ''
 
   // Sync services list when server provides new initial data
   useEffect(() => {
@@ -53,20 +58,21 @@ export default function ServicesPageClient({
       const p = new URLSearchParams()
       if (search) p.set('q', search)
       if (category) p.set('category', category)
+      if (campusOnly && userUniversityId) p.set('university_id', userUniversityId)
       router.replace(`/services${p.size ? '?' + p.toString() : ''}`, { scroll: false })
     }, delay)
     return () => clearTimeout(t)
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [search, category])
+  }, [search, category, campusOnly])
 
   const loadMore = async () => {
     setLoadingMore(true)
     try {
       if (search.trim()) {
-        // Use /api/search (Meilisearch → Supabase fallback) when text search is active
         const page = Math.floor(offsetRef.current / PAGE_SIZE) + 2
         const p = new URLSearchParams({ q: search, type: 'services', page: String(page) })
         if (category) p.set('category', category)
+        if (campusOnly && userUniversityId) p.set('university_id', userUniversityId)
         const res = await fetch(`/api/search?${p}`)
         const json = await res.json()
         const rows: Service[] = json.hits ?? []
@@ -74,7 +80,6 @@ export default function ServicesPageClient({
         offsetRef.current += rows.length
         setHasMore(json.hasMore)
       } else {
-        // Supabase direct for category-only browsing
         const from = offsetRef.current + PAGE_SIZE
         let q = supabase
           .from('services')
@@ -84,6 +89,7 @@ export default function ServicesPageClient({
           `)
           .neq('status', 'deleted')
         if (category) q = q.eq('category', category)
+        if (campusOnly && userUniversityId) q = q.eq('university_id', userUniversityId)
         const { data } = await q.order('total_bookings', { ascending: false }).range(from, from + PAGE_SIZE - 1)
         const rows = (data as unknown as Service[]) ?? []
         setServices(prev => [...prev, ...rows])
@@ -94,8 +100,8 @@ export default function ServicesPageClient({
     finally { setLoadingMore(false) }
   }
 
-  const hasFilters = category || search
-  const clearFilters = () => { setCategory(''); setSearch('') }
+  const hasFilters = category || search || campusOnly
+  const clearFilters = () => { setCategory(''); setSearch(''); setCampusOnly(false) }
 
   return (
     <div>
@@ -133,16 +139,31 @@ export default function ServicesPageClient({
         </div>
       </div>
 
-      {/* Search */}
+      {/* Search + Campus Filter */}
       <div style={{ background: '#fff', borderBottom: '1px solid #eee', padding: '12px 20px' }}>
-        <div className="container" style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+        <div className="container" style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
           <input
             type="text"
             placeholder="Search services or providers..."
             value={search}
             onChange={e => setSearch(e.target.value)}
-            style={{ flex: 1, maxWidth: '480px', padding: '10px 16px', border: '2px solid #111', fontFamily: '"Space Grotesk", sans-serif', fontSize: '14px', fontWeight: 600, outline: 'none' }}
+            style={{ flex: 1, minWidth: '200px', maxWidth: '480px', padding: '10px 16px', border: '2px solid #111', fontFamily: '"Space Grotesk", sans-serif', fontSize: '14px', fontWeight: 600, outline: 'none' }}
           />
+          {userUniversityId && (
+            <button
+              onClick={() => setCampusOnly(v => !v)}
+              style={{
+                padding: '10px 16px', border: '2px solid #111', cursor: 'pointer',
+                fontFamily: '"Archivo Black", sans-serif', fontSize: '12px', letterSpacing: '0.5px',
+                background: campusOnly ? '#1B5E20' : '#fff',
+                color: campusOnly ? '#fff' : '#111',
+                boxShadow: campusOnly ? '2px 2px 0 #111' : 'none',
+                transition: 'all 0.15s', whiteSpace: 'nowrap',
+              }}
+            >
+              {campusOnly ? '● MY CAMPUS' : '○ MY CAMPUS'}
+            </button>
+          )}
           {hasFilters && (
             <button onClick={clearFilters} style={{ padding: '10px 18px', background: '#ff3366', color: '#fff', border: '2px solid #111', fontWeight: 700, cursor: 'pointer', fontFamily: '"Space Grotesk", sans-serif', fontSize: '13px' }}>
               ✕ CLEAR
@@ -155,26 +176,43 @@ export default function ServicesPageClient({
       <div className="container" style={{ paddingTop: '28px', paddingBottom: '60px' }}>
         {services.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '80px 20px' }}>
-            <div style={{ fontSize: '48px', marginBottom: '16px' }}>🔍</div>
+            <div style={{ fontSize: '48px', marginBottom: '16px' }}>{campusOnly ? '🏫' : '🔍'}</div>
             <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '28px', marginBottom: '10px' }}>
-              {hasFilters ? 'NO SERVICES FOUND' : 'NO SERVICES YET'}
+              {campusOnly ? 'NO CAMPUS SERVICES YET' : hasFilters ? 'NO SERVICES FOUND' : 'NO SERVICES YET'}
             </div>
             <p style={{ color: '#666', marginBottom: '24px' }}>
-              {hasFilters ? 'Try a different category or search term' : 'Be the first to offer a service!'}
+              {campusOnly
+                ? 'No services listed at your campus yet. Be the first!'
+                : hasFilters ? 'Try a different category or search term' : 'Be the first to offer a service!'}
             </p>
-            {hasFilters ? (
-              <button onClick={clearFilters} className="btn-primary" style={{ cursor: 'pointer' }}>CLEAR FILTERS</button>
-            ) : (
-              <a href="/offer-service" className="btn-primary" style={{ display: 'inline-block', textDecoration: 'none', padding: '14px 32px' }}>
-                OFFER A SERVICE →
-              </a>
-            )}
+            <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
+              {campusOnly && (
+                <button
+                  onClick={() => setCampusOnly(false)}
+                  style={{ padding: '12px 24px', background: '#fff', color: '#111', border: '2px solid #111', fontFamily: '"Archivo Black", sans-serif', fontSize: '13px', cursor: 'pointer', boxShadow: '3px 3px 0 #111' }}
+                >
+                  ALL UNIVERSITIES
+                </button>
+              )}
+              {hasFilters && !campusOnly ? (
+                <button onClick={clearFilters} className="btn-primary" style={{ cursor: 'pointer' }}>CLEAR FILTERS</button>
+              ) : (
+                <a href="/offer-service" className="btn-primary" style={{ display: 'inline-block', textDecoration: 'none', padding: '14px 32px' }}>
+                  OFFER A SERVICE →
+                </a>
+              )}
+            </div>
           </div>
         ) : (
           <>
-            <p style={{ marginBottom: '20px', fontWeight: 600, color: '#888', fontSize: '14px' }}>
+            <p style={{ marginBottom: '20px', fontWeight: 600, color: '#888', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
               Showing <strong style={{ color: '#111' }}>{services.length}</strong> service{services.length !== 1 ? 's' : ''}
               {category && ` in ${category}`}
+              {campusOnly && (
+                <span style={{ padding: '2px 8px', background: '#1B5E20', color: '#fff', fontSize: '11px', fontFamily: '"Archivo Black", sans-serif', letterSpacing: '0.5px' }}>
+                  MY CAMPUS
+                </span>
+              )}
             </p>
             <div className="product-grid">
               {services.map(service => (

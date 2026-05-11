@@ -9,10 +9,11 @@ type SearchParams = Promise<{
   condition?: string
   category?: string
   sort?: string
+  university_id?: string
 }>
 
 export default async function GoodsPage({ searchParams }: { searchParams: SearchParams }) {
-  const { q = '', condition = '', category = '', sort = 'newest' } = await searchParams
+  const { q = '', condition = '', category = '', sort = 'newest', university_id = '' } = await searchParams
 
   // ── Meilisearch path (text search) ─────────────────────────────────────────
   if (q.trim()) {
@@ -22,6 +23,7 @@ export default async function GoodsPage({ searchParams }: { searchParams: Search
         const filters: string[] = ['status = "active"']
         if (category) filters.push(`category = "${category}"`)
         if (condition) filters.push(`condition = "${condition}"`)
+        if (university_id) filters.push(`university_id = "${university_id}"`)
 
         const sortBy: string[] = []
         if (sort === 'price-low') sortBy.push('price:asc')
@@ -38,7 +40,7 @@ export default async function GoodsPage({ searchParams }: { searchParams: Search
         return (
           <GoodsPageClient
             initialProducts={result.hits as any[]}
-            sp={{ q, condition, category, sort }}
+            sp={{ q, condition, category, sort, university_id }}
           />
         )
       } catch (e) {
@@ -47,7 +49,7 @@ export default async function GoodsPage({ searchParams }: { searchParams: Search
     }
   }
 
-  // ── Supabase path (browse / filter without text) ───────────────────────────
+  // ── Supabase path ─────────────────────────────────────────────────────────
   const supabase = createSupabaseReadClient()
   let query = supabase
     .from('products')
@@ -60,6 +62,7 @@ export default async function GoodsPage({ searchParams }: { searchParams: Search
   if (q.trim()) query = query.textSearch('search_vector', q.trim(), { type: 'websearch', config: 'english' })
   if (condition) query = query.eq('condition', condition)
   if (category) query = query.eq('category', category)
+  if (university_id) query = query.eq('university_id', university_id)
 
   if (sort === 'price-low') query = query.order('price', { ascending: true })
   else if (sort === 'price-high') query = query.order('price', { ascending: false })
@@ -71,7 +74,7 @@ export default async function GoodsPage({ searchParams }: { searchParams: Search
   return (
     <GoodsPageClient
       initialProducts={(data ?? []) as any[]}
-      sp={{ q, condition, category, sort }}
+      sp={{ q, condition, category, sort, university_id }}
     />
   )
 }
