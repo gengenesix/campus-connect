@@ -1,12 +1,16 @@
-"use client"
-
-import { useEffect, useState, useRef } from 'react'
-import Link from 'next/link'
+import { notFound } from 'next/navigation'
 import Image from 'next/image'
-import { useParams, useRouter } from 'next/navigation'
-import { supabase } from '@/lib/supabase'
-import { useAuth } from '@/context/AuthContext'
+import Link from 'next/link'
+import type { Metadata } from 'next'
+import { createSupabaseReadClient } from '@/lib/supabase-server'
 import { timeAgo } from '@/lib/utils'
+import GoodsActionsClient from './GoodsActionsClient'
+import ImageGallery from '@/components/ImageGallery'
+import ReviewsSection from '@/components/ReviewsSection'
+
+export const revalidate = 60
+
+type Params = Promise<{ id: string }>
 
 interface Product {
   id: string
@@ -31,11 +35,11 @@ interface Product {
   } | null
 }
 
-interface RelatedProduct {
-  id: string
-  title: string
-  price: number
-  image_url: string | null
+function toWaNumber(raw: string): string {
+  const digits = raw.replace(/\D/g, '')
+  if (digits.startsWith('0') && digits.length === 10) return '233' + digits.slice(1)
+  if (digits.startsWith('233')) return digits
+  return digits
 }
 
 const conditionColors: Record<string, { bg: string; text: string }> = {
@@ -45,122 +49,112 @@ const conditionColors: Record<string, { bg: string; text: string }> = {
   'Fair':     { bg: '#6D4C41', text: '#fff' },
 }
 
-/** Normalise a WhatsApp number to international format (no +) for wa.me */
-function toWaNumber(raw: string): string {
-  const digits = raw.replace(/\D/g, '')
-  // Ghana: 0XXXXXXXXX → 233XXXXXXXXX
-  if (digits.startsWith('0') && digits.length === 10) return '233' + digits.slice(1)
-  // Already has 233 prefix
-  if (digits.startsWith('233')) return digits
-  // Has + (already stripped above), just return digits
-  return digits
+export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
+  const { id } = await params
+  const supabase = createSupabaseReadClient()
+  const { data } = await supabase
+    .from('products')
+    .select('title, description, image_url, price')
+    .eq('id', id)
+    .neq('status', 'deleted')
+    .single()
+
+  if (!data) return { title: 'Listing Not Found — Campus Connect' }
+
+  return {
+    title: `${data.title} — Campus Connect`,
+    description: (data.description ?? `Buy ${data.title} on Campus Connect Ghana`).slice(0, 155),
+    openGraph: {
+      title: data.title,
+      description: (data.description ?? '').slice(0, 155),
+      images: data.image_url ? [{ url: data.image_url }] : [],
+    },
+  }
 }
 
-export default function GoodDetailPage() {
-  const params = useParams<{ id: string }>()
-  const { user } = useAuth()
-  const router = useRouter()
-  const [product, setProduct] = useState<Product | null>(null)
-  const [related, setRelated] = useState<RelatedProduct[]>([])
-  const [views, setViews] = useState(0)
-  const [loading, setLoading] = useState(true)
-  const [notFound, setNotFound] = useState(false)
-  const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null)
+export default async function GoodDetailPage({ params }: { params: Params }) {
+  const { id } = await params
+  const supabase = createSupabaseReadClient()
 
-  useEffect(() => {
-    const fetchProduct = async () => {
-      setLoading(true)
+  const { data, error } = await supabase
+    .from('products')
+    .select(`
+      id, title, price, condition, category, image_url, views, description, created_at, whatsapp, status, in_stock,
+      seller:profiles!seller_id (id, name, avatar_url, rating, is_verified, phone)
+    `)
+    .eq('id', id)
+    .neq('status', 'deleted')
+    .single()
 
-      const { data, error } = await supabase
-        .from('products')
-        .select(`
-          id, title, price, condition, category, image_url, views, description, created_at, whatsapp, status, in_stock,
-          seller:profiles!seller_id (id, name, avatar_url, rating, is_verified, phone)
-        `)
-        .eq('id', params.id)
-        .neq('status', 'deleted')
-        .single()
+  if (error || !data) notFound()
 
-      if (error || !data) { setNotFound(true); setLoading(false); return }
+  const product = data as unknown as Product
+  const isPending = product.status === 'pending'
 
-      const p = data as unknown as Product
-      setProduct(p)
-      setViews(p.views)
+  const { data: productImagesData } = await supabase
+    .from('product_images')
+    .select('image_url')
+    .eq('product_id', id)
+    .order('display_order', { ascending: true })
 
-      // Increment views (fire-and-forget)
-      supabase.rpc('increment_product_views', { product_id: params.id })
+  const galleryImages = [
+    ...(product.image_url ? [{ url: product.image_url, alt: product.title }] : []),
+    ...((productImagesData ?? []) as { image_url: string }[]).map(img => ({ url: img.image_url, alt: product.title })),
+  ]
 
-      // Related items (same category, active only)
-      const { data: relatedData } = await supabase
-        .from('products')
-        .select('id, title, price, image_url')
-        .eq('category', p.category)
-        .eq('status', 'active')
-        .neq('id', params.id)
-        .limit(3)
+  const { data: related } = await supabase
+    .from('products')
+    .select('id, title, price, image_url')
+    .eq('category', product.category)
+    .eq('status', 'active')
+    .neq('id', id)
+    .limit(3)
 
-      setRelated((relatedData as RelatedProduct[]) ?? [])
-      setLoading(false)
-    }
+  const cond = conditionColors[product.condition] ?? { bg: '#111', text: '#fff' }
 
-    if (params.id) fetchProduct()
-  }, [params.id])
-
-  // Live view counter via Supabase Realtime
-  useEffect(() => {
-    if (!params.id) return
-    if (channelRef.current) supabase.removeChannel(channelRef.current)
-
-    const ch = supabase
-      .channel(`product_views:${params.id}`)
-      .on(
-        'postgres_changes' as any,
-        { event: 'UPDATE', schema: 'public', table: 'products', filter: `id=eq.${params.id}` },
-        (payload: any) => {
-          if (typeof payload.new?.views === 'number') setViews(payload.new.views)
-        }
-      )
-      .subscribe()
-
-    channelRef.current = ch
-    return () => { supabase.removeChannel(ch) }
-  }, [params.id])
-
-  if (loading) {
-    return (
-      <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ fontFamily: '"Archivo Black", sans-serif', color: '#888' }}>Loading...</div>
-      </div>
-    )
-  }
-
-  if (notFound || !product) {
-    return (
-      <div style={{ minHeight: '60vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '16px' }}>
-        <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '32px' }}>NOT FOUND</div>
-        <p style={{ color: '#888' }}>This listing may have been removed or sold.</p>
-        <Link href="/goods" className="btn-primary" style={{ textDecoration: 'none', padding: '12px 28px' }}>← BACK TO LISTINGS</Link>
-      </div>
-    )
-  }
-
-  const condition = conditionColors[product.condition] || { bg: '#111', text: '#fff' }
   const rawWa = product.whatsapp || product.seller?.phone || ''
   const waNumber = rawWa ? toWaNumber(rawWa) : ''
   const whatsappMsg = `Hi, I'm interested in your listing: ${product.title} on Campus Connect`
   const whatsappHref = waNumber ? `https://wa.me/${waNumber}?text=${encodeURIComponent(whatsappMsg)}` : null
-  const isMine = user?.id === product.seller?.id
-  const isPending = product.status === 'pending'
 
-  const handleInAppMessage = () => {
-    if (!user) { router.push(`/auth/login?redirect=/goods/${product.id}`); return }
-    if (product.seller?.id) router.push(`/messages?with=${product.seller.id}&product=${product.id}&title=${encodeURIComponent(product.title)}`)
+  const relatedItems = (related ?? []) as { id: string; title: string; price: number; image_url: string | null }[]
+
+  // JSON-LD structured data
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: product.title,
+    description: product.description,
+    image: galleryImages.map(g => g.url).filter(Boolean),
+    offers: {
+      '@type': 'Offer',
+      priceCurrency: 'GHS',
+      price: product.price,
+      availability: product.in_stock
+        ? 'https://schema.org/InStock'
+        : 'https://schema.org/OutOfStock',
+      seller: {
+        '@type': 'Person',
+        name: product.seller?.name ?? 'Campus Seller',
+      },
+    },
+    ...(product.seller?.rating && product.seller.rating > 0 ? {
+      aggregateRating: {
+        '@type': 'AggregateRating',
+        ratingValue: product.seller.rating,
+        ratingCount: 1,
+        bestRating: 5,
+      },
+    } : {}),
   }
 
   return (
     <div style={{ background: '#f8f8f8', minHeight: '80vh' }}>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
 
-      {/* Pending review banner */}
       {isPending && (
         <div style={{ background: '#fff8e1', borderBottom: '3px solid #f59e0b', padding: '12px 20px', textAlign: 'center' }}>
           <span style={{ fontWeight: 700, color: '#92400e', fontSize: '14px' }}>
@@ -186,23 +180,16 @@ export default function GoodDetailPage() {
 
           {/* LEFT — Image */}
           <div>
-            <div style={{ border: '3px solid #111', overflow: 'hidden', background: '#fff', boxShadow: '8px 8px 0 #111', position: 'relative', height: '460px' }}>
-              <Image
-                src={product.image_url ?? '/placeholder.jpg'}
-                alt={product.title}
-                fill priority
-                style={{ objectFit: 'cover' }}
-                sizes="(max-width: 768px) 100vw, 55vw"
-                onError={(e: any) => { e.currentTarget.src = '/placeholder.jpg' }}
-              />
+            <div style={{ position: 'relative' }}>
+              <ImageGallery images={galleryImages} alt={product.title} height={460} />
               {!product.in_stock && (
-                <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.55)', display: 'flex', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none' }}>
+                <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.55)', display: 'flex', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none', zIndex: 5 }}>
                   <span style={{ background: '#dc2626', color: '#fff', fontFamily: '"Archivo Black", sans-serif', fontSize: '16px', letterSpacing: '1px', padding: '10px 28px', border: '3px solid #fff' }}>OUT OF STOCK</span>
                 </div>
               )}
             </div>
             <div style={{ display: 'flex', gap: '8px', marginTop: '12px', flexWrap: 'wrap' }}>
-              <span style={{ padding: '6px 14px', background: condition.bg, color: condition.text, fontWeight: 700, fontSize: '11px', letterSpacing: '0.5px', border: '2px solid #111' }}>
+              <span style={{ padding: '6px 14px', background: cond.bg, color: cond.text, fontWeight: 700, fontSize: '11px', letterSpacing: '0.5px', border: '2px solid #111' }}>
                 {product.condition.toUpperCase()}
               </span>
               <span style={{ padding: '6px 14px', background: '#f0f0f0', fontWeight: 700, fontSize: '11px', letterSpacing: '0.5px', border: '2px solid #ddd' }}>
@@ -216,7 +203,7 @@ export default function GoodDetailPage() {
                 {product.in_stock ? '✓ IN STOCK' : '✕ OUT OF STOCK'}
               </span>
               <span style={{ padding: '6px 14px', background: '#fff', fontWeight: 600, fontSize: '11px', border: '2px solid #eee', color: '#888' }}>
-                👁 {views} views
+                👁 {product.views} views
               </span>
               <span style={{ padding: '6px 14px', background: '#fff', fontWeight: 600, fontSize: '11px', border: '2px solid #eee', color: '#888' }}>
                 🕐 {timeAgo(product.created_at)}
@@ -244,32 +231,27 @@ export default function GoodDetailPage() {
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                 {product.seller?.avatar_url ? (
                   <Image
-                    src={product.seller.avatar_url} alt={product.seller.name}
+                    src={product.seller.avatar_url}
+                    alt={product.seller.name}
                     width={52} height={52}
                     style={{ borderRadius: '50%', border: '2px solid #111', objectFit: 'cover' }}
-                    onError={(e: any) => { e.currentTarget.src = '/placeholder-user.jpg' }}
                   />
                 ) : (
                   <div style={{ width: '52px', height: '52px', borderRadius: '50%', background: '#1B5E20', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '18px', border: '2px solid #111' }}>
-                    {(product.seller?.name ?? 'U').split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
+                    {(product.seller?.name ?? 'S').split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
                   </div>
                 )}
                 <div style={{ flex: 1 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                    <span style={{ fontWeight: 700, fontSize: '16px' }}>{product.seller?.name ?? 'UMaT Student'}</span>
+                    <span style={{ fontWeight: 700, fontSize: '16px' }}>{product.seller?.name ?? 'Student'}</span>
                     {product.seller?.is_verified && (
-                      <span title="Verified seller" style={{
-                        display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                        width: '20px', height: '20px', background: '#1d9bf0', borderRadius: '50%',
-                        fontSize: '11px', color: '#fff', fontWeight: 900, flexShrink: 0,
-                        boxShadow: '0 1px 4px rgba(29,155,240,0.5)',
-                      }}>✓</span>
+                      <span title="Verified seller" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '20px', height: '20px', background: '#1d9bf0', borderRadius: '50%', fontSize: '11px', color: '#fff', fontWeight: 900, flexShrink: 0 }}>✓</span>
                     )}
                   </div>
                   <div style={{ fontSize: '13px', color: '#888', marginTop: '2px' }}>
-                    {product.seller?.rating ? `⭐ ${product.seller.rating.toFixed(1)}/5` : '★ New seller'} · UMaT Student
+                    {product.seller?.rating ? `⭐ ${product.seller.rating.toFixed(1)}/5` : '★ New seller'} · Campus Seller
                   </div>
-                  {product.seller?.id && !isMine && (
+                  {product.seller?.id && (
                     <Link
                       href={`/profile/${product.seller.id}`}
                       style={{ display: 'inline-block', marginTop: '8px', fontSize: '11px', fontWeight: 700, color: '#1B5E20', textDecoration: 'none', letterSpacing: '0.5px', borderBottom: '1px solid #1B5E20' }}
@@ -281,64 +263,13 @@ export default function GoodDetailPage() {
               </div>
             </div>
 
-            {/* Actions */}
-            {!isMine && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '24px' }}>
-                {/* In-app message button */}
-                <button
-                  onClick={handleInAppMessage}
-                  className="btn-primary hover-lift"
-                  style={{ width: '100%', padding: '16px 40px', fontFamily: '"Archivo Black", sans-serif', fontSize: '15px', border: '2px solid #111', boxShadow: '4px 4px 0 #111', cursor: 'pointer', letterSpacing: '0.5px', background: '#111', color: '#fff' }}
-                >
-                  💬 MESSAGE SELLER
-                </button>
-
-                {/* WhatsApp button */}
-                {whatsappHref ? (
-                  <a
-                    href={whatsappHref}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{
-                      textAlign: 'center', display: 'block', textDecoration: 'none',
-                      padding: '14px 40px', background: '#25D366', color: '#fff',
-                      fontFamily: '"Archivo Black", sans-serif', fontSize: '14px',
-                      border: '2px solid #111', boxShadow: '4px 4px 0 #111',
-                      letterSpacing: '0.5px',
-                    }}
-                  >
-                    📱 CHAT ON WHATSAPP
-                  </a>
-                ) : !user ? (
-                  <Link
-                    href={`/auth/login?redirect=/goods/${product.id}`}
-                    style={{
-                      textAlign: 'center', display: 'block', textDecoration: 'none',
-                      padding: '14px 40px', background: '#888', color: '#fff',
-                      fontFamily: '"Archivo Black", sans-serif', fontSize: '14px',
-                      border: '2px solid #111', boxShadow: '4px 4px 0 #111', letterSpacing: '0.5px',
-                    }}
-                  >
-                    🔒 LOGIN TO CONTACT SELLER
-                  </Link>
-                ) : null}
-
-                <Link href="/goods" className="btn-secondary hover-lift" style={{ textAlign: 'center', display: 'block', textDecoration: 'none', padding: '14px 40px' }}>
-                  ← BACK TO LISTINGS
-                </Link>
-              </div>
-            )}
-
-            {isMine && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '24px' }}>
-                <div style={{ padding: '12px 16px', background: '#f0fdf4', border: '2px solid #1B5E20', fontSize: '13px', color: '#15803d', fontWeight: 700 }}>
-                  ✓ This is your listing
-                </div>
-                <Link href="/my-listings" style={{ textAlign: 'center', display: 'block', textDecoration: 'none', padding: '14px 40px', background: '#111', color: '#fff', fontFamily: '"Archivo Black", sans-serif', fontSize: '14px', border: '2px solid #111', boxShadow: '4px 4px 0 #111' }}>
-                  MANAGE MY LISTINGS →
-                </Link>
-              </div>
-            )}
+            {/* Interactive actions (client-rendered) */}
+            <GoodsActionsClient
+              productId={product.id}
+              sellerId={product.seller?.id ?? null}
+              whatsappHref={whatsappHref}
+              productTitle={product.title}
+            />
 
             <div style={{ padding: '14px 16px', background: '#fffbeb', border: '2px solid #f59e0b', fontSize: '13px', color: '#92400e', lineHeight: 1.5 }}>
               🛡️ <strong>Safety tip:</strong> Always meet in a public place on campus (library, SRC). Never transfer money before seeing the item in person.
@@ -346,8 +277,13 @@ export default function GoodDetailPage() {
           </div>
         </div>
 
+        {/* Reviews */}
+        {product.seller?.id && (
+          <ReviewsSection productId={product.id} revieweeId={product.seller.id} />
+        )}
+
         {/* Related Items */}
-        {related.length > 0 && (
+        {relatedItems.length > 0 && (
           <div style={{ marginTop: '60px', paddingTop: '40px', borderTop: '2px solid #111' }}>
             <div className="trending-header" style={{ marginBottom: '24px' }}>
               <h3 style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '22px', textTransform: 'uppercase' }}>
@@ -356,15 +292,11 @@ export default function GoodDetailPage() {
               <Link href="/goods" style={{ color: '#111', fontWeight: 700, textDecoration: 'underline', fontSize: '14px' }}>See All</Link>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '20px' }}>
-              {related.map(g => (
+              {relatedItems.map(g => (
                 <Link key={g.id} href={`/goods/${g.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                  <div
-                    style={{ border: '2px solid #eee', background: '#fff', overflow: 'hidden', transition: '0.2s' }}
-                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = '#111'; (e.currentTarget as HTMLElement).style.boxShadow = '4px 4px 0 #111' }}
-                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = '#eee'; (e.currentTarget as HTMLElement).style.boxShadow = 'none' }}
-                  >
+                  <div style={{ border: '2px solid #eee', background: '#fff', overflow: 'hidden' }}>
                     <div style={{ position: 'relative', height: '180px', overflow: 'hidden' }}>
-                      <Image src={g.image_url ?? '/placeholder.jpg'} alt={g.title} fill style={{ objectFit: 'cover' }} sizes="33vw" onError={(e: any) => { e.currentTarget.src = '/placeholder.jpg' }} />
+                      <Image src={g.image_url ?? '/placeholder.jpg'} alt={g.title} fill style={{ objectFit: 'cover' }} sizes="33vw" />
                     </div>
                     <div style={{ padding: '12px' }}>
                       <div style={{ fontWeight: 700, fontSize: '14px', marginBottom: '4px' }}>{g.title}</div>

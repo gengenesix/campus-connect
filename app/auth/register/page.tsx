@@ -7,6 +7,8 @@ import { useAuth } from '@/context/AuthContext'
 import { supabase } from '@/lib/supabase'
 import { FACULTIES, CLASS_YEARS } from '@/lib/umat-data'
 import { useHostels } from '@/lib/useHostels'
+import UniversityPicker from '@/components/UniversityPicker'
+import { type GhanaUniversity } from '@/lib/ghana-universities'
 
 async function signInWithGoogle() {
   await supabase.auth.signInWithOAuth({
@@ -20,7 +22,9 @@ export default function RegisterPage() {
   const [form, setForm] = useState({
     name: '', email: '', password: '', confirmPassword: '',
     department: '', course: '', class_year: '', hostel: '', phone: '', role: 'buyer',
+    universitySlug: '', universityId: '',
   })
+  const [selectedUni, setSelectedUni] = useState<GhanaUniversity | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
@@ -54,10 +58,10 @@ export default function RegisterPage() {
     e.preventDefault()
     setError('')
 
-    // Sellers and providers must provide phone and department
+    if (!form.universitySlug) { setError('Please select your university.'); return }
+    // Sellers and providers must provide phone
     if (form.role !== 'buyer') {
       if (!form.phone.trim()) { setError('Phone/WhatsApp is required for sellers and service providers.'); return }
-      if (!form.department) { setError('Department is required for sellers and service providers.'); return }
     }
 
     setLoading(true)
@@ -81,6 +85,17 @@ export default function RegisterPage() {
     // Write profile data immediately — also updated by the DB trigger,
     // but upsert ensures all fields including new ones are saved
     if (data.user) {
+      // Resolve university_id from slug via DB
+      let universityId: string | null = null
+      if (form.universitySlug) {
+        const { data: uniRow } = await supabase
+          .from('universities')
+          .select('id')
+          .eq('slug', form.universitySlug)
+          .single()
+        universityId = uniRow?.id ?? null
+      }
+
       await supabase.from('profiles').upsert({
         id: data.user.id,
         email: form.email,
@@ -91,8 +106,16 @@ export default function RegisterPage() {
         hostel: form.hostel || null,
         phone: form.phone ? '+233' + form.phone.replace(/\D/g, '') : null,
         role: form.role,
+        university_id: universityId,
       })
     }
+
+    // Fire welcome event (non-blocking — ignore errors)
+    void fetch('/api/auth/welcome', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: form.name }),
+    })
 
     if (!data.session) {
       setSuccess(true)
@@ -145,7 +168,7 @@ export default function RegisterPage() {
               JOIN FREE
             </div>
             <div style={{ color: 'rgba(255,255,255,0.6)', fontSize: '13px', marginTop: '6px' }}>
-              Step {step} of 2 · {step === 1 ? 'Create your account' : 'Your UMaT profile'}
+              Step {step} of 2 · {step === 1 ? 'Create your account' : 'Your university profile'}
             </div>
             <div style={{ marginTop: '14px', height: '4px', background: 'rgba(255,255,255,0.15)', borderRadius: '2px' }}>
               <div style={{ height: '100%', width: step === 1 ? '50%' : '100%', background: '#86efac', transition: 'width 0.4s ease', borderRadius: '2px' }} />
@@ -196,7 +219,7 @@ export default function RegisterPage() {
               <form onSubmit={handleStep1} noValidate>
                 {[
                   { key: 'name', label: 'FULL NAME *', type: 'text', placeholder: 'Kwame Asante', autoComplete: 'name' },
-                  { key: 'email', label: 'EMAIL ADDRESS *', type: 'email', placeholder: 'kwame@umat.edu.gh', autoComplete: 'email' },
+                  { key: 'email', label: 'EMAIL ADDRESS *', type: 'email', placeholder: 'kwame@email.com', autoComplete: 'email' },
                   { key: 'password', label: 'PASSWORD (8+ CHARACTERS) *', type: 'password', placeholder: '••••••••', autoComplete: 'new-password' },
                   { key: 'confirmPassword', label: 'CONFIRM PASSWORD *', type: 'password', placeholder: '••••••••', autoComplete: 'new-password' },
                 ].map(field => (
@@ -236,6 +259,27 @@ export default function RegisterPage() {
               </form>
             ) : (
               <form onSubmit={handleSubmit}>
+                {/* University */}
+                <div style={{ marginBottom: '20px' }}>
+                  <label style={{ display: 'block', fontWeight: 700, fontSize: '12px', letterSpacing: '1.5px', marginBottom: '8px' }}>
+                    YOUR UNIVERSITY *
+                  </label>
+                  <UniversityPicker
+                    value={form.universitySlug}
+                    onChange={(slug, uni) => {
+                      setForm(p => ({ ...p, universitySlug: slug, department: '', hostel: '' }))
+                      setSelectedUni(uni)
+                    }}
+                    required
+                    error={!form.universitySlug}
+                  />
+                  {!form.universitySlug && (
+                    <p style={{ marginTop: '4px', fontSize: '11px', color: '#f59e0b', fontWeight: 600 }}>
+                      Select your university to continue
+                    </p>
+                  )}
+                </div>
+
                 {/* Role */}
                 <div style={{ marginBottom: '24px' }}>
                   <label style={{ display: 'block', fontWeight: 700, fontSize: '12px', letterSpacing: '1.5px', marginBottom: '12px' }}>
@@ -277,20 +321,30 @@ export default function RegisterPage() {
                 {/* Programme / Course */}
                 <div style={{ marginBottom: '16px' }}>
                   <label style={{ display: 'block', fontWeight: 700, fontSize: '12px', letterSpacing: '1.5px', marginBottom: '8px' }}>
-                    PROGRAMME / COURSE {isSeller ? '*' : ''}
+                    PROGRAMME / COURSE (OPTIONAL)
                   </label>
-                  <select
-                    value={form.department}
-                    onChange={e => update('department', e.target.value)}
-                    style={{ width: '100%', padding: '13px 16px', border: `2px solid ${isSeller && !form.department ? '#f59e0b' : '#111'}`, fontFamily: '"Space Grotesk", sans-serif', fontSize: '14px', background: '#fff', boxSizing: 'border-box', outline: 'none' }}
-                  >
-                    <option value="">Select your programme{isSeller ? ' (required)' : ' (optional)'}</option>
-                    {FACULTIES.map(f => (
-                      <optgroup key={f.short} label={f.name}>
-                        {f.programmes.map(p => <option key={p} value={p}>{p}</option>)}
-                      </optgroup>
-                    ))}
-                  </select>
+                  {form.universitySlug === 'umat' ? (
+                    <select
+                      value={form.department}
+                      onChange={e => update('department', e.target.value)}
+                      style={{ width: '100%', padding: '13px 16px', border: '2px solid #111', fontFamily: '"Space Grotesk", sans-serif', fontSize: '14px', background: '#fff', boxSizing: 'border-box', outline: 'none' }}
+                    >
+                      <option value="">Select your programme</option>
+                      {FACULTIES.map(f => (
+                        <optgroup key={f.short} label={f.name}>
+                          {f.programmes.map(p => <option key={p} value={p}>{p}</option>)}
+                        </optgroup>
+                      ))}
+                    </select>
+                  ) : (
+                    <input
+                      type="text"
+                      value={form.department}
+                      onChange={e => update('department', e.target.value)}
+                      placeholder="e.g. BSc Computer Science"
+                      style={{ width: '100%', padding: '13px 16px', border: '2px solid #111', fontFamily: '"Space Grotesk", sans-serif', fontSize: '14px', outline: 'none', boxSizing: 'border-box' }}
+                    />
+                  )}
                 </div>
 
                 {/* Class Year */}
@@ -311,24 +365,34 @@ export default function RegisterPage() {
                 {/* Hostel */}
                 <div style={{ marginBottom: '16px' }}>
                   <label style={{ display: 'block', fontWeight: 700, fontSize: '12px', letterSpacing: '1.5px', marginBottom: '8px' }}>
-                    HOSTEL / AREA
+                    HOSTEL / AREA (OPTIONAL)
                   </label>
-                  <select
-                    value={form.hostel}
-                    onChange={e => update('hostel', e.target.value)}
-                    style={{ width: '100%', padding: '13px 16px', border: '2px solid #ddd', fontFamily: '"Space Grotesk", sans-serif', fontSize: '14px', background: '#fff', boxSizing: 'border-box', outline: 'none' }}
-                  >
-                    <option value="">Select hostel (optional)</option>
-                    <optgroup label="Main Halls of Residence">
-                      {hostels.main.map(h => <option key={h} value={h}>{h}</option>)}
-                    </optgroup>
-                    <optgroup label="Private & Affiliated Hostels">
-                      {hostels.private.map(h => <option key={h} value={h}>{h}</option>)}
-                    </optgroup>
-                    <optgroup label="Other">
-                      {hostels.other.map(h => <option key={h} value={h}>{h}</option>)}
-                    </optgroup>
-                  </select>
+                  {form.universitySlug === 'umat' ? (
+                    <select
+                      value={form.hostel}
+                      onChange={e => update('hostel', e.target.value)}
+                      style={{ width: '100%', padding: '13px 16px', border: '2px solid #ddd', fontFamily: '"Space Grotesk", sans-serif', fontSize: '14px', background: '#fff', boxSizing: 'border-box', outline: 'none' }}
+                    >
+                      <option value="">Select hostel (optional)</option>
+                      <optgroup label="Main Halls of Residence">
+                        {hostels.main.map(h => <option key={h} value={h}>{h}</option>)}
+                      </optgroup>
+                      <optgroup label="Private & Affiliated Hostels">
+                        {hostels.private.map(h => <option key={h} value={h}>{h}</option>)}
+                      </optgroup>
+                      <optgroup label="Other">
+                        {hostels.other.map(h => <option key={h} value={h}>{h}</option>)}
+                      </optgroup>
+                    </select>
+                  ) : (
+                    <input
+                      type="text"
+                      value={form.hostel}
+                      onChange={e => update('hostel', e.target.value)}
+                      placeholder={selectedUni ? `Hostel or area near ${selectedUni.shortName}` : 'Hostel or residential area'}
+                      style={{ width: '100%', padding: '13px 16px', border: '2px solid #ddd', fontFamily: '"Space Grotesk", sans-serif', fontSize: '14px', outline: 'none', boxSizing: 'border-box' }}
+                    />
+                  )}
                 </div>
 
                 {/* Phone */}

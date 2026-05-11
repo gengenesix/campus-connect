@@ -21,6 +21,12 @@ export interface Profile {
   is_verified: boolean
   is_banned?: boolean
   created_at?: string
+  // Multi-university fields (added in patch_v16)
+  university_id?: string | null
+  faculty?: string | null
+  programme?: string | null
+  student_id?: string | null
+  push_sub?: object | null
 }
 
 interface AuthContextType {
@@ -93,8 +99,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     )
 
-    // Safety: if INITIAL_SESSION never fires (stale/dead session), force loading off after 8s
-    const timeout = setTimeout(() => setLoading(false), 8000)
+    // Safety: if INITIAL_SESSION never fires (stale/dead session), force loading off after 30s
+    // 30s accounts for slow Ghana 3G connections (~1-2 Mbps)
+    const timeout = setTimeout(() => setLoading(false), 30000)
 
     return () => {
       subscription.unsubscribe()

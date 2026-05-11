@@ -7,12 +7,33 @@ import { useAuth } from '@/context/AuthContext'
 import { supabase } from '@/lib/supabase'
 import imageCompression from 'browser-image-compression'
 
+async function uploadImageToR2(file: File, folder: string): Promise<string | null> {
+  try {
+    const res = await fetch('/api/upload', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ contentType: file.type, folder, fileSize: file.size }),
+    })
+    if (!res.ok) return null
+    const { uploadUrl, publicUrl } = await res.json()
+    const put = await fetch(uploadUrl, {
+      method: 'PUT',
+      body: file,
+      headers: { 'Content-Type': file.type },
+    })
+    return put.ok ? publicUrl : null
+  } catch {
+    return null
+  }
+}
+
 const SERVICE_CATEGORIES = ['Barbing', 'Tutoring', 'Photography', 'Laundry', 'Tech Repair', 'Design', 'Other'] as const
 
 export default function OfferServicePage() {
   const { user, profile, loading: authLoading } = useAuth()
   const router = useRouter()
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const additionalFileInputRef = useRef<HTMLInputElement>(null)
 
   const [form, setForm] = useState({
     name: '',
@@ -24,14 +45,30 @@ export default function OfferServicePage() {
   })
   const [imageFile, setImageFile] = useState<File | null>(null)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const [additionalFiles, setAdditionalFiles] = useState<File[]>([])
+  const [additionalPreviews, setAdditionalPreviews] = useState<string[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
   const [newId, setNewId] = useState<string | null>(null)
+  const [subStatus, setSubStatus] = useState<'loading' | 'active' | 'none'>('loading')
 
   useEffect(() => {
     if (!authLoading && !user) router.push('/auth/login?redirect=/offer-service')
   }, [user, authLoading, router])
+
+  useEffect(() => {
+    if (authLoading || !user) return
+    supabase
+      .from('profiles')
+      .select('subscription_expires_at')
+      .eq('id', user.id)
+      .single()
+      .then(({ data }) => {
+        const exp = (data as any)?.subscription_expires_at
+        setSubStatus(exp && new Date(exp) > new Date() ? 'active' : 'none')
+      })
+  }, [user, authLoading])
 
   const update = (key: string, val: string) => setForm(p => ({ ...p, [key]: val }))
 
@@ -58,6 +95,30 @@ export default function OfferServicePage() {
     }
   }
 
+  const handleAdditionalImagesChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files ?? [])
+    if (!files.length) return
+    const remaining = 4 - additionalFiles.length
+    const toAdd = files.slice(0, remaining)
+    const newFiles: File[] = []
+    const newPreviews: string[] = []
+    for (const file of toAdd) {
+      if (file.size > 5 * 1024 * 1024) continue
+      newPreviews.push(URL.createObjectURL(file))
+      if (file.size > 500 * 1024) {
+        try {
+          const compressed = await imageCompression(file, { maxSizeMB: 0.5, maxWidthOrHeight: 1920, useWebWorker: true })
+          newFiles.push(compressed)
+        } catch { newFiles.push(file) }
+      } else {
+        newFiles.push(file)
+      }
+    }
+    setAdditionalFiles(prev => [...prev, ...newFiles])
+    setAdditionalPreviews(prev => [...prev, ...newPreviews])
+    e.target.value = ''
+  }
+
   // Providers must have name + phone + department before listing
   const profileReady = !!(profile?.name?.trim() && profile?.phone?.trim() && profile?.department?.trim())
 
@@ -81,18 +142,15 @@ export default function OfferServicePage() {
 
     try {
       let imageUrl: string | null = null
-
       if (imageFile) {
-        const ext = imageFile.name.split('.').pop()
-        const path = `services/${user.id}/${Date.now()}.${ext}`
-        const { error: uploadErr } = await supabase.storage
-          .from('service-images')
-          .upload(path, imageFile, { contentType: imageFile.type })
+        imageUrl = await uploadImageToR2(imageFile, 'services')
+        if (!imageUrl) console.warn('Image upload to R2 failed — service created without image')
+      }
 
-        if (!uploadErr) {
-          const { data: { publicUrl } } = supabase.storage.from('service-images').getPublicUrl(path)
-          imageUrl = publicUrl
-        }
+      const additionalImageUrls: string[] = []
+      for (const file of additionalFiles) {
+        const url = await uploadImageToR2(file, 'services')
+        if (url) additionalImageUrls.push(url)
       }
 
       // Insert via API route (server-side rate limiting applied)
@@ -107,6 +165,7 @@ export default function OfferServicePage() {
           availability: form.availability.trim(),
           imageUrl,
           whatsapp: form.whatsapp.trim() ? '+233' + form.whatsapp.replace(/\D/g, '') : (profile.phone ?? null),
+          additionalImages: additionalImageUrls,
         }),
       })
 
@@ -145,6 +204,47 @@ export default function OfferServicePage() {
     </div>
   )
 
+  if (subStatus === 'loading') return (
+    <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ fontFamily: '"Archivo Black", sans-serif', color: '#888' }}>Loading...</div>
+    </div>
+  )
+
+  if (subStatus === 'none') return (
+    <div style={{ background: '#f8f8f8', minHeight: '80vh' }}>
+      <div style={{ background: '#1B5E20', color: '#fff', padding: '36px 20px' }}>
+        <div className="container">
+          <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '36px', letterSpacing: '-1px' }}>OFFER A SERVICE</div>
+        </div>
+      </div>
+      <div className="container" style={{ paddingTop: '60px', paddingBottom: '80px' }}>
+        <div style={{ maxWidth: '520px', border: '3px solid #1B5E20', background: '#fff', boxShadow: '8px 8px 0 #1B5E20', padding: '40px' }}>
+          <div style={{ fontSize: '48px', marginBottom: '16px' }}>🛠️</div>
+          <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '26px', letterSpacing: '-0.5px', marginBottom: '14px' }}>
+            SELLER SUBSCRIPTION REQUIRED
+          </div>
+          <p style={{ color: '#555', fontSize: '14px', lineHeight: 1.7, marginBottom: '24px' }}>
+            To offer services on Campus Connect, activate your seller account for <strong>GHS 20/month</strong>. This covers tutoring, photography, laundry, barbing, and any other service you want to offer to campus students.
+          </p>
+          {['Unlimited service listings', 'Unlimited goods listings', 'Admin-reviewed for quality', 'Keep the platform alive for 300k+ students'].map(f => (
+            <div key={f} style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
+              <span style={{ color: '#1B5E20', fontWeight: 900, fontSize: '16px' }}>✓</span>
+              <span style={{ fontSize: '14px', fontWeight: 600 }}>{f}</span>
+            </div>
+          ))}
+          <div style={{ marginTop: '28px' }}>
+            <Link href="/subscribe" style={{ display: 'block', padding: '18px', background: '#1B5E20', color: '#fff', fontFamily: '"Archivo Black", sans-serif', fontSize: '15px', textDecoration: 'none', border: '2px solid #111', boxShadow: '6px 6px 0 #111', textAlign: 'center', letterSpacing: '0.5px' }}>
+              SUBSCRIBE — GHS 20/MONTH →
+            </Link>
+            <p style={{ marginTop: '12px', fontSize: '12px', color: '#999', textAlign: 'center' }}>
+              Pay via MTN MoMo · Vodafone Cash · AirtelTigo · Card
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+
   if (success) {
     return (
       <div style={{ minHeight: '70vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 20px', background: '#f8f8f8' }}>
@@ -180,7 +280,7 @@ export default function OfferServicePage() {
             OFFER A SERVICE
           </div>
           <p style={{ color: 'rgba(255,255,255,0.6)', marginTop: '6px', fontSize: '14px' }}>
-            Share your skills with UMaT students. Build your reputation. Grow your income.
+            Share your skills with campus students. Build your reputation. Grow your income.
           </p>
         </div>
       </div>
@@ -241,6 +341,38 @@ export default function OfferServicePage() {
                 <input ref={fileInputRef} type="file" accept="image/jpeg,image/png,image/webp" onChange={handleImageChange} style={{ display: 'none' }} />
               </div>
             </div>
+
+            {/* Additional Photos */}
+            {imagePreview && (
+              <div>
+                <label style={{ display: 'block', fontWeight: 700, fontSize: '12px', letterSpacing: '1.5px', marginBottom: '10px' }}>
+                  ADDITIONAL PHOTOS <span style={{ fontWeight: 400, color: '#888' }}>(optional, up to 4 more)</span>
+                </label>
+                <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                  {additionalPreviews.map((preview, idx) => (
+                    <div key={idx} style={{ position: 'relative', width: '80px', height: '80px', flexShrink: 0 }}>
+                      <img src={preview} alt={`Additional ${idx + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover', border: '2px solid #111', display: 'block' }} />
+                      <button
+                        type="button"
+                        onClick={() => { setAdditionalFiles(p => p.filter((_, i) => i !== idx)); setAdditionalPreviews(p => p.filter((_, i) => i !== idx)) }}
+                        style={{ position: 'absolute', top: '-6px', right: '-6px', width: '20px', height: '20px', background: '#dc2626', color: '#fff', border: 'none', borderRadius: '50%', cursor: 'pointer', fontSize: '11px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}
+                      >✕</button>
+                    </div>
+                  ))}
+                  {additionalPreviews.length < 4 && (
+                    <button
+                      type="button"
+                      onClick={() => additionalFileInputRef.current?.click()}
+                      style={{ width: '80px', height: '80px', border: '2px dashed #ddd', background: '#fff', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '4px', color: '#888', flexShrink: 0 }}
+                    >
+                      <span style={{ fontSize: '20px', lineHeight: 1 }}>+</span>
+                      <span style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.5px' }}>ADD</span>
+                    </button>
+                  )}
+                  <input ref={additionalFileInputRef} type="file" accept="image/jpeg,image/png,image/webp" multiple onChange={handleAdditionalImagesChange} style={{ display: 'none' }} />
+                </div>
+              </div>
+            )}
 
             {/* Service Name */}
             <div>

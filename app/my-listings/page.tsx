@@ -109,6 +109,9 @@ export default function MyListingsPage() {
   const totalViews = listings.reduce((s, l) => s + (l.views ?? 0), 0)
   const activeCount = listings.filter(l => l.status === 'active').length
   const pendingCount = listings.filter(l => l.status === 'pending').length
+  const sortedByViews = [...listings].sort((a, b) => (b.views ?? 0) - (a.views ?? 0))
+  const topPerformer = sortedByViews[0] ?? null
+  const maxViews = topPerformer?.views ?? 0
 
   if (authLoading || (loading && !listings.length)) {
     return (
@@ -171,6 +174,72 @@ export default function MyListingsPage() {
             </div>
           ))}
         </div>
+
+        {/* Performance analytics */}
+        {listings.length > 0 && (
+          <div style={{ marginBottom: '24px' }}>
+            <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '13px', letterSpacing: '1.5px', marginBottom: '14px', color: '#111', borderBottom: '3px solid #111', paddingBottom: '8px' }}>
+              PERFORMANCE
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '16px' }}>
+
+              {/* Top Performer */}
+              <div style={{ border: '2px solid #111', background: '#fff', padding: '16px', boxShadow: '4px 4px 0 #5d3fd3' }}>
+                <div style={{ fontSize: '10px', fontWeight: 800, letterSpacing: '1.5px', color: '#5d3fd3', marginBottom: '12px' }}>TOP PERFORMER</div>
+                {topPerformer ? (
+                  <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
+                    {topPerformer.image_url ? (
+                      <Image src={topPerformer.image_url} alt={topPerformer.title} width={52} height={52} style={{ objectFit: 'cover', border: '2px solid #111', flexShrink: 0 }} />
+                    ) : (
+                      <div style={{ width: '52px', height: '52px', background: '#f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', flexShrink: 0, border: '2px solid #eee' }}>📦</div>
+                    )}
+                    <div style={{ minWidth: 0 }}>
+                      <Link href={`/goods/${topPerformer.id}`} style={{ fontWeight: 700, fontSize: '12px', color: '#111', textDecoration: 'none', display: 'block', marginBottom: '6px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {topPerformer.title}
+                      </Link>
+                      <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '28px', color: '#5d3fd3', lineHeight: 1 }}>
+                        {topPerformer.views ?? 0}
+                      </div>
+                      <div style={{ fontSize: '10px', color: '#888', fontWeight: 700, letterSpacing: '0.5px' }}>VIEWS</div>
+                    </div>
+                  </div>
+                ) : (
+                  <div style={{ fontSize: '13px', color: '#888' }}>No listings yet</div>
+                )}
+              </div>
+
+              {/* Views bar chart */}
+              <div style={{ border: '2px solid #111', background: '#fff', padding: '16px', boxShadow: '4px 4px 0 #111' }}>
+                <div style={{ fontSize: '10px', fontWeight: 800, letterSpacing: '1.5px', color: '#888', marginBottom: '12px' }}>
+                  VIEWS BY LISTING
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '7px' }}>
+                  {sortedByViews.slice(0, 8).map(listing => {
+                    const pct = maxViews > 0 ? Math.max((listing.views / maxViews) * 100, listing.views > 0 ? 2 : 0) : 0
+                    return (
+                      <div key={listing.id} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <div style={{ flex: 1, minWidth: 0, height: '22px', background: '#f0f0f0', position: 'relative', overflow: 'hidden' }}>
+                          <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: `${pct}%`, background: '#5d3fd3', transition: 'width 0.5s ease' }} />
+                          <span style={{ position: 'absolute', left: '8px', top: '50%', transform: 'translateY(-50%)', fontSize: '10px', fontWeight: 700, color: pct > 35 ? '#fff' : '#111', whiteSpace: 'nowrap', overflow: 'hidden', maxWidth: '85%', textOverflow: 'ellipsis' }}>
+                            {listing.title}
+                          </span>
+                        </div>
+                        <span style={{ fontSize: '11px', fontWeight: 800, color: '#5d3fd3', width: '28px', textAlign: 'right', flexShrink: 0 }}>
+                          {listing.views ?? 0}
+                        </span>
+                      </div>
+                    )
+                  })}
+                  {listings.length > 8 && (
+                    <div style={{ fontSize: '11px', color: '#888', paddingTop: '4px' }}>
+                      + {listings.length - 8} more listings
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Pending notice */}
         {pendingCount > 0 && (

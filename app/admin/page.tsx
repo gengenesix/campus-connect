@@ -90,10 +90,12 @@ export default function AdminDashboard() {
   const { user, profile, loading, signOut } = useAuth()
   const router = useRouter()
 
-  const [activeTab, setActiveTab] = useState<'pending' | 'users' | 'listings' | 'services'>('pending')
+  const [activeTab, setActiveTab] = useState<'pending' | 'users' | 'listings' | 'services' | 'reports'>('pending')
   const [users, setUsers] = useState<AdminUser[]>([])
   const [products, setProducts] = useState<AdminProduct[]>([])
   const [services, setServices] = useState<AdminService[]>([])
+  const [reports, setReports] = useState<any[]>([])
+  const [reportsLoading, setReportsLoading] = useState(false)
   const [loadingData, setLoadingData] = useState(false)
   const [loadError, setLoadError] = useState<string | null>(null)
   const [actionId, setActionId] = useState<string | null>(null)
@@ -274,11 +276,41 @@ export default function AdminDashboard() {
     )
   }
 
+  const loadReports = async () => {
+    if (reportsLoading) return
+    setReportsLoading(true)
+    try {
+      const res = await fetch('/api/reports?status=pending')
+      if (res.ok) {
+        const json = await res.json()
+        setReports(json.reports ?? [])
+      }
+    } catch {}
+    setReportsLoading(false)
+  }
+
+  const resolveReport = async (id: string, status: 'resolved' | 'dismissed') => {
+    setActionId(id)
+    const res = await fetch('/api/reports', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, status }),
+    })
+    if (res.ok) {
+      setReports(prev => prev.filter(r => r.id !== id))
+      showToast(status === 'resolved' ? '✓ Report resolved' : '✓ Report dismissed')
+    } else {
+      showToast('Failed to update report', 'err')
+    }
+    setActionId(null)
+  }
+
   const tabs = [
-    { key: 'pending' as const, label: pendingCount > 0 ? `⚠ PENDING (${pendingCount})` : 'PENDING', urgent: pendingCount > 0 },
-    { key: 'users' as const,   label: `USERS (${users.length})`, urgent: false },
+    { key: 'pending' as const,  label: pendingCount > 0 ? `⚠ PENDING (${pendingCount})` : 'PENDING', urgent: pendingCount > 0 },
+    { key: 'users' as const,    label: `USERS (${users.length})`, urgent: false },
     { key: 'listings' as const, label: `LISTINGS (${products.filter(p => p.status !== 'pending').length})`, urgent: false },
     { key: 'services' as const, label: `SERVICES (${services.filter(s => s.status !== 'pending').length})`, urgent: false },
+    { key: 'reports' as const,  label: `REPORTS`, urgent: false },
   ]
 
   return (
@@ -346,7 +378,7 @@ export default function AdminDashboard() {
         {/* Tabs */}
         <div style={{ display: 'flex', borderBottom: '2px solid #111', marginBottom: '24px', flexWrap: 'wrap' }}>
           {tabs.map(tab => (
-            <button key={tab.key} onClick={() => setActiveTab(tab.key)} style={{
+            <button key={tab.key} onClick={() => { setActiveTab(tab.key); if (tab.key === 'reports' && reports.length === 0) loadReports() }} style={{
               padding: '12px 22px',
               background: activeTab === tab.key ? (tab.urgent ? '#f59e0b' : '#111') : '#fff',
               color: activeTab === tab.key ? '#fff' : tab.urgent ? '#92400e' : '#666',
@@ -598,6 +630,98 @@ export default function AdminDashboard() {
               ))}
               {services.filter(s => s.status !== 'pending').length === 0 && <div style={{ textAlign: 'center', padding: '60px', color: '#888' }}>No live services yet.</div>}
             </div>
+          </>
+        )}
+
+        {/* ── REPORTS TAB ── */}
+        {!loadingData && activeTab === 'reports' && (
+          <>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '12px' }}>
+              <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '18px' }}>
+                PENDING REPORTS ({reports.length})
+              </div>
+              <button
+                onClick={loadReports}
+                disabled={reportsLoading}
+                style={{ padding: '8px 16px', border: '2px solid #111', background: '#fff', fontFamily: '"Archivo Black"', fontSize: '11px', cursor: reportsLoading ? 'not-allowed' : 'pointer', color: '#111', opacity: reportsLoading ? 0.6 : 1 }}
+              >
+                {reportsLoading ? '↻ LOADING...' : '↻ REFRESH'}
+              </button>
+            </div>
+
+            {reportsLoading ? (
+              <div style={{ textAlign: 'center', padding: '60px', color: '#888' }}>Loading reports...</div>
+            ) : reports.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '80px 20px', border: '2px solid #111', background: '#fff', boxShadow: '6px 6px 0 #111' }}>
+                <div style={{ fontSize: '48px', marginBottom: '12px' }}>🛡️</div>
+                <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '22px', marginBottom: '8px' }}>ALL CLEAR</div>
+                <p style={{ color: '#888', fontSize: '14px' }}>No pending reports.</p>
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                {reports.map((report: any) => (
+                  <div key={report.id} style={{ border: '2px solid #f59e0b', background: '#fffbeb', padding: '20px 24px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px' }}>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginBottom: '8px', flexWrap: 'wrap' }}>
+                          <span style={{ padding: '3px 10px', background: '#f59e0b', color: '#000', fontSize: '10px', fontWeight: 800, letterSpacing: '1px' }}>
+                            {report.reason.toUpperCase().replace('_', ' ')}
+                          </span>
+                          <span style={{ fontSize: '12px', color: '#888' }}>
+                            {new Date(report.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                          </span>
+                        </div>
+                        <div style={{ fontSize: '13px', color: '#111', marginBottom: '4px' }}>
+                          <strong>Reporter:</strong> {report.reporter?.name ?? 'Unknown'}
+                        </div>
+                        {report.product && (
+                          <div style={{ fontSize: '13px', color: '#555' }}>
+                            <strong>Listing:</strong>{' '}
+                            <a href={`/goods/${report.product.id}`} target="_blank" rel="noopener noreferrer" style={{ color: '#1B5E20', fontWeight: 700 }}>
+                              {report.product.title}
+                            </a>
+                          </div>
+                        )}
+                        {report.service && (
+                          <div style={{ fontSize: '13px', color: '#555' }}>
+                            <strong>Service:</strong>{' '}
+                            <a href={`/services/${report.service.id}`} target="_blank" rel="noopener noreferrer" style={{ color: '#1B5E20', fontWeight: 700 }}>
+                              {report.service.name}
+                            </a>
+                          </div>
+                        )}
+                        {report.reported_user && (
+                          <div style={{ fontSize: '13px', color: '#555' }}>
+                            <strong>Reported user:</strong> {report.reported_user.name ?? 'Unknown'}
+                          </div>
+                        )}
+                        {report.details && (
+                          <div style={{ marginTop: '8px', padding: '10px 14px', background: '#fff', border: '1px solid #f59e0b', fontSize: '13px', color: '#555', fontStyle: 'italic' }}>
+                            &quot;{report.details}&quot;
+                          </div>
+                        )}
+                      </div>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', flexShrink: 0 }}>
+                        <button
+                          onClick={() => resolveReport(report.id, 'resolved')}
+                          disabled={actionId === report.id}
+                          style={{ padding: '8px 16px', background: '#1B5E20', color: '#fff', fontFamily: '"Archivo Black"', fontSize: '11px', letterSpacing: '0.5px', border: '2px solid #111', cursor: actionId === report.id ? 'not-allowed' : 'pointer', opacity: actionId === report.id ? 0.6 : 1 }}
+                        >
+                          RESOLVE
+                        </button>
+                        <button
+                          onClick={() => resolveReport(report.id, 'dismissed')}
+                          disabled={actionId === report.id}
+                          style={{ padding: '8px 16px', background: '#fff', color: '#666', fontFamily: '"Archivo Black"', fontSize: '11px', letterSpacing: '0.5px', border: '2px solid #ddd', cursor: actionId === report.id ? 'not-allowed' : 'pointer', opacity: actionId === report.id ? 0.6 : 1 }}
+                        >
+                          DISMISS
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </>
         )}
       </div>

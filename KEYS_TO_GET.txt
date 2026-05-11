@@ -1,0 +1,169 @@
+================================================================================
+CAMPUS CONNECT — ALL API KEYS & HOW TO GET THEM
+================================================================================
+Last updated: May 2026
+
+--------------------------------------------------------------------------------
+1. SUPABASE (already have — check .env.local)
+--------------------------------------------------------------------------------
+NEXT_PUBLIC_SUPABASE_URL          → Supabase Dashboard → Settings → API → Project URL
+NEXT_PUBLIC_SUPABASE_ANON_KEY     → Supabase Dashboard → Settings → API → anon (public) key
+SUPABASE_SERVICE_ROLE_KEY         → Supabase Dashboard → Settings → API → service_role key (secret!)
+DATABASE_URL                      → See note below for connection pooler
+
+  CONNECTION POOLER (DATABASE_URL):
+  - Supabase Dashboard → Settings → Database
+  - Scroll down to "Connection string"
+  - Click the dropdown that says "URI" and find the one with port 6543
+  - OR look for "Connection pooling" section — copy the string that ends in ?pgbouncer=true
+  - Add ?pgbouncer=true at the end if not present
+  Example: postgresql://postgres.xxxx:[PASSWORD]@aws-0-us-east-1.pooler.supabase.com:6543/postgres?pgbouncer=true
+
+--------------------------------------------------------------------------------
+2. CLOUDFLARE R2 (image uploads)
+--------------------------------------------------------------------------------
+R2_ACCOUNT_ID                     → Cloudflare Dashboard → right sidebar "Account ID"
+R2_ACCESS_KEY_ID                  → Cloudflare Dashboard → R2 → Manage API Tokens → Create API Token
+R2_SECRET_ACCESS_KEY              → Same as above (only shown once — copy it immediately!)
+R2_BUCKET_NAME                    → The name of your R2 bucket (e.g. campus-connect-images)
+NEXT_PUBLIC_R2_PUBLIC_URL         → Your R2 public bucket URL (e.g. https://pub-xxxx.r2.dev)
+
+  HOW TO GET R2 KEYS:
+  1. Go to dash.cloudflare.com
+  2. Click R2 in the left sidebar
+  3. Click "Manage R2 API Tokens"
+  4. Create token with "Object Read & Write" permissions
+  5. Scope it to your specific bucket
+
+--------------------------------------------------------------------------------
+3. MEILISEARCH (search — already deployed on Railway)
+--------------------------------------------------------------------------------
+MEILISEARCH_HOST                  → Your Railway Meilisearch URL (e.g. https://meilisearch-production-xxxx.up.railway.app)
+MEILISEARCH_ADMIN_KEY             → Railway → campus-connect project → Meilisearch service → Variables → MEILI_MASTER_KEY
+MEILISEARCH_SEARCH_KEY            → Generate from Meilisearch dashboard or use master key for now
+MEILISEARCH_SYNC_SECRET           → Make up a random secret string (e.g. 32 random chars) — used to auth Supabase webhooks
+
+  HOW TO GET SEARCH KEY:
+  Go to https://[your-meilisearch-url]/keys with your master key as Bearer token
+  OR just set MEILISEARCH_SEARCH_KEY = same value as MEILISEARCH_ADMIN_KEY for simplicity
+
+--------------------------------------------------------------------------------
+4. RESEND (transactional email)
+--------------------------------------------------------------------------------
+RESEND_API_KEY                    → resend.com → Sign up → API Keys → Create API Key
+RESEND_FROM_EMAIL                 → A verified sender email (e.g. noreply@yourdomain.com)
+                                    OR use Resend's free test domain: onboarding@resend.dev
+
+  HOW TO GET:
+  1. Go to resend.com and create a free account
+  2. Dashboard → API Keys → + Create API Key
+  3. For RESEND_FROM_EMAIL: add and verify your domain, or use onboarding@resend.dev for testing
+
+--------------------------------------------------------------------------------
+5. INNGEST (background jobs / email queue)
+--------------------------------------------------------------------------------
+INNGEST_SIGNING_KEY               → app.inngest.com → Your app → Manage → Signing Key
+INNGEST_EVENT_KEY                 → app.inngest.com → Your app → Manage → Event Key
+
+  HOW TO GET:
+  1. Go to app.inngest.com and sign up (free tier available)
+  2. Create a new app
+  3. Dashboard → your app → "Manage" tab → copy both keys
+
+--------------------------------------------------------------------------------
+6. PAYSTACK (payments — GHS 20/month seller subscription)
+--------------------------------------------------------------------------------
+PAYSTACK_SECRET_KEY               → dashboard.paystack.com → Settings → API Keys & Webhooks → Secret Key
+NEXT_PUBLIC_SITE_URL              → Your live domain (e.g. https://campusconnect.gh or Railway URL)
+
+  HOW TO GET:
+  1. Go to dashboard.paystack.com (or create account at paystack.com)
+  2. Settings → API Keys & Webhooks
+  3. Use TEST secret key for development, LIVE secret key for production
+  4. Also set webhook URL in Paystack: https://[your-domain]/api/webhooks/paystack
+
+--------------------------------------------------------------------------------
+7. SENTRY (error tracking)
+--------------------------------------------------------------------------------
+NEXT_PUBLIC_SENTRY_DSN            → sentry.io → Your project → Settings → Client Keys → DSN
+SENTRY_AUTH_TOKEN                 → sentry.io → Settings → Auth Tokens → Create New Token
+SENTRY_ORG                        → Your Sentry organisation slug (shown in URL: sentry.io/organizations/[slug])
+SENTRY_PROJECT                    → Your Sentry project slug
+
+  HOW TO GET:
+  1. Go to sentry.io and sign up (free tier available)
+  2. Create a new project → choose Next.js
+  3. Copy the DSN from the setup screen
+  4. For auth token: User Settings → Auth Tokens → Create token with project:releases scope
+
+--------------------------------------------------------------------------------
+8. WEB PUSH / VAPID KEYS (browser push notifications)
+--------------------------------------------------------------------------------
+VAPID_PUBLIC_KEY                  → Generate locally (see below)
+VAPID_PRIVATE_KEY                 → Generate locally (see below)
+NEXT_PUBLIC_VAPID_PUBLIC_KEY      → Same value as VAPID_PUBLIC_KEY
+VAPID_SUBJECT                     → Your email: mailto:your@email.com
+
+  HOW TO GENERATE (run this once in your project terminal):
+  npx web-push generate-vapid-keys
+
+  Copy the output — you get a public key and a private key.
+  NEVER regenerate these after users have subscribed — it will break their push subscriptions.
+
+--------------------------------------------------------------------------------
+9. POSTHOG (product analytics)
+--------------------------------------------------------------------------------
+NEXT_PUBLIC_POSTHOG_KEY           → us.posthog.com → Project Settings → Project API Key
+NEXT_PUBLIC_POSTHOG_HOST          → https://us.i.posthog.com (default, can omit)
+
+  HOW TO GET:
+  1. Go to posthog.com and sign up (generous free tier)
+  2. Create a project
+  3. Project Settings → Project API Key → copy
+
+--------------------------------------------------------------------------------
+10. UPSTASH REDIS (caching — featured listings, rate limiting)
+--------------------------------------------------------------------------------
+UPSTASH_REDIS_REST_URL            → console.upstash.com → Your database → REST API → UPSTASH_REDIS_REST_URL
+UPSTASH_REDIS_REST_TOKEN          → console.upstash.com → Your database → REST API → UPSTASH_REDIS_REST_TOKEN
+
+  HOW TO GET:
+  1. Go to console.upstash.com and sign up (free tier: 10k requests/day)
+  2. Create a Redis database (choose region closest to your users — pick EU or US)
+  3. Click the database → "REST API" tab → copy both values
+
+================================================================================
+CHECKLIST — tick off as you add each to .env.local and Railway/Vercel
+================================================================================
+[ ] NEXT_PUBLIC_SUPABASE_URL
+[ ] NEXT_PUBLIC_SUPABASE_ANON_KEY
+[ ] SUPABASE_SERVICE_ROLE_KEY
+[ ] DATABASE_URL (connection pooler, port 6543)
+[ ] R2_ACCOUNT_ID
+[ ] R2_ACCESS_KEY_ID
+[ ] R2_SECRET_ACCESS_KEY
+[ ] R2_BUCKET_NAME
+[ ] NEXT_PUBLIC_R2_PUBLIC_URL
+[ ] MEILISEARCH_HOST
+[ ] MEILISEARCH_ADMIN_KEY
+[ ] MEILISEARCH_SEARCH_KEY
+[ ] MEILISEARCH_SYNC_SECRET
+[ ] RESEND_API_KEY
+[ ] RESEND_FROM_EMAIL
+[ ] INNGEST_SIGNING_KEY
+[ ] INNGEST_EVENT_KEY
+[ ] PAYSTACK_SECRET_KEY
+[ ] NEXT_PUBLIC_SITE_URL
+[ ] NEXT_PUBLIC_SENTRY_DSN
+[ ] SENTRY_AUTH_TOKEN
+[ ] SENTRY_ORG
+[ ] SENTRY_PROJECT
+[ ] VAPID_PUBLIC_KEY
+[ ] VAPID_PRIVATE_KEY
+[ ] NEXT_PUBLIC_VAPID_PUBLIC_KEY
+[ ] VAPID_SUBJECT
+[ ] NEXT_PUBLIC_POSTHOG_KEY
+[ ] UPSTASH_REDIS_REST_URL
+[ ] UPSTASH_REDIS_REST_TOKEN
+
+================================================================================

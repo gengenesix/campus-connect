@@ -73,7 +73,7 @@ function LoginForm() {
               SIGN IN
             </div>
             <div style={{ color: '#666', fontSize: '13px', marginTop: '6px' }}>
-              Welcome back to UMaT&apos;s marketplace
+              Welcome back to Ghana's campus marketplace
             </div>
           </div>
 
@@ -125,7 +125,7 @@ function LoginForm() {
                   type="email"
                   value={email}
                   onChange={e => setEmail(e.target.value)}
-                  placeholder="your@umat.edu.gh"
+                  placeholder="your@email.com"
                   required
                   autoComplete="email"
                   style={{

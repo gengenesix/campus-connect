@@ -5,6 +5,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useAuth } from '@/context/AuthContext'
 import type { Good } from '@/lib/mockData'
+import WishlistButton from '@/components/WishlistButton'
 
 const conditionMeta: Record<string, { bg: string; text: string }> = {
   'New':      { bg: '#1B5E20', text: '#fff' },
@@ -76,6 +77,11 @@ export default function GoodsCard({ good }: { good: Good }) {
           }}>
             {good.views} 👁
           </span>
+
+          {/* Wishlist button */}
+          <div style={{ position: 'absolute', bottom: '10px', right: '10px', zIndex: 2 }}>
+            <WishlistButton productId={good.id} size={32} />
+          </div>
 
           {/* Out of stock overlay */}
           {good.inStock === false && (

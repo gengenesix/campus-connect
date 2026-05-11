@@ -1,11 +1,15 @@
-"use client"
-
-import { useEffect, useState } from 'react'
-import Link from 'next/link'
+import { notFound } from 'next/navigation'
 import Image from 'next/image'
-import { useParams, useRouter } from 'next/navigation'
-import { supabase } from '@/lib/supabase'
-import { useAuth } from '@/context/AuthContext'
+import Link from 'next/link'
+import type { Metadata } from 'next'
+import { createSupabaseReadClient } from '@/lib/supabase-server'
+import ServiceActionsClient from './ServiceActionsClient'
+import ImageGallery from '@/components/ImageGallery'
+import ReviewsSection from '@/components/ReviewsSection'
+
+export const revalidate = 60
+
+type Params = Promise<{ id: string }>
 
 interface Service {
   id: string
@@ -27,86 +31,103 @@ interface Service {
   } | null
 }
 
-interface RelatedService {
-  id: string
-  name: string
-  rate: string | null
-  image_url: string | null
+export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
+  const { id } = await params
+  const supabase = createSupabaseReadClient()
+  const { data } = await supabase
+    .from('services')
+    .select('name, description, image_url, rate')
+    .eq('id', id)
+    .neq('status', 'deleted')
+    .single()
+
+  if (!data) return { title: 'Service Not Found — Campus Connect' }
+
+  return {
+    title: `${data.name} — Campus Connect`,
+    description: (data.description ?? `Book ${data.name} on Campus Connect Ghana`).slice(0, 155),
+    openGraph: {
+      title: data.name,
+      description: (data.description ?? '').slice(0, 155),
+      images: data.image_url ? [{ url: data.image_url }] : [],
+    },
+  }
 }
 
-export default function ServiceDetailPage() {
-  const params = useParams<{ id: string }>()
-  const router = useRouter()
-  const { user } = useAuth()
-  const [service, setService] = useState<Service | null>(null)
-  const [related, setRelated] = useState<RelatedService[]>([])
-  const [loading, setLoading] = useState(true)
-  const [notFound, setNotFound] = useState(false)
+export default async function ServiceDetailPage({ params }: { params: Params }) {
+  const { id } = await params
+  const supabase = createSupabaseReadClient()
 
-  useEffect(() => {
-    const fetchService = async () => {
-      setLoading(true)
+  const { data, error } = await supabase
+    .from('services')
+    .select(`
+      id, name, category, rate, availability, response_time, image_url, description, total_bookings, whatsapp,
+      provider:profiles!provider_id (id, name, avatar_url, rating, phone)
+    `)
+    .eq('id', id)
+    .neq('status', 'deleted')
+    .single()
 
-      const { data, error } = await supabase
-        .from('services')
-        .select(`
-          id, name, category, rate, availability, response_time, image_url, description, total_bookings, whatsapp,
-          provider:profiles!provider_id (id, name, avatar_url, rating, phone)
-        `)
-        .eq('id', params.id)
-        .neq('status', 'deleted')
-        .single()
+  if (error || !data) notFound()
 
-      if (error || !data) {
-        setNotFound(true)
-        setLoading(false)
-        return
-      }
+  const service = data as unknown as Service
 
-      const s = data as Service
-      setService(s)
+  const { data: serviceImagesData } = await supabase
+    .from('service_images')
+    .select('image_url')
+    .eq('service_id', id)
+    .order('display_order', { ascending: true })
 
-      const { data: relatedData } = await supabase
-        .from('services')
-        .select('id, name, rate, image_url')
-        .eq('category', s.category)
-        .neq('id', params.id)
-        .neq('status', 'deleted')
-        .limit(3)
+  const galleryImages = [
+    ...(service.image_url ? [{ url: service.image_url, alt: service.name }] : []),
+    ...((serviceImagesData ?? []) as { image_url: string }[]).map(img => ({ url: img.image_url, alt: service.name })),
+  ]
 
-      setRelated((relatedData as RelatedService[]) ?? [])
-      setLoading(false)
-    }
+  const { data: relatedData } = await supabase
+    .from('services')
+    .select('id, name, rate, image_url')
+    .eq('category', service.category)
+    .neq('id', id)
+    .neq('status', 'deleted')
+    .limit(3)
 
-    if (params.id) fetchService()
-  }, [params.id])
+  const related = (relatedData ?? []) as { id: string; name: string; rate: string | null; image_url: string | null }[]
 
-  if (loading) {
-    return (
-      <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ fontFamily: '"Archivo Black", sans-serif', color: '#888' }}>Loading...</div>
-      </div>
-    )
+  const rawContact = service.whatsapp || service.provider?.phone || ''
+
+  // JSON-LD structured data
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Service',
+    name: service.name,
+    description: service.description,
+    image: galleryImages.map(g => g.url).filter(Boolean),
+    provider: {
+      '@type': 'Person',
+      name: service.provider?.name ?? 'Campus Provider',
+    },
+    ...(service.rate ? { offers: { '@type': 'Offer', price: service.rate, priceCurrency: 'GHS' } } : {}),
+    ...(service.provider?.rating && service.provider.rating > 0 ? {
+      aggregateRating: {
+        '@type': 'AggregateRating',
+        ratingValue: service.provider.rating,
+        ratingCount: 1,
+        bestRating: 5,
+      },
+    } : {}),
   }
-
-  if (notFound || !service) {
-    return (
-      <div style={{ minHeight: '60vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '16px' }}>
-        <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '32px' }}>NOT FOUND</div>
-        <p style={{ color: '#888' }}>This service may have been removed or paused.</p>
-        <Link href="/services" className="btn-primary" style={{ textDecoration: 'none', padding: '12px 28px' }}>← BACK TO SERVICES</Link>
-      </div>
-    )
-  }
-
-  const contact = service.whatsapp || service.provider?.phone
   const whatsappMsg = `Hi ${service.provider?.name ?? ''}, I'd like to book: ${service.name} on Campus Connect`
-  const whatsappHref = contact
-    ? `https://wa.me/${contact.replace(/\D/g, '')}?text=${encodeURIComponent(whatsappMsg)}`
+  const whatsappHref = rawContact
+    ? `https://wa.me/${rawContact.replace(/\D/g, '')}?text=${encodeURIComponent(whatsappMsg)}`
     : `https://wa.me/?text=${encodeURIComponent(whatsappMsg)}`
 
   return (
     <div style={{ background: '#f8f8f8', minHeight: '80vh' }}>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+
       {/* Breadcrumb */}
       <div style={{ background: '#111', padding: '12px 20px' }}>
         <div className="container" style={{ display: 'flex', gap: '8px', alignItems: 'center', fontSize: '13px', color: '#666' }}>
@@ -123,17 +144,7 @@ export default function ServiceDetailPage() {
 
           {/* LEFT — Image + Stats */}
           <div>
-            <div style={{ border: '3px solid #111', overflow: 'hidden', background: '#fff', boxShadow: '8px 8px 0 #1B5E20', position: 'relative', height: '400px' }}>
-              <Image
-                src={service.image_url ?? '/placeholder.jpg'}
-                alt={service.name}
-                fill
-                priority
-                style={{ objectFit: 'cover' }}
-                sizes="(max-width: 768px) 100vw, 55vw"
-                onError={(e: any) => { e.currentTarget.src = '/placeholder.jpg' }}
-              />
-            </div>
+            <ImageGallery images={galleryImages} alt={service.name} height={400} />
             <div style={{ display: 'flex', gap: '8px', marginTop: '12px', flexWrap: 'wrap' }}>
               <span style={{ padding: '6px 14px', background: '#1B5E20', color: '#fff', fontWeight: 700, fontSize: '11px', letterSpacing: '0.5px', border: '2px solid #111' }}>
                 {service.category.toUpperCase()}
@@ -179,22 +190,20 @@ export default function ServiceDetailPage() {
                   <Image
                     src={service.provider.avatar_url}
                     alt={service.provider.name}
-                    width={52}
-                    height={52}
+                    width={52} height={52}
                     style={{ borderRadius: '50%', border: '2px solid #111', objectFit: 'cover' }}
-                    onError={(e: any) => { e.currentTarget.src = '/placeholder-user.jpg' }}
                   />
                 ) : (
                   <div style={{ width: '52px', height: '52px', borderRadius: '50%', background: '#1B5E20', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '18px', border: '2px solid #111' }}>
-                    {(service.provider?.name ?? 'U').split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
+                    {(service.provider?.name ?? 'P').split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
                   </div>
                 )}
                 <div>
-                  <div style={{ fontWeight: 700, fontSize: '16px', marginBottom: '2px' }}>{service.provider?.name ?? 'UMaT Provider'}</div>
+                  <div style={{ fontWeight: 700, fontSize: '16px', marginBottom: '2px' }}>{service.provider?.name ?? 'Provider'}</div>
                   <div style={{ fontSize: '13px', color: '#888' }}>
-                    {service.provider?.rating ? `⭐ ${service.provider.rating.toFixed(1)}/5` : '★ New provider'} · UMaT Provider
+                    {service.provider?.rating ? `⭐ ${service.provider.rating.toFixed(1)}/5` : '★ New provider'} · Campus Provider
                   </div>
-                  {service.provider?.id && service.provider.id !== (user?.id ?? '') && (
+                  {service.provider?.id && (
                     <Link
                       href={`/profile/${service.provider.id}`}
                       style={{ display: 'inline-block', marginTop: '8px', fontSize: '11px', fontWeight: 700, color: '#1B5E20', textDecoration: 'none', letterSpacing: '0.5px', borderBottom: '1px solid #1B5E20' }}
@@ -206,68 +215,24 @@ export default function ServiceDetailPage() {
               </div>
             </div>
 
-            {/* Book */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '24px' }}>
-              {user ? (
-                <>
-                  {service.provider && service.provider.id !== user.id && (
-                    <button
-                      onClick={() => router.push(`/messages?with=${service.provider!.id}&title=${encodeURIComponent(service.name)}`)}
-                      style={{
-                        textAlign: 'center', display: 'block', width: '100%', cursor: 'pointer',
-                        padding: '18px 40px', background: '#111', color: '#fff',
-                        fontFamily: '"Archivo Black", sans-serif', fontSize: '16px',
-                        border: '2px solid #111', boxShadow: '4px 4px 0 #1B5E20',
-                        transition: 'all 0.2s',
-                      }}
-                      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#1B5E20' }}
-                      onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#111' }}
-                    >
-                      💬 MESSAGE PROVIDER
-                    </button>
-                  )}
-                  <a
-                    href={whatsappHref}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{
-                      textAlign: 'center', display: 'block', textDecoration: 'none',
-                      padding: '18px 40px', background: '#1B5E20', color: '#fff',
-                      fontFamily: '"Archivo Black", sans-serif', fontSize: '16px',
-                      border: '2px solid #111', boxShadow: '4px 4px 0 #111',
-                      transition: 'all 0.2s',
-                    }}
-                  >
-                    📅 BOOK VIA WHATSAPP
-                  </a>
-                </>
-              ) : (
-                <Link
-                  href={`/auth/login?redirect=/services/${service.id}`}
-                  style={{
-                    textAlign: 'center', display: 'block', textDecoration: 'none',
-                    padding: '18px 40px', background: '#888', color: '#fff',
-                    fontFamily: '"Archivo Black", sans-serif', fontSize: '16px',
-                    border: '2px solid #111', boxShadow: '4px 4px 0 #111',
-                  }}
-                >
-                  🔒 LOGIN TO BOOK
-                </Link>
-              )}
-              <Link
-                href="/services"
-                className="btn-secondary hover-lift"
-                style={{ textAlign: 'center', display: 'block', textDecoration: 'none', padding: '16px 40px' }}
-              >
-                ← BACK TO SERVICES
-              </Link>
-            </div>
+            {/* Interactive actions (client-rendered) */}
+            <ServiceActionsClient
+              serviceId={service.id}
+              serviceName={service.name}
+              providerId={service.provider?.id ?? null}
+              whatsappHref={whatsappHref}
+            />
 
             <div style={{ padding: '14px 16px', background: '#e8f5e9', border: '2px solid #1B5E20', fontSize: '13px', color: '#1B5E20', lineHeight: 1.5 }}>
-              ✅ <strong>Active provider:</strong> {service.response_time ? `Response time is ${service.response_time}.` : ''} This provider is verified on campus.
+              ✅ <strong>Active provider:</strong> {service.response_time ? `Response time is ${service.response_time}.` : ''} This provider is active on campus.
             </div>
           </div>
         </div>
+
+        {/* Reviews */}
+        {service.provider?.id && (
+          <ReviewsSection serviceId={service.id} revieweeId={service.provider.id} />
+        )}
 
         {/* Related Services */}
         {related.length > 0 && (
@@ -280,12 +245,9 @@ export default function ServiceDetailPage() {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px' }}>
               {related.map(s => (
                 <Link key={s.id} href={`/services/${s.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                  <div style={{ border: '2px solid #eee', background: '#fff', overflow: 'hidden', transition: '0.2s' }}
-                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = '#111'; (e.currentTarget as HTMLElement).style.boxShadow = '4px 4px 0 #1B5E20' }}
-                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = '#eee'; (e.currentTarget as HTMLElement).style.boxShadow = 'none' }}
-                  >
+                  <div style={{ border: '2px solid #eee', background: '#fff', overflow: 'hidden' }}>
                     <div style={{ position: 'relative', height: '160px', overflow: 'hidden' }}>
-                      <Image src={s.image_url ?? '/placeholder.jpg'} alt={s.name} fill style={{ objectFit: 'cover' }} sizes="33vw" onError={(e: any) => { e.currentTarget.src = '/placeholder.jpg' }} />
+                      <Image src={s.image_url ?? '/placeholder.jpg'} alt={s.name} fill style={{ objectFit: 'cover' }} sizes="33vw" />
                     </div>
                     <div style={{ padding: '12px' }}>
                       <div style={{ fontWeight: 700, fontSize: '14px', marginBottom: '4px' }}>{s.name}</div>

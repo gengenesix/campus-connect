@@ -213,7 +213,7 @@ export default function PublicProfilePage() {
             {/* Name + role */}
             <div style={{ marginBottom: '16px' }}>
               <h1 style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '26px', marginBottom: '6px', color: '#111' }}>
-                {profile.name ?? 'UMaT Student'}
+                {profile.name ?? 'Campus Student'}
               </h1>
               <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
                 <span style={{ padding: '4px 12px', background: '#1B5E20', color: '#fff', fontSize: '11px', fontWeight: 700, letterSpacing: '0.5px' }}>

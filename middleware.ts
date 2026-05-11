@@ -33,15 +33,19 @@ export async function middleware(request: NextRequest) {
     supabaseResponse.cookies.getAll().forEach(c => to.cookies.set(c.name, c.value, c))
   }
 
-  // Helper: fetch role from DB (only called when actually needed)
-  const getRole = async (): Promise<string | null> => {
-    if (!user) return null
-    const { data } = await supabase.from('profiles').select('role').eq('id', user.id).single()
-    return data?.role ?? null
+  // Check if user is an admin via the admins table (no hardcoded emails)
+  const isAdmin = async (): Promise<boolean> => {
+    if (!user) return false
+    const { data } = await supabase
+      .from('admins')
+      .select('id')
+      .eq('user_id', user.id)
+      .limit(1)
+      .single()
+    return !!data
   }
 
   // ── /admin: server-side gate ───────────────────────────────────────────────
-  // Not logged in → redirect to login
   if (!user && path.startsWith('/admin')) {
     const url = request.nextUrl.clone()
     url.pathname = '/auth/login'
@@ -50,17 +54,15 @@ export async function middleware(request: NextRequest) {
     copySessionCookies(r)
     return r
   }
-  // Logged in but not admin → 404 (hides that /admin even exists)
-  // gengenesix@gmail.com is hardcoded as admin regardless of DB role
+  // Logged in but not in admins table → 404 (hides /admin from non-admins)
   if (user && path.startsWith('/admin')) {
-    const isAdmin = user.email === 'gengenesix@gmail.com' || (await getRole()) === 'admin'
-    if (!isAdmin) {
+    if (!(await isAdmin())) {
       return NextResponse.rewrite(new URL('/not-found', request.url))
     }
   }
 
   // ── Other protected pages ─────────────────────────────────────────────────
-  // /profile (exact) is protected; /profile/[id] is public
+  // /profile (exact) is protected; /profile/[id] (view others) is public
   const nonAdminProtected = PROTECTED_PATHS.filter(p => p !== '/admin')
   const isProtected = nonAdminProtected.some(p => path.startsWith(p)) || path === '/profile'
   if (!user && isProtected) {
@@ -74,9 +76,9 @@ export async function middleware(request: NextRequest) {
 
   // ── Auth pages: redirect already-logged-in users ──────────────────────────
   if (user && AUTH_PATHS.some(p => path.startsWith(p))) {
-    const isAdmin = user.email === 'gengenesix@gmail.com' || (await getRole()) === 'admin'
+    const admin = await isAdmin()
     const url = request.nextUrl.clone()
-    url.pathname = isAdmin ? '/admin' : '/dashboard'
+    url.pathname = admin ? '/admin' : '/dashboard'
     const r = NextResponse.redirect(url)
     copySessionCookies(r)
     return r

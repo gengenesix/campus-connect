@@ -5,6 +5,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useAuth } from '@/context/AuthContext'
 import type { Service } from '@/lib/mockData'
+import WishlistButton from '@/components/WishlistButton'
 
 const categoryAccent: Record<string, string> = {
   'Barbing':    '#5d3fd3',
@@ -61,6 +62,11 @@ export default function ServiceCard({ service }: { service: Service }) {
             }}>
               BOOK NOW →
             </span>
+          </div>
+
+          {/* Wishlist button */}
+          <div style={{ position: 'absolute', bottom: '10px', right: '10px', zIndex: 2 }}>
+            <WishlistButton serviceId={service.id} size={32} />
           </div>
 
           {/* Category badge */}

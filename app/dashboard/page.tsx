@@ -33,6 +33,7 @@ export default function DashboardPage() {
   const [myListings, setMyListings] = useState<Listing[]>([])
   const [myBookings, setMyBookings] = useState<Booking[]>([])
   const [unreadCount, setUnreadCount] = useState(0)
+  const [subExpiry, setSubExpiry] = useState<string | null>(null)
   const [dataLoading, setDataLoading] = useState(true)
 
   useEffect(() => {
@@ -45,7 +46,7 @@ export default function DashboardPage() {
     const fetchDashboardData = async () => {
       setDataLoading(true)
 
-      const [listingsRes, bookingsRes, unreadRes] = await Promise.all([
+      const [listingsRes, bookingsRes, unreadRes, subRes] = await Promise.all([
         supabase
           .from('products')
           .select('id, title, price, image_url, views, status')
@@ -60,7 +61,7 @@ export default function DashboardPage() {
             id, status,
             service:services!service_id (id, name, rate, image_url)
           `)
-          .eq('buyer_id', user.id)
+          .eq('client_id', user.id)
           .order('created_at', { ascending: false })
           .limit(2),
 
@@ -69,11 +70,18 @@ export default function DashboardPage() {
           .select('id', { count: 'exact', head: true })
           .eq('receiver_id', user.id)
           .eq('is_read', false),
+
+        supabase
+          .from('profiles')
+          .select('subscription_expires_at')
+          .eq('id', user.id)
+          .single(),
       ])
 
       setMyListings((listingsRes.data as Listing[]) ?? [])
-      setMyBookings((bookingsRes.data as Booking[]) ?? [])
+      setMyBookings((bookingsRes.data as unknown as Booking[]) ?? [])
       setUnreadCount(unreadRes.count ?? 0)
+      setSubExpiry((subRes.data as any)?.subscription_expires_at ?? null)
       setDataLoading(false)
     }
 
@@ -87,7 +95,7 @@ export default function DashboardPage() {
     { label: 'My Listings', value: dataLoading ? '—' : String(myListings.length), icon: '📦', color: '#5d3fd3', href: '/my-listings' },
     { label: 'Active', value: dataLoading ? '—' : String(activeListings), icon: '✅', color: '#1B5E20', href: '/my-listings' },
     { label: 'Unread Messages', value: dataLoading ? '—' : String(unreadCount), icon: '💬', color: '#ff3366', href: '/messages' },
-    { label: 'My Bookings', value: dataLoading ? '—' : String(myBookings.length), icon: '📅', color: '#111', href: '/services' },
+    { label: 'My Bookings', value: dataLoading ? '—' : String(myBookings.length), icon: '📅', color: '#111', href: '/bookings' },
   ]
 
   if (loading) {
@@ -115,7 +123,7 @@ export default function DashboardPage() {
                 DASHBOARD
               </div>
               <p style={{ color: '#666', marginTop: '4px', fontSize: '14px' }}>
-                Welcome back, {firstName} 👋 · {profile?.department ?? 'UMaT Student'}
+                Welcome back, {firstName} 👋 · {profile?.department ?? 'Campus Student'}
               </p>
             </div>
             <Link
@@ -151,6 +159,45 @@ export default function DashboardPage() {
             </Link>
           ))}
         </div>
+
+        {/* Subscription Status */}
+        {!dataLoading && (() => {
+          const isActive = subExpiry && new Date(subExpiry) > new Date()
+          if (!isActive) {
+            return (
+              <div style={{ marginBottom: '24px', padding: '18px 24px', background: '#fff', border: '2px solid #ff3366', display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap', boxShadow: '4px 4px 0 #ff3366' }}>
+                <div style={{ fontSize: '28px' }}>🔒</div>
+                <div style={{ flex: 1, minWidth: '200px' }}>
+                  <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '15px', marginBottom: '3px' }}>NO ACTIVE SELLER SUBSCRIPTION</div>
+                  <div style={{ color: '#888', fontSize: '13px' }}>Subscribe for GHS 20/month to list goods and services on Campus Connect.</div>
+                </div>
+                <Link href="/subscribe" style={{ display: 'inline-block', padding: '10px 24px', background: '#ff3366', color: '#fff', fontFamily: '"Archivo Black", sans-serif', fontSize: '13px', textDecoration: 'none', border: '2px solid #111', boxShadow: '3px 3px 0 #111', whiteSpace: 'nowrap' }}>
+                  SUBSCRIBE →
+                </Link>
+              </div>
+            )
+          }
+          const daysLeft = Math.ceil((new Date(subExpiry).getTime() - Date.now()) / 86400000)
+          const expiring = daysLeft <= 7
+          return (
+            <div style={{ marginBottom: '24px', padding: '16px 24px', background: '#fff', border: `2px solid ${expiring ? '#f59e0b' : '#1B5E20'}`, display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
+              <div style={{ fontSize: '22px' }}>{expiring ? '⚠️' : '✅'}</div>
+              <div style={{ flex: 1, minWidth: '200px' }}>
+                <div style={{ fontWeight: 700, fontSize: '14px', color: expiring ? '#92400e' : '#1B5E20', marginBottom: '2px' }}>
+                  {expiring ? `SUBSCRIPTION EXPIRING IN ${daysLeft} DAY${daysLeft !== 1 ? 'S' : ''}` : 'SELLER SUBSCRIPTION ACTIVE'}
+                </div>
+                <div style={{ color: '#888', fontSize: '12px' }}>
+                  Expires {new Date(subExpiry).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
+                </div>
+              </div>
+              {expiring && (
+                <Link href="/subscribe" style={{ display: 'inline-block', padding: '9px 20px', background: '#f59e0b', color: '#111', fontFamily: '"Archivo Black", sans-serif', fontSize: '12px', textDecoration: 'none', border: '2px solid #111', boxShadow: '3px 3px 0 #111', whiteSpace: 'nowrap' }}>
+                  RENEW NOW →
+                </Link>
+              )}
+            </div>
+          )
+        })()}
 
         {/* Main Content Grid */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '24px' }}>
@@ -214,7 +261,7 @@ export default function DashboardPage() {
           <div style={{ border: '2px solid #111', background: '#fff', boxShadow: '4px 4px 0 #111' }}>
             <div style={{ background: '#1B5E20', color: '#fff', padding: '14px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '14px', letterSpacing: '0.5px' }}>MY BOOKINGS</span>
-              <Link href="/services" style={{ color: '#86efac', fontSize: '12px', textDecoration: 'none', fontWeight: 700 }}>Browse →</Link>
+              <Link href="/bookings" style={{ color: '#86efac', fontSize: '12px', textDecoration: 'none', fontWeight: 700 }}>View All →</Link>
             </div>
             <div>
               {dataLoading ? (
@@ -242,7 +289,12 @@ export default function DashboardPage() {
                         <div style={{ fontWeight: 700, fontSize: '13px', marginBottom: '2px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{booking.service?.name ?? 'Service'}</div>
                         <div style={{ color: '#1B5E20', fontWeight: 700, fontFamily: '"Archivo Black"', fontSize: '14px' }}>{booking.service?.rate ?? '—'}</div>
                       </div>
-                      <span style={{ background: '#e8f5e9', color: '#1B5E20', padding: '4px 10px', fontSize: '10px', fontWeight: 700, border: '1px solid #86efac', flexShrink: 0, textTransform: 'uppercase' }}>
+                      <span style={{
+                        padding: '4px 10px', fontSize: '10px', fontWeight: 700, flexShrink: 0, textTransform: 'uppercase', border: '1px solid',
+                        background: booking.status === 'confirmed' ? '#e8f5e9' : booking.status === 'completed' ? '#ede9fe' : booking.status === 'cancelled' ? '#f0f0f0' : '#fffbeb',
+                        color: booking.status === 'confirmed' ? '#1B5E20' : booking.status === 'completed' ? '#5d3fd3' : booking.status === 'cancelled' ? '#666' : '#92400e',
+                        borderColor: booking.status === 'confirmed' ? '#86efac' : booking.status === 'completed' ? '#a78bfa' : booking.status === 'cancelled' ? '#ccc' : '#fcd34d',
+                      }}>
                         {booking.status}
                       </span>
                     </div>
@@ -251,8 +303,8 @@ export default function DashboardPage() {
               )}
             </div>
             <div style={{ padding: '12px 16px', borderTop: '1px solid #f0f0f0' }}>
-              <Link href="/services" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', padding: '10px', color: '#1B5E20', fontWeight: 700, textDecoration: 'none', border: '2px dashed #1B5E20', fontSize: '13px' }}>
-                + Book a Service
+              <Link href="/bookings" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', padding: '10px', color: '#1B5E20', fontWeight: 700, textDecoration: 'none', border: '2px dashed #1B5E20', fontSize: '13px' }}>
+                View All Bookings →
               </Link>
             </div>
           </div>
@@ -263,12 +315,13 @@ export default function DashboardPage() {
           <div style={{ background: '#f0f0f0', padding: '14px 20px', borderBottom: '2px solid #111' }}>
             <span style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '14px', letterSpacing: '0.5px' }}>QUICK ACTIONS</span>
           </div>
-          <div style={{ padding: '20px', display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px' }}>
+          <div style={{ padding: '20px', display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '12px' }}>
             {[
               { href: '/sell', label: 'Sell Item', icon: '📦', color: '#5d3fd3' },
               { href: '/offer-service', label: 'Offer Service', icon: '🛠️', color: '#1B5E20' },
+              { href: '/bookings', label: 'My Bookings', icon: '📅', color: '#111' },
               { href: '/messages', label: 'Messages', icon: '💬', color: '#ff3366' },
-              { href: '/profile', label: 'Edit Profile', icon: '👤', color: '#111' },
+              { href: '/profile', label: 'Edit Profile', icon: '👤', color: '#444' },
             ].map(action => (
               <Link key={action.href} href={action.href} style={{ textDecoration: 'none' }}>
                 <div style={{ textAlign: 'center', padding: '20px 12px', border: '2px solid #eee', transition: '0.15s', background: '#fff', cursor: 'pointer' }}

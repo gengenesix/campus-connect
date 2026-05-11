@@ -1,472 +1,558 @@
--- ============================================================
--- Campus Connect — Supabase Schema (v2 — production)
--- Run this in the Supabase SQL Editor (safe to re-run)
--- ============================================================
+-- =============================================================================
+-- Campus Connect — Complete Fresh Schema (REBUILD)
+-- National Student Marketplace for All Ghana Universities (43+ institutions)
+-- =============================================================================
+-- Run instructions:
+--   1. Supabase Dashboard → SQL Editor → New Query
+--   2. Paste this entire file and run
+--   3. Create storage buckets (see bottom of file)
+--   4. Sign up, then promote yourself to super_admin (see bottom of file)
+-- =============================================================================
 
--- ============================================================
--- FRESH START — wipe all data before rebuilding
--- Deleting auth.users cascades to profiles → products →
--- services → bookings → messages → reviews automatically.
--- ============================================================
-delete from auth.users;
-truncate public.reviews   restart identity cascade;
-truncate public.messages  restart identity cascade;
-truncate public.bookings  restart identity cascade;
-truncate public.services  restart identity cascade;
-truncate public.products  restart identity cascade;
-truncate public.profiles  restart identity cascade;
+-- Required extensions
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+CREATE EXTENSION IF NOT EXISTS "pg_trgm";
 
-create extension if not exists "uuid-ossp";
 
--- ============================================================
--- PROFILES
--- ============================================================
-create table if not exists public.profiles (
-  id uuid references auth.users on delete cascade primary key,
-  email text not null,
-  name text,
-  department text,
-  course text,           -- programme / degree e.g. BSc Mining Engineering
-  class_year text,       -- Year 1 / Year 2 / ... / Postgraduate / PhD
-  hostel text,
-  phone text,
-  bio text,
-  avatar_url text,
-  role text default 'buyer' check (role in ('buyer', 'seller', 'provider', 'admin')),
-  rating numeric(3,2) default 0.0,
-  total_reviews int default 0,
-  is_verified boolean default false,
-  created_at timestamptz default now(),
-  updated_at timestamptz default now()
+-- =============================================================================
+-- 1. UNIVERSITIES
+-- =============================================================================
+CREATE TABLE universities (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  slug            TEXT UNIQUE NOT NULL,
+  name            TEXT NOT NULL,
+  short_name      TEXT NOT NULL,
+  region          TEXT NOT NULL,
+  city            TEXT NOT NULL,
+  type            TEXT NOT NULL CHECK (type IN ('public', 'private', 'technical')),
+  website         TEXT,
+  established     INT,
+  logo_url        TEXT,
+  primary_color   TEXT DEFAULT '#1B5E20',
+  secondary_color TEXT DEFAULT '#FFD700',
+  is_active       BOOLEAN NOT NULL DEFAULT true,
+  created_at      TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
--- Add new columns to existing deployments (safe — ignored if columns already exist)
-alter table public.profiles add column if not exists course text;
-alter table public.profiles add column if not exists class_year text;
-alter table public.profiles add column if not exists is_banned boolean default false;
+CREATE INDEX idx_universities_slug   ON universities (slug);
+CREATE INDEX idx_universities_type   ON universities (type);
+CREATE INDEX idx_universities_region ON universities (region);
 
--- Auto-create profile row when a new auth user signs up
-create or replace function public.handle_new_user()
-returns trigger as $$
-begin
-  insert into public.profiles (id, email, name, avatar_url)
-  values (
-    new.id,
-    new.email,
-    coalesce(
-      new.raw_user_meta_data->>'full_name',
-      new.raw_user_meta_data->>'name',
-      split_part(new.email, '@', 1)
-    ),
-    new.raw_user_meta_data->>'avatar_url'
+-- Seed all 43 Ghana universities
+INSERT INTO universities (slug, name, short_name, region, city, type, website, established) VALUES
+-- Public
+('ug',                       'University of Ghana',                                                                    'UG',       'Greater Accra', 'Legon, Accra',     'public',    'ug.edu.gh',               1948),
+('knust',                    'Kwame Nkrumah University of Science and Technology',                                     'KNUST',    'Ashanti',       'Kumasi',           'public',    'knust.edu.gh',            1951),
+('ucc',                      'University of Cape Coast',                                                               'UCC',      'Central',       'Cape Coast',       'public',    'ucc.edu.gh',              1962),
+('uds',                      'University for Development Studies',                                                     'UDS',      'Northern',      'Tamale',           'public',    'uds.edu.gh',              1992),
+('uew',                      'University of Education, Winneba',                                                       'UEW',      'Central',       'Winneba',          'public',    'uew.edu.gh',              1992),
+('umat',                     'University of Mines and Technology',                                                     'UMaT',     'Western',       'Tarkwa',           'public',    'umat.edu.gh',             2004),
+('uhas',                     'University of Health and Allied Sciences',                                               'UHAS',     'Volta',         'Ho',               'public',    'uhas.edu.gh',             2012),
+('uenr',                     'University of Energy and Natural Resources',                                             'UENR',     'Bono',          'Sunyani',          'public',    'uenr.edu.gh',             2013),
+('aamusted',                 'Akenten Appiah-Menka University of Skills Training and Entrepreneurial Development',     'AAMUSTED', 'Ashanti',       'Kumasi',           'public',    'aamusted.edu.gh',         2020),
+('cstutas',                  'C.K. Tedam University of Technology and Applied Sciences',                               'CKT-UTAS', 'Upper East',    'Navrongo',         'public',    'cktsutas.edu.gh',         2020),
+('gimpa',                    'Ghana Institute of Management and Public Administration',                                 'GIMPA',    'Greater Accra', 'Greenhill, Accra', 'public',    'gimpa.edu.gh',            1961),
+-- Technical
+('accra-tu',                 'Accra Technical University',                                                             'ATU',      'Greater Accra', 'Accra',            'technical', 'atu.edu.gh',              1949),
+('kumasi-tu',                'Kumasi Technical University',                                                            'KsTU',     'Ashanti',       'Kumasi',           'technical', 'kstu.edu.gh',             1954),
+('cape-coast-tu',            'Cape Coast Technical University',                                                        'CCTU',     'Central',       'Cape Coast',       'technical', 'cctu.edu.gh',             1984),
+('takoradi-tu',              'Takoradi Technical University',                                                          'TTU',      'Western',       'Takoradi',         'technical', 'ttu.edu.gh',              1954),
+('ho-tu',                    'Ho Technical University',                                                                'HTU',      'Volta',         'Ho',               'technical', 'htu.edu.gh',              1968),
+('koforidua-tu',             'Koforidua Technical University',                                                         'KTU',      'Eastern',       'Koforidua',        'technical', 'ktu.edu.gh',              1997),
+('sunyani-tu',               'Sunyani Technical University',                                                           'STU',      'Bono',          'Sunyani',          'technical', 'stu.edu.gh',              1963),
+('wa-tu',                    'Wa Technical University',                                                                'WaTU',     'Upper West',    'Wa',               'technical', 'wtu.edu.gh',              2016),
+('bolgatanga-tu',            'Bolgatanga Technical University',                                                        'BTU',      'Upper East',    'Bolgatanga',       'technical', 'btu.edu.gh',              2016),
+('tamale-tu',                'Tamale Technical University',                                                            'TaTU',     'Northern',      'Tamale',           'technical', 'tatu.edu.gh',             1951),
+-- Private
+('ashesi',                   'Ashesi University',                                                                      'Ashesi',   'Eastern',       'Berekuso',         'private',   'ashesi.edu.gh',           2002),
+('central-university',       'Central University',                                                                     'CU',       'Greater Accra', 'Miotso, Accra',    'private',   'central.edu.gh',          1988),
+('pentecost-university',     'Pentecost University',                                                                   'PU',       'Greater Accra', 'Accra',            'private',   'pentvars.edu.gh',         2003),
+('valley-view',              'Valley View University',                                                                  'VVU',      'Eastern',       'Techiman',         'private',   'vvu.edu.gh',              1997),
+('wisconsin-international',  'Wisconsin International University College',                                             'WIUC',     'Greater Accra', 'Accra',            'private',   'wiuc-ghana.edu.gh',       2000),
+('regent-university',        'Regent University College of Science and Technology',                                    'Regent',   'Greater Accra', 'Accra',            'private',   'regent.edu.gh',           2003),
+('blue-crest',               'BlueCrest University College',                                                           'BCUC',     'Greater Accra', 'Accra',            'private',   'bluecrestcollege.com',    2003),
+('methodist-university',     'Methodist University',                                                                   'MU',       'Greater Accra', 'Accra',            'private',   'mu.edu.gh',               2000),
+('presbyterian-university',  'Presbyterian University College',                                                        'PUC',      'Eastern',       'Abetifi',          'private',   'presbyuniversity.edu.gh', 2003),
+('catholic-university',      'Catholic University College of Ghana',                                                   'CUCG',     'Bono',          'Fiapre, Sunyani',  'private',   'cug.edu.gh',              2003),
+('ghana-telecom-university', 'Ghana Communication Technology University',                                              'GCTU',     'Greater Accra', 'Accra',            'private',   'gctu.edu.gh',             2012),
+('islamic-university',       'Islamic University College Ghana',                                                       'IUG',      'Greater Accra', 'Accra',            'private',   'iug.edu.gh',              1997),
+('academic-city',            'Academic City University College',                                                       'ACity',    'Greater Accra', 'Haatso, Accra',    'private',   'academiccity.edu.gh',     2016),
+('ghana-institute-journalism','Ghana Institute of Journalism',                                                         'GIJ',      'Greater Accra', 'Accra',            'private',   'gij.edu.gh',              1959),
+('lancaster-ghana',          'Lancaster University Ghana',                                                             'LU Ghana', 'Greater Accra', 'Accra',            'private',   'lancaster.edu.gh',        2013),
+('garden-city-university',   'Garden City University College',                                                         'GCUC',     'Ashanti',       'Kumasi',           'private',   'gcuc.edu.gh',             2003),
+('ghana-christian',          'Ghana Christian University College',                                                     'GHCUC',    'Greater Accra', 'Kwabenya, Accra',  'private',   'gcuc.edu.gh',             1996)
+ON CONFLICT (slug) DO NOTHING;
+
+
+-- =============================================================================
+-- 2. PROFILES (auto-created on sign-up via trigger)
+-- =============================================================================
+CREATE TABLE profiles (
+  id              UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+  email           TEXT NOT NULL,
+  name            TEXT,
+  university_id   UUID REFERENCES universities(id) ON DELETE SET NULL,
+  department      TEXT,
+  course          TEXT,
+  class_year      TEXT,
+  hostel          TEXT,
+  faculty         TEXT,
+  programme       TEXT,
+  student_id      TEXT,
+  phone           TEXT,
+  bio             TEXT,
+  avatar_url      TEXT,
+  role            TEXT NOT NULL DEFAULT 'buyer'
+                    CHECK (role IN ('buyer', 'seller', 'provider', 'admin')),
+  rating          NUMERIC(3,2) NOT NULL DEFAULT 0,
+  total_reviews   INT NOT NULL DEFAULT 0,
+  is_verified     BOOLEAN NOT NULL DEFAULT false,
+  is_banned       BOOLEAN NOT NULL DEFAULT false,
+  push_sub        JSONB,
+  created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at      TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX idx_profiles_university ON profiles (university_id);
+CREATE INDEX idx_profiles_role       ON profiles (role);
+
+-- Auto-update timestamp
+CREATE OR REPLACE FUNCTION update_updated_at()
+RETURNS TRIGGER LANGUAGE plpgsql AS $$
+BEGIN NEW.updated_at = now(); RETURN NEW; END;
+$$;
+
+CREATE TRIGGER profiles_updated_at
+  BEFORE UPDATE ON profiles
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+
+-- Auto-create profile on sign-up
+CREATE OR REPLACE FUNCTION handle_new_user()
+RETURNS TRIGGER LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
+BEGIN
+  INSERT INTO profiles (id, email, name)
+  VALUES (
+    NEW.id,
+    NEW.email,
+    COALESCE(NEW.raw_user_meta_data->>'name', split_part(NEW.email, '@', 1))
   )
-  on conflict (id) do nothing;
-  return new;
-end;
-$$ language plpgsql security definer;
+  ON CONFLICT (id) DO NOTHING;
+  RETURN NEW;
+END;
+$$;
 
-drop trigger if exists on_auth_user_created on auth.users;
-create trigger on_auth_user_created
-  after insert on auth.users
-  for each row execute procedure public.handle_new_user();
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+CREATE TRIGGER on_auth_user_created
+  AFTER INSERT ON auth.users
+  FOR EACH ROW EXECUTE FUNCTION handle_new_user();
 
--- ============================================================
--- PRODUCTS (Goods for sale)
--- ============================================================
-create table if not exists public.products (
-  id uuid default uuid_generate_v4() primary key,
-  seller_id uuid references public.profiles(id) on delete cascade not null,
-  title text not null,
-  description text,
-  price numeric(10,2) not null check (price >= 0),
-  condition text check (condition in ('New', 'Like New', 'Good', 'Fair')),
-  category text check (category in ('Electronics', 'Clothing', 'Books', 'Furniture', 'Sports', 'Other')),
-  image_url text,
-  whatsapp text,
-  status text default 'active' check (status in ('active', 'sold', 'paused', 'deleted')),
-  views int default 0,
-  location text,
-  created_at timestamptz default now(),
-  updated_at timestamptz default now()
+
+-- =============================================================================
+-- 3. ADMINS (source of truth for admin access — no hardcoded emails)
+-- =============================================================================
+CREATE TABLE admins (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id         UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  university_id   UUID REFERENCES universities(id) ON DELETE CASCADE,
+  -- NULL university_id = super admin (access to all universities)
+  role            TEXT NOT NULL DEFAULT 'university_admin'
+                    CHECK (role IN ('super_admin', 'university_admin', 'moderator')),
+  granted_by      UUID REFERENCES profiles(id),
+  created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
+  UNIQUE NULLS NOT DISTINCT (user_id, university_id)
 );
 
--- ============================================================
--- SERVICES
--- ============================================================
-create table if not exists public.services (
-  id uuid default uuid_generate_v4() primary key,
-  provider_id uuid references public.profiles(id) on delete cascade not null,
-  name text not null,
-  description text,
-  category text check (category in ('Barbing', 'Tutoring', 'Photography', 'Laundry', 'Tech Repair', 'Design', 'Other')),
-  rate text,
-  availability text,
-  response_time text,
-  image_url text,
-  whatsapp text,
-  status text default 'active' check (status in ('active', 'paused', 'deleted')),
-  total_bookings int default 0,
-  created_at timestamptz default now(),
-  updated_at timestamptz default now()
+CREATE INDEX idx_admins_user ON admins (user_id);
+CREATE INDEX idx_admins_uni  ON admins (university_id);
+
+
+-- =============================================================================
+-- 4. PRODUCTS
+-- =============================================================================
+CREATE TABLE products (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  seller_id       UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  university_id   UUID REFERENCES universities(id) ON DELETE CASCADE,
+  title           TEXT NOT NULL,
+  description     TEXT NOT NULL DEFAULT '',
+  price           NUMERIC(10,2) NOT NULL CHECK (price >= 0),
+  category        TEXT NOT NULL,
+  condition       TEXT NOT NULL CHECK (condition IN ('New', 'Like New', 'Good', 'Fair')),
+  image_url       TEXT,
+  whatsapp        TEXT,
+  views           INT NOT NULL DEFAULT 0,
+  in_stock        BOOLEAN NOT NULL DEFAULT true,
+  status          TEXT NOT NULL DEFAULT 'pending'
+                    CHECK (status IN ('pending', 'active', 'deleted')),
+  search_vector   TSVECTOR GENERATED ALWAYS AS (
+    setweight(to_tsvector('english', coalesce(title, '')), 'A') ||
+    setweight(to_tsvector('english', coalesce(description, '')), 'B') ||
+    setweight(to_tsvector('english', coalesce(category, '')), 'C')
+  ) STORED,
+  created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at      TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
--- ============================================================
--- BOOKINGS
--- ============================================================
-create table if not exists public.bookings (
-  id uuid default uuid_generate_v4() primary key,
-  service_id uuid references public.services(id) on delete cascade not null,
-  buyer_id uuid references public.profiles(id) on delete cascade not null,
-  provider_id uuid references public.profiles(id) not null,
-  status text default 'pending' check (status in ('pending', 'confirmed', 'completed', 'cancelled')),
-  notes text,
-  scheduled_date date,
-  total_price numeric(10,2),
-  created_at timestamptz default now(),
-  updated_at timestamptz default now()
+CREATE INDEX idx_products_seller      ON products (seller_id);
+CREATE INDEX idx_products_university  ON products (university_id);
+CREATE INDEX idx_products_status      ON products (status);
+CREATE INDEX idx_products_search      ON products USING GIN (search_vector);
+-- Hot path: university feed (most common query)
+CREATE INDEX idx_products_uni_active  ON products (university_id, status, created_at DESC)
+  WHERE status = 'active';
+
+CREATE TRIGGER products_updated_at
+  BEFORE UPDATE ON products
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+
+-- View counter RPC (called client-side, fire-and-forget)
+CREATE OR REPLACE FUNCTION increment_product_views(product_id UUID)
+RETURNS VOID LANGUAGE sql SECURITY DEFINER AS $$
+  UPDATE products SET views = views + 1 WHERE id = product_id AND status = 'active';
+$$;
+
+
+-- =============================================================================
+-- 5. SERVICES
+-- =============================================================================
+CREATE TABLE services (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  provider_id     UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  university_id   UUID REFERENCES universities(id) ON DELETE CASCADE,
+  name            TEXT NOT NULL,
+  description     TEXT NOT NULL DEFAULT '',
+  category        TEXT NOT NULL,
+  rate            TEXT NOT NULL,
+  availability    TEXT NOT NULL,
+  image_url       TEXT,
+  whatsapp        TEXT,
+  response_time   TEXT,
+  total_bookings  INT NOT NULL DEFAULT 0,
+  status          TEXT NOT NULL DEFAULT 'pending'
+                    CHECK (status IN ('pending', 'active', 'deleted')),
+  search_vector   TSVECTOR GENERATED ALWAYS AS (
+    setweight(to_tsvector('english', coalesce(name, '')), 'A') ||
+    setweight(to_tsvector('english', coalesce(description, '')), 'B') ||
+    setweight(to_tsvector('english', coalesce(category, '')), 'C')
+  ) STORED,
+  created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at      TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
--- ============================================================
--- MESSAGES
--- ============================================================
-create table if not exists public.messages (
-  id uuid default uuid_generate_v4() primary key,
-  sender_id uuid references public.profiles(id) on delete cascade not null,
-  receiver_id uuid references public.profiles(id) on delete cascade not null,
-  product_id uuid references public.products(id) on delete set null,
-  service_id uuid references public.services(id) on delete set null,
-  content text not null,
-  is_read boolean default false,
-  created_at timestamptz default now()
+CREATE INDEX idx_services_provider    ON services (provider_id);
+CREATE INDEX idx_services_university  ON services (university_id);
+CREATE INDEX idx_services_status      ON services (status);
+CREATE INDEX idx_services_search      ON services USING GIN (search_vector);
+CREATE INDEX idx_services_uni_active  ON services (university_id, status, total_bookings DESC)
+  WHERE status = 'active';
+
+CREATE TRIGGER services_updated_at
+  BEFORE UPDATE ON services
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+
+
+-- =============================================================================
+-- 6. MESSAGES
+-- =============================================================================
+CREATE TABLE messages (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  sender_id       UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  receiver_id     UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  university_id   UUID REFERENCES universities(id) ON DELETE CASCADE,
+  content         TEXT NOT NULL CHECK (char_length(content) BETWEEN 1 AND 2000),
+  product_id      UUID REFERENCES products(id) ON DELETE SET NULL,
+  service_id      UUID REFERENCES services(id) ON DELETE SET NULL,
+  is_read         BOOLEAN NOT NULL DEFAULT false,
+  created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
+  CONSTRAINT no_self_message CHECK (sender_id <> receiver_id)
 );
 
--- Conversations view — uses security_invoker so it respects the RLS
--- on the underlying messages table (prevents anonymous data access)
-create or replace view public.conversations
-  with (security_invoker = true)
-as
-select distinct on (
-    least(sender_id, receiver_id),
-    greatest(sender_id, receiver_id)
+CREATE INDEX idx_messages_sender       ON messages (sender_id, created_at DESC);
+CREATE INDEX idx_messages_receiver     ON messages (receiver_id, created_at DESC);
+CREATE INDEX idx_messages_unread       ON messages (receiver_id) WHERE is_read = false;
+-- Conversation thread lookup
+CREATE INDEX idx_messages_thread       ON messages (
+  LEAST(sender_id, receiver_id),
+  GREATEST(sender_id, receiver_id),
+  created_at DESC
+);
+
+ALTER TABLE messages REPLICA IDENTITY FULL;
+
+-- Conversations list RPC
+CREATE OR REPLACE FUNCTION get_conversations(p_user_id UUID)
+RETURNS TABLE (
+  other_user_id   UUID,
+  other_name      TEXT,
+  other_avatar    TEXT,
+  last_message    TEXT,
+  last_at         TIMESTAMPTZ,
+  unread_count    BIGINT
+) LANGUAGE sql STABLE SECURITY DEFINER AS $$
+  WITH convos AS (
+    SELECT
+      CASE WHEN sender_id = p_user_id THEN receiver_id ELSE sender_id END AS other_id,
+      content,
+      created_at,
+      CASE WHEN receiver_id = p_user_id AND NOT is_read THEN 1 ELSE 0 END AS is_unread
+    FROM messages
+    WHERE sender_id = p_user_id OR receiver_id = p_user_id
+  ),
+  latest AS (
+    SELECT DISTINCT ON (other_id) other_id, content, created_at
+    FROM convos
+    ORDER BY other_id, created_at DESC
   )
-  id,
-  sender_id,
-  receiver_id,
-  product_id,
-  service_id,
-  content,
-  is_read,
-  created_at
-from public.messages
-order by
-  least(sender_id, receiver_id),
-  greatest(sender_id, receiver_id),
-  created_at desc;
+  SELECT
+    l.other_id,
+    p.name,
+    p.avatar_url,
+    l.content,
+    l.created_at,
+    COALESCE(SUM(c.is_unread), 0)
+  FROM latest l
+  JOIN profiles p ON p.id = l.other_id
+  LEFT JOIN convos c ON c.other_id = l.other_id
+  GROUP BY l.other_id, p.name, p.avatar_url, l.content, l.created_at
+  ORDER BY l.created_at DESC;
+$$;
 
--- ============================================================
--- REVIEWS
--- ============================================================
-create table if not exists public.reviews (
-  id uuid default uuid_generate_v4() primary key,
-  reviewer_id uuid references public.profiles(id) on delete cascade not null,
-  target_id uuid references public.profiles(id) on delete cascade not null,
-  product_id uuid references public.products(id) on delete set null,
-  service_id uuid references public.services(id) on delete set null,
-  rating int not null check (rating between 1 and 5),
-  comment text,
-  created_at timestamptz default now(),
-  unique (reviewer_id, target_id, product_id),
-  unique (reviewer_id, target_id, service_id)
+
+-- =============================================================================
+-- 7. BOOKINGS
+-- =============================================================================
+CREATE TABLE bookings (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  service_id      UUID NOT NULL REFERENCES services(id) ON DELETE CASCADE,
+  client_id       UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  provider_id     UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  university_id   UUID REFERENCES universities(id) ON DELETE CASCADE,
+  status          TEXT NOT NULL DEFAULT 'pending'
+                    CHECK (status IN ('pending', 'confirmed', 'completed', 'cancelled')),
+  notes           TEXT,
+  scheduled_at    TIMESTAMPTZ,
+  created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at      TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
--- ============================================================
--- ROW LEVEL SECURITY
--- ============================================================
-alter table public.profiles enable row level security;
-alter table public.products enable row level security;
-alter table public.services enable row level security;
-alter table public.bookings enable row level security;
-alter table public.messages enable row level security;
-alter table public.reviews enable row level security;
+CREATE INDEX idx_bookings_client    ON bookings (client_id);
+CREATE INDEX idx_bookings_provider  ON bookings (provider_id);
+CREATE INDEX idx_bookings_service   ON bookings (service_id);
 
--- ============================================================
--- HELPER: is_admin()
--- Used in RLS policies so admin can manage all records.
--- security definer + stable avoids RLS recursion.
--- ============================================================
-create or replace function public.is_admin()
-returns boolean as $$
-  select exists (
-    select 1 from public.profiles
-    where id = auth.uid() and role = 'admin'
+CREATE TRIGGER bookings_updated_at
+  BEFORE UPDATE ON bookings
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+
+-- Auto-increment service bookings count on confirm
+CREATE OR REPLACE FUNCTION on_booking_confirmed()
+RETURNS TRIGGER LANGUAGE plpgsql AS $$
+BEGIN
+  IF NEW.status = 'confirmed' AND (OLD.status IS NULL OR OLD.status <> 'confirmed') THEN
+    UPDATE services SET total_bookings = total_bookings + 1 WHERE id = NEW.service_id;
+  END IF;
+  RETURN NEW;
+END;
+$$;
+
+CREATE TRIGGER booking_confirmed
+  AFTER INSERT OR UPDATE ON bookings
+  FOR EACH ROW EXECUTE FUNCTION on_booking_confirmed();
+
+
+-- =============================================================================
+-- 8. REVIEWS
+-- =============================================================================
+CREATE TABLE reviews (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  reviewer_id     UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  reviewee_id     UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  product_id      UUID REFERENCES products(id) ON DELETE SET NULL,
+  service_id      UUID REFERENCES services(id) ON DELETE SET NULL,
+  rating          INT NOT NULL CHECK (rating BETWEEN 1 AND 5),
+  comment         TEXT,
+  created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
+  CONSTRAINT no_self_review CHECK (reviewer_id <> reviewee_id)
+);
+
+CREATE INDEX idx_reviews_reviewee ON reviews (reviewee_id);
+
+-- Auto-update profile rating on new review
+CREATE OR REPLACE FUNCTION on_review_written()
+RETURNS TRIGGER LANGUAGE plpgsql AS $$
+BEGIN
+  UPDATE profiles
+  SET
+    rating = (SELECT ROUND(AVG(rating)::NUMERIC, 2) FROM reviews WHERE reviewee_id = NEW.reviewee_id),
+    total_reviews = (SELECT COUNT(*) FROM reviews WHERE reviewee_id = NEW.reviewee_id)
+  WHERE id = NEW.reviewee_id;
+  RETURN NEW;
+END;
+$$;
+
+CREATE TRIGGER review_inserted
+  AFTER INSERT ON reviews
+  FOR EACH ROW EXECUTE FUNCTION on_review_written();
+
+
+-- =============================================================================
+-- 9. NOTIFICATIONS
+-- =============================================================================
+CREATE TABLE notifications (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id         UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  university_id   UUID REFERENCES universities(id) ON DELETE CASCADE,
+  type            TEXT NOT NULL CHECK (type IN (
+    'message', 'listing_approved', 'listing_rejected',
+    'new_review', 'booking_confirmed', 'system'
+  )),
+  title           TEXT NOT NULL,
+  body            TEXT NOT NULL,
+  data            JSONB,
+  read            BOOLEAN NOT NULL DEFAULT false,
+  created_at      TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX idx_notifications_user   ON notifications (user_id, created_at DESC);
+CREATE INDEX idx_notifications_unread ON notifications (user_id) WHERE read = false;
+
+ALTER TABLE notifications REPLICA IDENTITY FULL;
+
+CREATE OR REPLACE FUNCTION get_unread_count()
+RETURNS BIGINT LANGUAGE sql STABLE SECURITY DEFINER AS $$
+  SELECT COUNT(*) FROM notifications WHERE user_id = auth.uid() AND read = false;
+$$;
+
+
+-- =============================================================================
+-- 10. ROW LEVEL SECURITY
+-- =============================================================================
+
+-- Profiles
+ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "profiles_select"  ON profiles FOR SELECT  USING (true);
+CREATE POLICY "profiles_insert"  ON profiles FOR INSERT  WITH CHECK (auth.uid() = id);
+CREATE POLICY "profiles_update"  ON profiles FOR UPDATE  USING (auth.uid() = id);
+
+-- Universities
+ALTER TABLE universities ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "universities_select" ON universities FOR SELECT USING (true);
+CREATE POLICY "universities_write"  ON universities FOR ALL USING (
+  EXISTS (SELECT 1 FROM admins WHERE user_id = auth.uid() AND role = 'super_admin')
+);
+
+-- Admins
+ALTER TABLE admins ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "admins_select" ON admins FOR SELECT USING (auth.role() = 'authenticated');
+CREATE POLICY "admins_write"  ON admins FOR ALL USING (
+  EXISTS (SELECT 1 FROM admins a WHERE a.user_id = auth.uid() AND a.role = 'super_admin')
+);
+
+-- Products
+ALTER TABLE products ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "products_select" ON products FOR SELECT
+  USING (status = 'active' OR seller_id = auth.uid() OR
+         EXISTS (SELECT 1 FROM admins WHERE user_id = auth.uid()));
+CREATE POLICY "products_insert" ON products FOR INSERT
+  WITH CHECK (auth.uid() = seller_id AND
+              EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND NOT is_banned));
+CREATE POLICY "products_update" ON products FOR UPDATE
+  USING (seller_id = auth.uid() OR EXISTS (SELECT 1 FROM admins WHERE user_id = auth.uid()));
+CREATE POLICY "products_delete" ON products FOR DELETE USING (seller_id = auth.uid());
+
+-- Services
+ALTER TABLE services ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "services_select" ON services FOR SELECT
+  USING (status <> 'deleted' OR provider_id = auth.uid() OR
+         EXISTS (SELECT 1 FROM admins WHERE user_id = auth.uid()));
+CREATE POLICY "services_insert" ON services FOR INSERT
+  WITH CHECK (auth.uid() = provider_id AND
+              EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND NOT is_banned));
+CREATE POLICY "services_update" ON services FOR UPDATE
+  USING (provider_id = auth.uid() OR EXISTS (SELECT 1 FROM admins WHERE user_id = auth.uid()));
+CREATE POLICY "services_delete" ON services FOR DELETE USING (provider_id = auth.uid());
+
+-- Messages
+ALTER TABLE messages ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "messages_select" ON messages FOR SELECT
+  USING (sender_id = auth.uid() OR receiver_id = auth.uid());
+CREATE POLICY "messages_insert" ON messages FOR INSERT
+  WITH CHECK (sender_id = auth.uid() AND
+              EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND NOT is_banned));
+CREATE POLICY "messages_update" ON messages FOR UPDATE USING (receiver_id = auth.uid());
+
+-- Bookings
+ALTER TABLE bookings ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "bookings_select" ON bookings FOR SELECT
+  USING (client_id = auth.uid() OR provider_id = auth.uid());
+CREATE POLICY "bookings_insert" ON bookings FOR INSERT
+  WITH CHECK (client_id = auth.uid() AND
+              EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND NOT is_banned));
+CREATE POLICY "bookings_update" ON bookings FOR UPDATE
+  USING (client_id = auth.uid() OR provider_id = auth.uid());
+
+-- Reviews
+ALTER TABLE reviews ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "reviews_select" ON reviews FOR SELECT USING (true);
+CREATE POLICY "reviews_insert" ON reviews FOR INSERT
+  WITH CHECK (reviewer_id = auth.uid() AND
+              EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND NOT is_banned));
+
+-- Notifications
+ALTER TABLE notifications ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "notifications_select" ON notifications FOR SELECT USING (user_id = auth.uid());
+CREATE POLICY "notifications_update" ON notifications FOR UPDATE USING (user_id = auth.uid());
+CREATE POLICY "notifications_insert" ON notifications FOR INSERT WITH CHECK (true);
+
+
+-- =============================================================================
+-- 11. REALTIME
+-- =============================================================================
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname='supabase_realtime' AND tablename='messages') THEN
+    ALTER PUBLICATION supabase_realtime ADD TABLE messages;
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname='supabase_realtime' AND tablename='notifications') THEN
+    ALTER PUBLICATION supabase_realtime ADD TABLE notifications;
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname='supabase_realtime' AND tablename='products') THEN
+    ALTER PUBLICATION supabase_realtime ADD TABLE products;
+  END IF;
+END;
+$$;
+
+
+-- =============================================================================
+-- 12. HELPER FUNCTIONS
+-- =============================================================================
+CREATE OR REPLACE FUNCTION is_super_admin()
+RETURNS BOOLEAN LANGUAGE sql STABLE SECURITY DEFINER AS $$
+  SELECT EXISTS (SELECT 1 FROM admins WHERE user_id = auth.uid() AND role = 'super_admin');
+$$;
+
+CREATE OR REPLACE FUNCTION is_university_admin(uni_id UUID)
+RETURNS BOOLEAN LANGUAGE sql STABLE SECURITY DEFINER AS $$
+  SELECT EXISTS (
+    SELECT 1 FROM admins
+    WHERE user_id = auth.uid() AND (university_id = uni_id OR role = 'super_admin')
   );
-$$ language sql security definer stable;
+$$;
 
--- Returns true if the current user is NOT banned
-create or replace function public.is_not_banned()
-returns boolean as $$
-  select exists (
-    select 1 from public.profiles
-    where id = auth.uid() and (is_banned is null or is_banned = false)
-  );
-$$ language sql security definer stable;
 
--- ============================================================
--- DROP EXISTING POLICIES (idempotent)
--- ============================================================
-drop policy if exists "Public profiles are viewable by everyone" on public.profiles;
-drop policy if exists "Users can update own profile" on public.profiles;
-drop policy if exists "Admins can update any profile" on public.profiles;
-drop policy if exists "Admins can ban users" on public.profiles;
-drop policy if exists "Users can create own profile" on public.profiles;
-drop policy if exists "Active products are viewable by everyone" on public.products;
-drop policy if exists "Users can insert own products (unbanned)" on public.products;
-drop policy if exists "Users can insert own products" on public.products;
-drop policy if exists "Sellers can update own products" on public.products;
-drop policy if exists "Sellers can delete own products" on public.products;
-drop policy if exists "Admins can manage all products" on public.products;
-drop policy if exists "Active services are viewable by everyone" on public.services;
-drop policy if exists "Providers can insert own services (unbanned)" on public.services;
-drop policy if exists "Providers can insert own services" on public.services;
-drop policy if exists "Providers can update own services" on public.services;
-drop policy if exists "Providers can delete own services" on public.services;
-drop policy if exists "Admins can manage all services" on public.services;
-drop policy if exists "Users can view own bookings" on public.bookings;
-drop policy if exists "Buyers can create bookings" on public.bookings;
-drop policy if exists "Participants can update booking status" on public.bookings;
-drop policy if exists "Users can view own messages" on public.messages;
-drop policy if exists "Authenticated users can send messages" on public.messages;
-drop policy if exists "Receiver can mark messages as read" on public.messages;
-drop policy if exists "Reviews are public" on public.reviews;
-drop policy if exists "Authenticated users can write reviews" on public.reviews;
-
--- ============================================================
--- PROFILES POLICIES
--- ============================================================
-create policy "Public profiles are viewable by everyone" on public.profiles
-  for select using (true);
-
-create policy "Users can update own profile" on public.profiles
-  for update using (auth.uid() = id);
-
--- Users can insert their own profile row (needed when trigger hasn't run yet)
-create policy "Users can create own profile" on public.profiles
-  for insert with check (auth.uid() = id);
-
--- Admins can update anyone's profile (e.g. set is_verified)
-create policy "Admins can update any profile" on public.profiles
-  for update using (public.is_admin());
-
--- ============================================================
--- PRODUCTS POLICIES
--- ============================================================
-create policy "Active products are viewable by everyone" on public.products
-  for select using (status != 'deleted');
-
-create policy "Users can insert own products" on public.products
-  for insert with check (auth.uid() = seller_id and public.is_not_banned());
-
-create policy "Sellers can update own products" on public.products
-  for update using (auth.uid() = seller_id);
-
-create policy "Sellers can delete own products" on public.products
-  for delete using (auth.uid() = seller_id);
-
-create policy "Admins can manage all products" on public.products
-  for all using (public.is_admin());
-
--- ============================================================
--- SERVICES POLICIES
--- ============================================================
-create policy "Active services are viewable by everyone" on public.services
-  for select using (status != 'deleted');
-
-create policy "Providers can insert own services" on public.services
-  for insert with check (auth.uid() = provider_id and public.is_not_banned());
-
-create policy "Providers can update own services" on public.services
-  for update using (auth.uid() = provider_id);
-
-create policy "Providers can delete own services" on public.services
-  for delete using (auth.uid() = provider_id);
-
-create policy "Admins can manage all services" on public.services
-  for all using (public.is_admin());
-
--- ============================================================
--- BOOKINGS POLICIES
--- ============================================================
-create policy "Users can view own bookings" on public.bookings
-  for select using (auth.uid() = buyer_id or auth.uid() = provider_id);
-
-create policy "Buyers can create bookings" on public.bookings
-  for insert with check (auth.uid() = buyer_id);
-
-create policy "Participants can update booking status" on public.bookings
-  for update using (auth.uid() = buyer_id or auth.uid() = provider_id);
-
--- ============================================================
--- MESSAGES POLICIES
--- ============================================================
-create policy "Users can view own messages" on public.messages
-  for select using (auth.uid() = sender_id or auth.uid() = receiver_id);
-
-create policy "Authenticated users can send messages" on public.messages
-  for insert with check (auth.uid() = sender_id);
-
-create policy "Receiver can mark messages as read" on public.messages
-  for update using (auth.uid() = receiver_id);
-
--- ============================================================
--- REVIEWS POLICIES
--- ============================================================
-create policy "Reviews are public" on public.reviews
-  for select using (true);
-
-create policy "Authenticated users can write reviews" on public.reviews
-  for insert with check (auth.uid() = reviewer_id);
-
--- ============================================================
--- ADMIN MODERATION POLICIES
--- These give the admin full read/delete access to all content
--- for moderation. Without these, admin can see listings but not
--- messages, bookings, or reviews.
--- ============================================================
-drop policy if exists "Admins can read all messages" on public.messages;
-create policy "Admins can read all messages" on public.messages
-  for select using (public.is_admin());
-
-drop policy if exists "Admins can delete any message" on public.messages;
-create policy "Admins can delete any message" on public.messages
-  for delete using (public.is_admin());
-
-drop policy if exists "Admins can manage all bookings" on public.bookings;
-create policy "Admins can manage all bookings" on public.bookings
-  for all using (public.is_admin());
-
-drop policy if exists "Admins can manage all reviews" on public.reviews;
-create policy "Admins can manage all reviews" on public.reviews
-  for all using (public.is_admin());
-
--- Lets admin permanently delete a user account (not just ban them)
-drop policy if exists "Admins can delete profiles" on public.profiles;
-create policy "Admins can delete profiles" on public.profiles
-  for delete using (public.is_admin());
-
--- ============================================================
--- STORAGE BUCKETS
--- ============================================================
-insert into storage.buckets (id, name, public) values ('avatars', 'avatars', true)
-  on conflict (id) do nothing;
-insert into storage.buckets (id, name, public) values ('product-images', 'product-images', true)
-  on conflict (id) do nothing;
-insert into storage.buckets (id, name, public) values ('service-images', 'service-images', true)
-  on conflict (id) do nothing;
-
--- Storage RLS
-drop policy if exists "Avatar images are publicly accessible" on storage.objects;
-drop policy if exists "Users can upload their own avatar" on storage.objects;
-drop policy if exists "Users can update their own avatar" on storage.objects;
-drop policy if exists "Users can delete their own avatar" on storage.objects;
-drop policy if exists "Product images are publicly accessible" on storage.objects;
-drop policy if exists "Authenticated users can upload product images" on storage.objects;
-drop policy if exists "Users can delete own product images" on storage.objects;
-drop policy if exists "Service images are publicly accessible" on storage.objects;
-drop policy if exists "Authenticated users can upload service images" on storage.objects;
-drop policy if exists "Users can delete own service images" on storage.objects;
-
-create policy "Avatar images are publicly accessible" on storage.objects
-  for select using (bucket_id = 'avatars');
-create policy "Users can upload their own avatar" on storage.objects
-  for insert with check (bucket_id = 'avatars' and auth.role() = 'authenticated');
-create policy "Users can update their own avatar" on storage.objects
-  for update using (bucket_id = 'avatars' and auth.uid()::text = (storage.foldername(name))[1]);
-create policy "Users can delete their own avatar" on storage.objects
-  for delete using (bucket_id = 'avatars' and auth.uid()::text = (storage.foldername(name))[1]);
-
-create policy "Product images are publicly accessible" on storage.objects
-  for select using (bucket_id = 'product-images');
-create policy "Authenticated users can upload product images" on storage.objects
-  for insert with check (bucket_id = 'product-images' and auth.role() = 'authenticated');
-create policy "Users can delete own product images" on storage.objects
-  for delete using (bucket_id = 'product-images' and auth.uid()::text = (storage.foldername(name))[1]);
-
-create policy "Service images are publicly accessible" on storage.objects
-  for select using (bucket_id = 'service-images');
-create policy "Authenticated users can upload service images" on storage.objects
-  for insert with check (bucket_id = 'service-images' and auth.role() = 'authenticated');
-create policy "Users can delete own service images" on storage.objects
-  for delete using (bucket_id = 'service-images' and auth.uid()::text = (storage.foldername(name))[1]);
-
--- ============================================================
--- REALTIME
--- ============================================================
-do $$
-begin
-  if not exists (
-    select 1 from pg_publication_tables
-    where pubname = 'supabase_realtime' and tablename = 'messages'
-  ) then
-    alter publication supabase_realtime add table public.messages;
-  end if;
-
-  if not exists (
-    select 1 from pg_publication_tables
-    where pubname = 'supabase_realtime' and tablename = 'bookings'
-  ) then
-    alter publication supabase_realtime add table public.bookings;
-  end if;
-end $$;
-
--- ============================================================
--- INDEXES
--- ============================================================
-create index if not exists products_seller_id_idx on public.products(seller_id);
-create index if not exists products_category_idx on public.products(category);
-create index if not exists products_status_idx on public.products(status);
-create index if not exists services_provider_id_idx on public.services(provider_id);
-create index if not exists services_category_idx on public.services(category);
-create index if not exists messages_sender_id_idx on public.messages(sender_id);
-create index if not exists messages_receiver_id_idx on public.messages(receiver_id);
-create index if not exists messages_created_at_idx on public.messages(created_at desc);
--- Composite index speeds up the conversation-list query (sender_id OR receiver_id)
-create index if not exists messages_conversation_idx on public.messages(sender_id, receiver_id, created_at desc);
-create index if not exists bookings_buyer_id_idx on public.bookings(buyer_id);
-create index if not exists bookings_provider_id_idx on public.bookings(provider_id);
-create index if not exists profiles_is_verified_idx on public.profiles(is_verified);
-create index if not exists profiles_role_idx on public.profiles(role);
-
--- ============================================================
--- UPDATED_AT TRIGGER
--- ============================================================
-create or replace function public.handle_updated_at()
-returns trigger as $$
-begin
-  new.updated_at = now();
-  return new;
-end;
-$$ language plpgsql;
-
-drop trigger if exists handle_updated_at on public.profiles;
-drop trigger if exists handle_updated_at on public.products;
-drop trigger if exists handle_updated_at on public.services;
-drop trigger if exists handle_updated_at on public.bookings;
-
-create trigger handle_updated_at before update on public.profiles
-  for each row execute procedure public.handle_updated_at();
-create trigger handle_updated_at before update on public.products
-  for each row execute procedure public.handle_updated_at();
-create trigger handle_updated_at before update on public.services
-  for each row execute procedure public.handle_updated_at();
-create trigger handle_updated_at before update on public.bookings
-  for each row execute procedure public.handle_updated_at();
-
--- ============================================================
--- INCREMENT PRODUCT VIEWS
--- ============================================================
-create or replace function public.increment_product_views(product_id uuid)
-returns void as $$
-begin
-  update public.products set views = views + 1 where id = product_id;
-end;
-$$ language plpgsql security definer;
+-- =============================================================================
+-- DONE — Next steps:
+--
+-- 1. Storage buckets (Dashboard → Storage → New bucket):
+--    - Name: "avatars"   | Public: YES | Max size: 5MB  | Allowed: image/*
+--    - Name: "listings"  | Public: YES | Max size: 10MB | Allowed: image/*
+--
+-- 2. After your first sign-up, run this to become super admin:
+--    INSERT INTO admins (user_id, university_id, role)
+--    SELECT id, NULL, 'super_admin' FROM profiles WHERE email = 'your@email.com';
+--
+-- 3. Storage RLS policies for avatars bucket (Dashboard → Storage → Policies):
+--    - SELECT: true (public read)
+--    - INSERT: (storage.foldername(name))[1] = auth.uid()::text
+--    - UPDATE: (storage.foldername(name))[1] = auth.uid()::text
+--    - DELETE: (storage.foldername(name))[1] = auth.uid()::text
+-- =============================================================================

@@ -129,6 +129,7 @@ function MessagesInner() {
   const [convLoading, setConvLoading] = useState(true)   // true only when NO cached data
   const [msgLoading,  setMsgLoading]  = useState(false)
   const [mobileView,  setMobileView]  = useState<'list' | 'chat'>('list')
+  const [rtPaused,    setRtPaused]    = useState(false)
 
   // New-message search
   const [showNewMsg,    setShowNewMsg]    = useState(false)
@@ -254,9 +255,15 @@ function MessagesInner() {
     loadConversations(cached.length > 0)       // silent refresh if cache hit
   }, [user])                                   // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Reload conversations when window becomes visible (cross-device sync)
+  // Page Visibility API — pause Realtime when tab is hidden, refresh when it returns.
+  // This prevents connection pool exhaustion: at 1,000 users × 2 channels = 2,000 connections.
+  // With this, backgrounded tabs drop their subscriptions and reconnect on focus.
   useEffect(() => {
-    const handler = () => { if (!document.hidden) loadConversations(true) }
+    const handler = () => {
+      const hidden = document.hidden
+      setRtPaused(hidden)
+      if (!hidden) loadConversations(true)
+    }
     document.addEventListener('visibilitychange', handler)
     return () => document.removeEventListener('visibilitychange', handler)
   }, [loadConversations])
@@ -303,8 +310,16 @@ function MessagesInner() {
   // ── Global Realtime channels ───────────────────────────────────────────────
   // Inbox: ALL messages addressed to this user (not just active partner)
   // Outbox: messages sent by this user on other devices
+  // Paused when tab is hidden (Page Visibility API) to conserve connection budget.
   useEffect(() => {
     if (!user) return
+
+    // Disconnect when tab is hidden — prevents pool exhaustion at scale
+    if (rtPaused) {
+      if (inboxRef.current)  { supabase.removeChannel(inboxRef.current);  inboxRef.current  = null }
+      if (outboxRef.current) { supabase.removeChannel(outboxRef.current); outboxRef.current = null }
+      return
+    }
 
     // Clean up any previous channels
     if (inboxRef.current)  supabase.removeChannel(inboxRef.current)
@@ -387,7 +402,7 @@ function MessagesInner() {
       if (inboxRef.current)  supabase.removeChannel(inboxRef.current)
       if (outboxRef.current) supabase.removeChannel(outboxRef.current)
     }
-  }, [user])   // stable channels — never recreated when activePartner changes
+  }, [user, rtPaused])   // reconnect when tab regains focus
 
   // Scroll to bottom when messages change
   useEffect(() => {

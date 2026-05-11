@@ -1,5 +1,5 @@
-// Campus Connect — Service Worker v1
-// Provides offline support and installability (PWA)
+// Campus Connect — Service Worker v2
+// Provides offline support, installability (PWA), and Web Push notifications
 
 const CACHE = 'campus-connect-v3'
 
@@ -78,5 +78,43 @@ self.addEventListener('fetch', event => {
         return response
       })
       .catch(() => caches.match(event.request))
+  )
+})
+
+// ── Web Push ──────────────────────────────────────────────────────────────────
+
+self.addEventListener('push', event => {
+  if (!event.data) return
+
+  let payload
+  try { payload = event.data.json() }
+  catch { payload = { title: 'Campus Connect', body: event.data.text() } }
+
+  const title   = payload.title ?? 'Campus Connect'
+  const options = {
+    body:    payload.body ?? '',
+    icon:    payload.icon ?? '/icons/icon-192x192.png',
+    badge:   '/icons/icon-96x96.png',
+    data:    { url: payload.url ?? '/' },
+    tag:     payload.tag ?? 'campus-connect',
+    renotify: true,
+    vibrate: [200, 100, 200],
+  }
+
+  event.waitUntil(self.registration.showNotification(title, options))
+})
+
+self.addEventListener('notificationclick', event => {
+  event.notification.close()
+  const url = event.notification.data?.url ?? '/'
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then(clientList => {
+      // Focus existing tab if already open
+      for (const client of clientList) {
+        if (client.url === url && 'focus' in client) return client.focus()
+      }
+      // Open new tab
+      if (clients.openWindow) return clients.openWindow(url)
+    })
   )
 })

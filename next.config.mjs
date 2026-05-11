@@ -1,8 +1,15 @@
+import { withSentryConfig } from '@sentry/nextjs'
+
 /** @type {import('next').NextConfig} */
+
+// Parse R2 public URL for dynamic remotePatterns — safe if not set yet
+const r2Hostname = (() => {
+  const url = process.env.NEXT_PUBLIC_R2_PUBLIC_URL
+  if (!url) return null
+  try { return new URL(url).hostname } catch { return null }
+})()
+
 const nextConfig = {
-  typescript: {
-    ignoreBuildErrors: true,
-  },
   images: {
     formats: ['image/avif', 'image/webp'],
     remotePatterns: [
@@ -19,9 +26,15 @@ const nextConfig = {
         protocol: 'https',
         hostname: '*.googleusercontent.com',
       },
+      // Cloudflare R2 public bucket (pub-*.r2.dev or custom domain)
+      ...(r2Hostname ? [{ protocol: 'https', hostname: r2Hostname }] : []),
     ],
   },
   async headers() {
+    // Build CSP img-src to include R2 if configured
+    const r2Origin = process.env.NEXT_PUBLIC_R2_PUBLIC_URL ?? ''
+    const imgSrcExtra = r2Origin ? ` ${r2Origin}` : ''
+
     return [
       // Service worker must never be cached so updates propagate immediately
       {
@@ -46,8 +59,9 @@ const nextConfig = {
               "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "font-src 'self' https://fonts.gstatic.com",
-              "img-src 'self' data: blob: https://*.supabase.co https://lh3.googleusercontent.com https://*.googleusercontent.com",
-              "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://wa.me",
+              `img-src 'self' data: blob: https://*.supabase.co https://lh3.googleusercontent.com https://*.googleusercontent.com${imgSrcExtra}`,
+              // connect-src: allow R2 presigned PUT uploads + Supabase + Upstash
+              `connect-src 'self' https://*.supabase.co wss://*.supabase.co https://wa.me https://*.r2.cloudflarestorage.com${r2Origin ? ` ${r2Origin}` : ''} https://*.sentry.io https://sentry.io`,
               "worker-src 'self'",
               "frame-ancestors 'none'",
               "base-uri 'self'",
@@ -70,8 +84,35 @@ const nextConfig = {
           { key: 'Cache-Control', value: 'public, max-age=86400, stale-while-revalidate=604800' },
         ],
       },
+      // University hub pages — 5 minute CDN cache
+      {
+        source: '/uni/:slug*',
+        headers: [
+          { key: 'Cache-Control', value: 'public, s-maxage=300, stale-while-revalidate=600' },
+        ],
+      },
     ]
   },
 }
 
-export default nextConfig
+export default withSentryConfig(nextConfig, {
+  // Suppress Sentry CLI output during builds
+  silent: true,
+
+  // Upload source maps only when SENTRY_AUTH_TOKEN is present
+  authToken: process.env.SENTRY_AUTH_TOKEN,
+
+  org: process.env.SENTRY_ORG,
+  project: process.env.SENTRY_PROJECT,
+
+  // Automatically instrument Next.js data fetching methods
+  autoInstrumentServerFunctions: true,
+
+  // Tree-shake Sentry logger to reduce bundle size
+  disableLogger: true,
+
+  // Don't fail the build if Sentry upload errors (e.g. missing auth token in dev)
+  errorHandler(err, invokeErr, compilation) {
+    compilation.warnings.push('Sentry CLI Plugin: ' + err.message)
+  },
+})

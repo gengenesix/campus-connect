@@ -1,18 +1,58 @@
 "use client"
 
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname, useRouter } from 'next/navigation'
 import { useAuth } from '@/context/AuthContext'
+import NotificationBell from './NotificationBell'
+
+interface InstantHit {
+  id: string
+  title?: string   // products
+  name?: string    // services
+  price?: number
+  category?: string
+  image_url?: string | null
+  type: 'product' | 'service'
+}
 
 export default function SiteNav() {
   const [searchOpen, setSearchOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
+  const [instantHits, setInstantHits] = useState<InstantHit[]>([])
+  const [instantLoading, setInstantLoading] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const pathname = usePathname()
   const router = useRouter()
   const { user, profile, signOut, loading } = useAuth()
+
+  // Instant search: debounced fetch as user types
+  useEffect(() => {
+    if (!searchOpen) { setInstantHits([]); return }
+    if (debounceRef.current) clearTimeout(debounceRef.current)
+    const q = searchQuery.trim()
+    if (!q) { setInstantHits([]); return }
+
+    setInstantLoading(true)
+    debounceRef.current = setTimeout(async () => {
+      try {
+        const [prodRes, svcRes] = await Promise.all([
+          fetch(`/api/search?q=${encodeURIComponent(q)}&type=products&limit=5`),
+          fetch(`/api/search?q=${encodeURIComponent(q)}&type=services&limit=3`),
+        ])
+        const [prodJson, svcJson] = await Promise.all([prodRes.json(), svcRes.json()])
+        const products: InstantHit[] = (prodJson.hits ?? []).map((h: any) => ({ ...h, type: 'product' as const }))
+        const services: InstantHit[] = (svcJson.hits ?? []).map((h: any) => ({ ...h, type: 'service' as const }))
+        setInstantHits([...products, ...services])
+      } catch {}
+      finally { setInstantLoading(false) }
+    }, 280)
+
+    return () => { if (debounceRef.current) clearTimeout(debounceRef.current) }
+  }, [searchQuery, searchOpen])
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
@@ -21,6 +61,13 @@ export default function SiteNav() {
     }
     setSearchOpen(false)
     setSearchQuery('')
+    setInstantHits([])
+  }
+
+  const closeSearch = () => {
+    setSearchOpen(false)
+    setSearchQuery('')
+    setInstantHits([])
   }
 
   const handleSignOut = async () => {
@@ -34,10 +81,10 @@ export default function SiteNav() {
     : user?.email?.[0]?.toUpperCase() ?? '?'
 
   const navLinks = [
+    { href: '/#universities', label: 'UNIVERSITIES' },
     { href: '/goods', label: 'BROWSE GOODS' },
     { href: '/services', label: 'SERVICES' },
     { href: '/sell', label: 'SELL' },
-    { href: '/about', label: 'HOW IT WORKS' },
   ]
 
   return (
@@ -46,8 +93,8 @@ export default function SiteNav() {
       <div className="marquee-bar">
         <div className="marquee-container">
           <div className="marquee-content">
-            100% FREE &bull; NO COMMISSION &bull; UMAT CAMPUS COMMUNITY &bull; BUY &amp; SELL GOODS &bull; BOOK CAMPUS SERVICES &bull; PEER-TO-PEER MARKETPLACE &bull;&nbsp;
-            100% FREE &bull; NO COMMISSION &bull; UMAT CAMPUS COMMUNITY &bull; BUY &amp; SELL GOODS &bull; BOOK CAMPUS SERVICES &bull; PEER-TO-PEER MARKETPLACE &bull;
+            100% FREE &bull; NO COMMISSION &bull; 43 GHANA UNIVERSITIES &bull; BUY &amp; SELL GOODS &bull; BOOK CAMPUS SERVICES &bull; PEER-TO-PEER MARKETPLACE &bull;&nbsp;
+            100% FREE &bull; NO COMMISSION &bull; 43 GHANA UNIVERSITIES &bull; BUY &amp; SELL GOODS &bull; BOOK CAMPUS SERVICES &bull; PEER-TO-PEER MARKETPLACE &bull;
           </div>
         </div>
       </div>
@@ -76,7 +123,7 @@ export default function SiteNav() {
         <div className="nav-actions">
           <div
             className="nav-icon"
-            onClick={() => setSearchOpen(!searchOpen)}
+            onClick={() => { if (searchOpen) closeSearch(); else setSearchOpen(true) }}
             style={{ cursor: 'pointer' }}
             aria-label="Search"
           >
@@ -86,11 +133,14 @@ export default function SiteNav() {
           </div>
 
           {user && (
-            <Link href="/messages" className="nav-icon" aria-label="Messages">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-              </svg>
-            </Link>
+            <>
+              <Link href="/messages" className="nav-icon" aria-label="Messages">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                </svg>
+              </Link>
+              <NotificationBell />
+            </>
           )}
 
           {!loading && (
@@ -112,7 +162,7 @@ export default function SiteNav() {
                     aria-label="User menu"
                   >
                     {profile?.avatar_url ? (
-                      <img src={profile.avatar_url} alt={profile.name ?? ''} style={{ width: '28px', height: '28px', borderRadius: '50%', objectFit: 'cover' }} />
+                      <Image src={profile.avatar_url} alt={profile.name ?? ''} width={28} height={28} style={{ borderRadius: '50%', objectFit: 'cover' }} unoptimized />
                     ) : (
                       <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: '#1B5E20', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '11px' }}>
                         {initials}
@@ -142,6 +192,7 @@ export default function SiteNav() {
                       {[
                         { href: '/dashboard', label: 'Dashboard' },
                         { href: '/my-listings', label: 'My Listings' },
+                        { href: '/bookings', label: '📅 My Bookings' },
                         { href: '/messages', label: 'Messages' },
                         { href: '/profile', label: 'Edit Profile' },
                         ...(profile?.role === 'admin' ? [{ href: '/admin', label: '⚙ Admin Panel' }] : []),
@@ -255,8 +306,8 @@ export default function SiteNav() {
 
       {/* Search Overlay */}
       {searchOpen && (
-        <div className="search-overlay" onClick={() => setSearchOpen(false)}>
-          <div className="search-container" onClick={e => e.stopPropagation()}>
+        <div className="search-overlay" onClick={closeSearch}>
+          <div className="search-container" onClick={e => e.stopPropagation()} style={{ position: 'relative' }}>
             <form onSubmit={handleSearch}>
               <input
                 type="text"
@@ -267,7 +318,110 @@ export default function SiteNav() {
                 autoFocus
               />
             </form>
-            <button className="search-close" onClick={() => setSearchOpen(false)}>✕</button>
+            <button className="search-close" onClick={closeSearch}>✕</button>
+
+            {/* Instant results dropdown */}
+            {searchQuery.trim() && (
+              <div style={{
+                position: 'absolute',
+                top: '100%',
+                left: 0,
+                right: 0,
+                background: '#fff',
+                border: '2px solid #111',
+                borderTop: 'none',
+                boxShadow: '6px 6px 0 #111',
+                zIndex: 200,
+                maxHeight: '420px',
+                overflowY: 'auto',
+              }}>
+                {instantLoading && (
+                  <div style={{ padding: '16px', fontFamily: '"Space Grotesk", sans-serif', fontSize: '13px', color: '#888', fontWeight: 600 }}>
+                    Searching...
+                  </div>
+                )}
+
+                {!instantLoading && instantHits.length === 0 && (
+                  <div style={{ padding: '16px', fontFamily: '"Space Grotesk", sans-serif', fontSize: '13px', color: '#888' }}>
+                    No results for &ldquo;{searchQuery}&rdquo;
+                  </div>
+                )}
+
+                {!instantLoading && instantHits.length > 0 && (
+                  <>
+                    {instantHits.map(hit => {
+                      const label = hit.title ?? hit.name ?? ''
+                      const href = hit.type === 'product' ? `/goods/${hit.id}` : `/services/${hit.id}`
+                      const tag = hit.type === 'product' ? 'GOODS' : 'SERVICE'
+                      const tagColor = hit.type === 'product' ? '#5d3fd3' : '#1B5E20'
+                      return (
+                        <Link
+                          key={`${hit.type}-${hit.id}`}
+                          href={href}
+                          onClick={closeSearch}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '12px',
+                            padding: '10px 16px',
+                            borderBottom: '1px solid #f0f0f0',
+                            textDecoration: 'none',
+                            color: '#111',
+                            transition: 'background 0.1s',
+                          }}
+                          onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = '#f8f8f8'}
+                          onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = 'transparent'}
+                        >
+                          {hit.image_url ? (
+                            <img src={hit.image_url} alt="" style={{ width: '40px', height: '40px', objectFit: 'cover', border: '1px solid #eee', flexShrink: 0 }} />
+                          ) : (
+                            <div style={{ width: '40px', height: '40px', background: '#f0f0f0', border: '1px solid #eee', flexShrink: 0 }} />
+                          )}
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div style={{ fontFamily: '"Space Grotesk", sans-serif', fontWeight: 700, fontSize: '14px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                              {label}
+                            </div>
+                            <div style={{ display: 'flex', gap: '8px', marginTop: '2px', alignItems: 'center' }}>
+                              <span style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.5px', color: '#fff', background: tagColor, padding: '1px 6px' }}>
+                                {tag}
+                              </span>
+                              {hit.category && (
+                                <span style={{ fontSize: '11px', color: '#888', fontFamily: '"Space Grotesk", sans-serif' }}>
+                                  {hit.category}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                          {hit.price !== undefined && (
+                            <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '14px', flexShrink: 0 }}>
+                              GHS {hit.price}
+                            </div>
+                          )}
+                        </Link>
+                      )
+                    })}
+
+                    {/* Footer actions */}
+                    <div style={{ display: 'flex', borderTop: '2px solid #111' }}>
+                      <Link
+                        href={`/goods?q=${encodeURIComponent(searchQuery.trim())}`}
+                        onClick={closeSearch}
+                        style={{ flex: 1, padding: '11px 16px', fontFamily: '"Space Grotesk", sans-serif', fontWeight: 700, fontSize: '12px', textDecoration: 'none', color: '#5d3fd3', borderRight: '1px solid #eee', letterSpacing: '0.5px' }}
+                      >
+                        ALL GOODS →
+                      </Link>
+                      <Link
+                        href={`/services?q=${encodeURIComponent(searchQuery.trim())}`}
+                        onClick={closeSearch}
+                        style={{ flex: 1, padding: '11px 16px', fontFamily: '"Space Grotesk", sans-serif', fontWeight: 700, fontSize: '12px', textDecoration: 'none', color: '#1B5E20', letterSpacing: '0.5px' }}
+                      >
+                        ALL SERVICES →
+                      </Link>
+                    </div>
+                  </>
+                )}
+              </div>
+            )}
           </div>
         </div>
       )}

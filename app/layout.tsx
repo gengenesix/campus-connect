@@ -1,4 +1,5 @@
 import type React from "react"
+import { Suspense } from "react"
 import type { Metadata, Viewport } from "next"
 import Script from "next/script"
 import "./globals.css"
@@ -7,15 +8,18 @@ import SiteFooter from "@/components/SiteFooter"
 import { AuthProvider } from "@/context/AuthContext"
 import { Toaster } from "sonner"
 import PWAInstallBanner from "@/components/PWAInstallBanner"
+import MobileNav from "@/components/MobileNav"
+import SellFAB from "@/components/SellFAB"
+import PostHogProvider from "@/components/PostHogProvider"
 
 export const metadata: Metadata = {
-  title: "Campus Connect — UMaT Student Marketplace",
+  title: "Campus Connect — Ghana's Campus Marketplace",
   description:
-    "Buy and sell goods or book campus services from fellow UMaT students. 100% free. No commission. No hidden fees.",
-  keywords: ["UMaT", "campus marketplace", "student marketplace", "Ghana", "Tarkwa", "buy sell campus"],
+    "Buy and sell goods or book campus services from fellow students across all 43 Ghanaian universities. 100% free. No commission. No hidden fees.",
+  keywords: ["Ghana campus marketplace", "student marketplace", "Ghana university", "buy sell campus", "KNUST", "UG", "UCC", "UMaT", "UHAS", "UDS"],
   openGraph: {
-    title: "Campus Connect — UMaT Student Marketplace",
-    description: "Buy and sell goods or book campus services from fellow UMaT students. 100% free.",
+    title: "Campus Connect — Ghana's Campus Marketplace",
+    description: "Buy and sell goods or book campus services from fellow students across 43 Ghana universities. 100% free.",
     type: "website",
   },
   icons: {
@@ -64,6 +68,9 @@ export default function RootLayout({
           <div style={{ minHeight: '100vh' }}>{children}</div>
           <SiteFooter />
           <PWAInstallBanner />
+          <MobileNav />
+          <SellFAB />
+          <Suspense fallback={null}><PostHogProvider /></Suspense>
           <Toaster
             position="bottom-right"
             richColors

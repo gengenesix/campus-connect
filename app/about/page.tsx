@@ -8,7 +8,7 @@ export default function AboutPage() {
       </h1>
 
       <p style={{ fontSize: "20px", color: "#666", marginBottom: "40px", lineHeight: "1.6" }}>
-        Campus Connect is a free, student-to-student peer-to-peer marketplace exclusively for the UMaT community. Buy and sell goods or book services from fellow students — no commission, no hidden fees, just pure community support.
+        Campus Connect is a free, student-to-student peer-to-peer marketplace for students across all 43 Ghanaian universities. Buy and sell goods or book services from fellow students — no commission, no hidden fees, just pure community support.
       </p>
 
       {/* How It Works */}
@@ -16,7 +16,7 @@ export default function AboutPage() {
         <h2 style={{ fontSize: "36px", fontFamily: '"Archivo Black"', marginBottom: "32px", color: "#111" }}>How It Works</h2>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "24px" }}>
           {[
-            { num: "1", title: "Browse", desc: "Explore goods and services listed by fellow UMaT students. Filter by category, condition, and price." },
+            { num: "1", title: "Browse", desc: "Explore goods and services listed by fellow campus students. Filter by category, condition, and price." },
             { num: "2", title: "Connect", desc: "Message sellers or service providers directly. No intermediaries. Direct peer-to-peer communication." },
             { num: "3", title: "Exchange", desc: "Arrange a meetup on campus. Inspect, negotiate, and complete the deal — safely and fairly." },
           ].map((step) => (
@@ -35,11 +35,11 @@ export default function AboutPage() {
         <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "16px" }}>
           {[
             "100% Free — No commission, no hidden fees, no subscription",
-            "Community First — Built by students, for UMaT students",
+            "Community First — Built by students, for students across Ghana",
             "Safe Trading — Rate and review sellers after transactions",
             "Direct Messaging — Real-time chat with buyers and providers",
             "Easy Listing — Post goods or services in under 2 minutes",
-            "Campus Only — Exclusively for UMaT students for your safety",
+            "43 Universities — Every accredited university in Ghana on one platform",
           ].map((feature) => (
             <div key={feature} style={{ display: "flex", gap: "12px", alignItems: "flex-start" }}>
               <span style={{ fontFamily: '"Archivo Black"', fontSize: "18px", color: "#1B5E20", flexShrink: 0 }}>✓</span>
@@ -55,7 +55,7 @@ export default function AboutPage() {
         <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
           {[
             { q: "Is Campus Connect really free?", a: "Yes — 100% free. No commission, no hidden fees. We believe students should help each other without profit in between." },
-            { q: "How do I know I'm trading with a real student?", a: "We use UMaT email verification during sign-up. The community rating system also helps build trust. Always meet in safe, public campus locations." },
+            { q: "How do I know I'm trading with a real student?", a: "All users must sign up with a valid email. The community rating system helps build trust — always meet in safe, public campus locations." },
             { q: "What if something goes wrong with a transaction?", a: "Check the Safety Tips section below. For serious issues, contact us. We're building a dispute resolution system soon." },
             { q: "Can I sell anything?", a: "No. Illegal items, weapons, and counterfeit goods are not allowed. Check our community guidelines before posting." },
             { q: "How do I price my item?", a: "Browse similar listings to understand market value. Be realistic and fair — good pricing means faster sales." },
@@ -94,7 +94,7 @@ export default function AboutPage() {
       <section style={{ textAlign: "center", marginBottom: "40px" }}>
         <h2 style={{ fontSize: "36px", fontFamily: '"Archivo Black"', marginBottom: "24px", color: "#111" }}>Ready to Join?</h2>
         <p style={{ fontSize: "16px", color: "#666", marginBottom: "32px" }}>
-          Start buying, selling, or offering services to the UMaT community today. 100% free.
+          Start buying, selling, or offering services across Ghana's campus community today. 100% free.
         </p>
         <div style={{ display: "flex", gap: "16px", justifyContent: "center", flexWrap: "wrap" }}>
           <Link href="/goods" style={{ padding: "16px 40px", background: "#111", color: "#fff", fontFamily: '"Archivo Black"', fontSize: "14px", textDecoration: "none", border: "2px solid #111", boxShadow: "4px 4px 0 #888" }}>

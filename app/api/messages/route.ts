@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createSupabaseServerClient } from '@/lib/supabase-server'
 import { getRateLimiter } from '@/lib/ratelimit'
+import { inngest } from '@/lib/inngest'
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 const MAX_CONTENT = 2000
@@ -107,7 +108,7 @@ export async function POST(req: NextRequest) {
       if (code === 'PGRST116' || !receiverProfile) {
         return err('Recipient not found', 404)
       }
-      console.error('[API /messages] Receiver fetch error:', receiverErr?.message)
+      console.error('[API /messages] Receiver fetch error:', (receiverErr as any)?.message)
       return err('Could not verify recipient', 500)
     }
     if (receiverProfile.is_banned) {
@@ -141,6 +142,18 @@ export async function POST(req: NextRequest) {
       console.error('[API /messages] Insert returned no data (silent RLS block?)')
       return err('Message could not be saved — please try again.', 500)
     }
+
+    // Fire-and-forget: trigger Inngest job for notification + email
+    void inngest.send({
+      name: 'message/sent',
+      data: {
+        messageId: data.id,
+        senderId: user.id,
+        receiverId,
+        productId: productId ?? null,
+        contentPreview: cleanContent.slice(0, 200),
+      },
+    })
 
     return NextResponse.json(data)
   } catch (e: any) {

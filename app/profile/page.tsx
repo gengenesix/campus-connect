@@ -6,8 +6,30 @@ import { useRouter } from 'next/navigation'
 import { useAuth } from '@/context/AuthContext'
 import { supabase } from '@/lib/supabase'
 import imageCompression from 'browser-image-compression'
+
+async function uploadAvatarToR2(file: File): Promise<string | null> {
+  try {
+    const res = await fetch('/api/upload', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ contentType: file.type, folder: 'avatars', fileSize: file.size }),
+    })
+    if (!res.ok) return null
+    const { uploadUrl, publicUrl } = await res.json()
+    const put = await fetch(uploadUrl, {
+      method: 'PUT',
+      body: file,
+      headers: { 'Content-Type': file.type },
+    })
+    return put.ok ? publicUrl : null
+  } catch {
+    return null
+  }
+}
 import { FACULTIES, CLASS_YEARS } from '@/lib/umat-data'
 import { useHostels } from '@/lib/useHostels'
+import UniversityPicker from '@/components/UniversityPicker'
+import { GHANA_UNIVERSITIES, type GhanaUniversity } from '@/lib/ghana-universities'
 
 export default function ProfilePage() {
   const { user, profile, loading, updateProfile, signOut } = useAuth()
@@ -30,7 +52,47 @@ export default function ProfilePage() {
     phone: '',
     bio: '',
     role: '',
+    universitySlug: '',
   })
+  const [selectedUni, setSelectedUni] = useState<GhanaUniversity | null>(null)
+
+  // Delete account state
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [deleteConfirm, setDeleteConfirm] = useState('')
+  const [deleting, setDeleting] = useState(false)
+  const [deleteError, setDeleteError] = useState<string | null>(null)
+
+  const handleDeleteAccount = async () => {
+    if (deleteConfirm !== 'DELETE') return
+    setDeleting(true)
+    setDeleteError(null)
+    try {
+      // Soft-delete all listings first
+      await Promise.all([
+        supabase.from('products').update({ status: 'deleted' }).eq('seller_id', user!.id),
+        supabase.from('services').update({ status: 'deleted' }).eq('provider_id', user!.id),
+      ])
+      // Call admin API to delete the auth user
+      const res = await fetch('/api/auth/delete-account', { method: 'POST' })
+      if (!res.ok) {
+        const json = await res.json().catch(() => ({}))
+        throw new Error(json.error ?? 'Failed to delete account')
+      }
+      await signOut()
+      router.push('/?deleted=1')
+    } catch (err: unknown) {
+      setDeleteError(err instanceof Error ? err.message : 'Something went wrong')
+      setDeleting(false)
+    }
+  }
+
+  // University email verification state
+  const [uniEmail, setUniEmail] = useState('')
+  const [otpCode, setOtpCode] = useState('')
+  const [emailStep, setEmailStep] = useState<'idle' | 'sent' | 'verified'>('idle')
+  const [emailMsg, setEmailMsg] = useState('')
+  const [emailLoading, setEmailLoading] = useState(false)
+  const [verifiedUniEmail, setVerifiedUniEmail] = useState<string | null>(null)
 
   useEffect(() => {
     if (!loading && !user) router.push('/auth/login?redirect=/profile')
@@ -38,6 +100,16 @@ export default function ProfilePage() {
 
   useEffect(() => {
     if (profile) {
+      // Resolve slug from university_id for the picker
+      let uniSlug = ''
+      let uniObj: GhanaUniversity | null = null
+      if (profile.university_id) {
+        // We store slug in profile.university_id... actually we store UUID.
+        // But we can look it up from the supabase universities table OR from
+        // the local ghana-universities.ts list by matching what's stored.
+        // For now: the profile has university_id (UUID), but the picker needs slug.
+        // We'll rely on a separate fetch below.
+      }
       setForm({
         name: profile.name ?? '',
         department: profile.department ?? '',
@@ -47,9 +119,92 @@ export default function ProfilePage() {
         phone: profile.phone?.replace(/^\+?233|^0/, '') ?? '',
         bio: profile.bio ?? '',
         role: profile.role ?? 'buyer',
+        universitySlug: uniSlug,
       })
+      setSelectedUni(uniObj)
     }
   }, [profile])
+
+  // Resolve university slug from ID (after profile loads)
+  useEffect(() => {
+    if (!profile?.university_id) return
+    supabase
+      .from('universities')
+      .select('slug')
+      .eq('id', profile.university_id)
+      .single()
+      .then(({ data }) => {
+        if (data?.slug) {
+          const uni = GHANA_UNIVERSITIES.find(u => u.slug === data.slug) ?? null
+          setForm(p => ({ ...p, universitySlug: data.slug }))
+          setSelectedUni(uni)
+        }
+      })
+  }, [profile?.university_id])
+
+  // Load university email verification status
+  useEffect(() => {
+    if (!user) return
+    supabase
+      .from('profiles')
+      .select('university_email, university_email_verified')
+      .eq('id', user.id)
+      .single()
+      .then(({ data }) => {
+        if (data?.university_email_verified && data.university_email) {
+          setVerifiedUniEmail(data.university_email)
+          setEmailStep('verified')
+        } else if (data?.university_email) {
+          setUniEmail(data.university_email)
+        }
+      })
+  }, [user])
+
+  const handleSendOtp = async () => {
+    if (!uniEmail.toLowerCase().endsWith('.edu.gh')) {
+      setEmailMsg('Enter a valid .edu.gh university email address')
+      return
+    }
+    setEmailLoading(true)
+    setEmailMsg('')
+    try {
+      const res = await fetch('/api/verify-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'send', email: uniEmail }),
+      })
+      const data = await res.json()
+      if (!res.ok) { setEmailMsg(data.error ?? 'Failed to send code'); return }
+      setEmailStep('sent')
+      setEmailMsg('Code sent! Check your university inbox.')
+    } catch {
+      setEmailMsg('Network error. Try again.')
+    } finally {
+      setEmailLoading(false)
+    }
+  }
+
+  const handleConfirmOtp = async () => {
+    if (otpCode.length !== 6) { setEmailMsg('Enter the full 6-digit code'); return }
+    setEmailLoading(true)
+    setEmailMsg('')
+    try {
+      const res = await fetch('/api/verify-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'confirm', email: uniEmail, otp: otpCode }),
+      })
+      const data = await res.json()
+      if (!res.ok) { setEmailMsg(data.error ?? 'Verification failed'); return }
+      setEmailStep('verified')
+      setVerifiedUniEmail(uniEmail)
+      setEmailMsg('')
+    } catch {
+      setEmailMsg('Network error. Try again.')
+    } finally {
+      setEmailLoading(false)
+    }
+  }
 
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -77,21 +232,15 @@ export default function ProfilePage() {
         }
       }
 
-      // Path: {userId}/avatar.jpg — the folder MUST be the user's ID so storage RLS works
-      const path = `${user.id}/avatar.jpg`
+      const publicUrl = await uploadAvatarToR2(fileToUpload)
 
-      const { error: uploadErr } = await supabase.storage
-        .from('avatars')
-        .upload(path, fileToUpload, { upsert: true, contentType: file.type })
-
-      if (uploadErr) {
+      if (!publicUrl) {
         setAvatarPreview(null)
-        setSaveMsg(`Upload failed: ${uploadErr.message}`)
+        setSaveMsg('Upload failed. Please try again.')
         return
       }
 
-      // Add cache-busting param so the browser loads the new image
-      const { data: { publicUrl } } = supabase.storage.from('avatars').getPublicUrl(path)
+      // Cache-busting param ensures browser reloads the new avatar
       const urlWithBust = `${publicUrl}?t=${Date.now()}`
 
       const { error } = await updateProfile({ avatar_url: urlWithBust } as any)
@@ -122,6 +271,18 @@ export default function ProfilePage() {
 
     try {
       const roleToSave = form.role && form.role !== 'admin' ? form.role : (profile?.role ?? 'buyer')
+
+      // Resolve university_id if slug changed
+      let universityId: string | undefined = undefined
+      if (form.universitySlug) {
+        const { data: uniRow } = await supabase
+          .from('universities')
+          .select('id')
+          .eq('slug', form.universitySlug)
+          .single()
+        if (uniRow?.id) universityId = uniRow.id
+      }
+
       const { error } = await updateProfile({
         name: form.name.trim(),
         department: form.department || null,
@@ -131,6 +292,7 @@ export default function ProfilePage() {
         phone: form.phone ? '+233' + form.phone.replace(/\D/g, '') : null,
         bio: form.bio || null,
         role: roleToSave,
+        ...(universityId !== undefined ? { university_id: universityId } : {}),
       } as any)
 
       if (error) {
@@ -192,6 +354,7 @@ export default function ProfilePage() {
   )
 
   return (
+    <>
     <div style={{ background: '#f8f8f8', minHeight: '80vh' }}>
       <style>{`
         .profile-layout { display: grid; grid-template-columns: 280px 1fr; gap: 32px; align-items: start; }
@@ -362,7 +525,9 @@ export default function ProfilePage() {
                   >✓</span>
                 )}
               </div>
-              <div style={{ fontSize: '12px', color: '#888', marginBottom: '2px' }}>{profile?.department ?? 'UMaT Student'}</div>
+              <div style={{ fontSize: '12px', color: '#888', marginBottom: '2px' }}>
+                {selectedUni ? selectedUni.shortName : profile?.department ?? 'Student'}
+              </div>
               {profile?.course && <div style={{ fontSize: '12px', color: '#999', marginBottom: '2px' }}>{profile.course}</div>}
               {profile?.class_year && <div style={{ fontSize: '12px', color: '#bbb', marginBottom: '16px' }}>{profile.class_year}</div>}
               {!profile?.course && !profile?.class_year && <div style={{ marginBottom: '16px' }} />}
@@ -456,21 +621,43 @@ export default function ProfilePage() {
                       <p style={{ marginTop: '4px', fontSize: '11px', color: '#888' }}>Enter the 9 digits after +233</p>
                     </div>
 
+                    {/* University */}
+                    <div>
+                      <label style={{ display: 'block', fontWeight: 700, fontSize: '12px', letterSpacing: '1.5px', marginBottom: '8px' }}>UNIVERSITY</label>
+                      <UniversityPicker
+                        value={form.universitySlug}
+                        onChange={(slug, uni) => {
+                          setForm(p => ({ ...p, universitySlug: slug, department: '', hostel: '' }))
+                          setSelectedUni(uni)
+                        }}
+                      />
+                    </div>
+
                     {/* Programme / Course */}
                     <div>
                       <label style={{ display: 'block', fontWeight: 700, fontSize: '12px', letterSpacing: '1.5px', marginBottom: '8px' }}>PROGRAMME / COURSE</label>
-                      <select
-                        value={form.department}
-                        onChange={e => setForm(p => ({ ...p, department: e.target.value }))}
-                        style={{ width: '100%', padding: '12px 16px', border: '2px solid #111', fontFamily: '"Space Grotesk", sans-serif', fontSize: '14px', background: '#fff', boxSizing: 'border-box' }}
-                      >
-                        <option value="">Select your programme</option>
-                        {FACULTIES.map(f => (
-                          <optgroup key={f.short} label={`${f.name}`}>
-                            {f.programmes.map(p => <option key={p} value={p}>{p}</option>)}
-                          </optgroup>
-                        ))}
-                      </select>
+                      {form.universitySlug === 'umat' ? (
+                        <select
+                          value={form.department}
+                          onChange={e => setForm(p => ({ ...p, department: e.target.value }))}
+                          style={{ width: '100%', padding: '12px 16px', border: '2px solid #111', fontFamily: '"Space Grotesk", sans-serif', fontSize: '14px', background: '#fff', boxSizing: 'border-box' }}
+                        >
+                          <option value="">Select your programme</option>
+                          {FACULTIES.map(f => (
+                            <optgroup key={f.short} label={f.name}>
+                              {f.programmes.map(p => <option key={p} value={p}>{p}</option>)}
+                            </optgroup>
+                          ))}
+                        </select>
+                      ) : (
+                        <input
+                          type="text"
+                          value={form.department}
+                          onChange={e => setForm(p => ({ ...p, department: e.target.value }))}
+                          placeholder="e.g. BSc Computer Science"
+                          style={{ width: '100%', padding: '12px 16px', border: '2px solid #111', fontFamily: '"Space Grotesk", sans-serif', fontSize: '14px', outline: 'none', boxSizing: 'border-box' }}
+                        />
+                      )}
                     </div>
 
                     {/* Class Year */}
@@ -489,32 +676,42 @@ export default function ProfilePage() {
                     {/* Hostel */}
                     <div>
                       <label style={{ display: 'block', fontWeight: 700, fontSize: '12px', letterSpacing: '1.5px', marginBottom: '8px' }}>HOSTEL / RESIDENCE</label>
-                      {form.hostel && !hostels.all.includes(form.hostel) && (
-                        <div style={{ marginBottom: '6px', padding: '6px 10px', background: '#fff8e1', border: '1px solid #f59e0b', fontSize: '11px', color: '#92400e', fontWeight: 600 }}>
-                          ⚠ Your saved hostel "{form.hostel}" is no longer listed. Please select an updated option below.
-                        </div>
+                      {form.universitySlug === 'umat' ? (
+                        <>
+                          {form.hostel && !hostels.all.includes(form.hostel) && (
+                            <div style={{ marginBottom: '6px', padding: '6px 10px', background: '#fff8e1', border: '1px solid #f59e0b', fontSize: '11px', color: '#92400e', fontWeight: 600 }}>
+                              ⚠ Your saved hostel "{form.hostel}" is no longer listed. Please select an updated option.
+                            </div>
+                          )}
+                          <select
+                            value={form.hostel}
+                            onChange={e => setForm(p => ({ ...p, hostel: e.target.value }))}
+                            style={{ width: '100%', padding: '12px 16px', border: '2px solid #111', fontFamily: '"Space Grotesk", sans-serif', fontSize: '14px', background: '#fff', boxSizing: 'border-box' }}
+                          >
+                            <option value="">Select hostel</option>
+                            {form.hostel && !hostels.all.includes(form.hostel) && (
+                              <option value={form.hostel} disabled style={{ color: '#aaa' }}>⚠ {form.hostel} (outdated)</option>
+                            )}
+                            <optgroup label="Main Halls of Residence">
+                              {hostels.main.map(h => <option key={h} value={h}>{h}</option>)}
+                            </optgroup>
+                            <optgroup label="Private & Affiliated Hostels">
+                              {hostels.private.map(h => <option key={h} value={h}>{h}</option>)}
+                            </optgroup>
+                            <optgroup label="Other">
+                              {hostels.other.map(h => <option key={h} value={h}>{h}</option>)}
+                            </optgroup>
+                          </select>
+                        </>
+                      ) : (
+                        <input
+                          type="text"
+                          value={form.hostel}
+                          onChange={e => setForm(p => ({ ...p, hostel: e.target.value }))}
+                          placeholder={selectedUni ? `Hostel or area near ${selectedUni.shortName}` : 'Hostel or residential area'}
+                          style={{ width: '100%', padding: '12px 16px', border: '2px solid #111', fontFamily: '"Space Grotesk", sans-serif', fontSize: '14px', outline: 'none', boxSizing: 'border-box' }}
+                        />
                       )}
-                      <select
-                        value={form.hostel}
-                        onChange={e => setForm(p => ({ ...p, hostel: e.target.value }))}
-                        style={{ width: '100%', padding: '12px 16px', border: '2px solid #111', fontFamily: '"Space Grotesk", sans-serif', fontSize: '14px', background: '#fff', boxSizing: 'border-box' }}
-                      >
-                        <option value="">Select hostel</option>
-                        {form.hostel && !hostels.all.includes(form.hostel) && (
-                          <option value={form.hostel} disabled style={{ color: '#aaa' }}>
-                            ⚠ {form.hostel} (outdated)
-                          </option>
-                        )}
-                        <optgroup label="Main Halls of Residence">
-                          {hostels.main.map(h => <option key={h} value={h}>{h}</option>)}
-                        </optgroup>
-                        <optgroup label="Private & Affiliated Hostels">
-                          {hostels.private.map(h => <option key={h} value={h}>{h}</option>)}
-                        </optgroup>
-                        <optgroup label="Other">
-                          {hostels.other.map(h => <option key={h} value={h}>{h}</option>)}
-                        </optgroup>
-                      </select>
                     </div>
 
                     {/* Bio */}
@@ -570,6 +767,7 @@ export default function ProfilePage() {
                     {[
                       { label: 'FULL NAME', value: profile?.name },
                       { label: 'EMAIL', value: user.email },
+                      { label: 'UNIVERSITY', value: selectedUni ? `${selectedUni.shortName} — ${selectedUni.name}` : profile?.university_id ? 'Loading...' : null },
                       { label: 'PHONE / WHATSAPP', value: profile?.phone },
                       { label: 'PROGRAMME / COURSE', value: profile?.department },
                       { label: 'YEAR / LEVEL', value: profile?.class_year },
@@ -593,6 +791,97 @@ export default function ProfilePage() {
               </div>
             </div>
 
+            {/* University Email Verification */}
+            <div style={{ marginTop: '24px', border: '2px solid #111', background: '#fff', boxShadow: '4px 4px 0 #111' }}>
+              <div style={{ background: '#f0f0f0', padding: '14px 24px', borderBottom: '2px solid #111', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <span style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '14px', letterSpacing: '0.5px' }}>
+                  UNIVERSITY EMAIL VERIFICATION
+                </span>
+                {emailStep === 'verified' && (
+                  <span style={{ background: '#1B5E20', color: '#fff', padding: '3px 10px', fontSize: '11px', fontWeight: 700, letterSpacing: '0.5px' }}>
+                    ✓ VERIFIED
+                  </span>
+                )}
+              </div>
+              <div style={{ padding: '20px 24px' }}>
+                {emailStep === 'verified' ? (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                    <div style={{ fontSize: '32px' }}>🎓</div>
+                    <div>
+                      <div style={{ fontWeight: 700, fontSize: '14px', color: '#1B5E20' }}>{verifiedUniEmail}</div>
+                      <div style={{ fontSize: '12px', color: '#666', marginTop: '3px', lineHeight: 1.5 }}>
+                        Your university email is verified. This builds trust with buyers and clients.
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <p style={{ fontSize: '13px', color: '#555', marginBottom: '16px', lineHeight: 1.5 }}>
+                      Verify your university email <strong>(.edu.gh)</strong> to earn a trust badge visible on your listings.
+                    </p>
+                    {emailStep === 'idle' ? (
+                      <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                        <input
+                          type="email"
+                          value={uniEmail}
+                          onChange={e => setUniEmail(e.target.value)}
+                          placeholder="yourname@st.umat.edu.gh"
+                          style={{ flex: 1, minWidth: '220px', padding: '10px 14px', border: '2px solid #111', fontFamily: '"Space Grotesk", sans-serif', fontSize: '14px', outline: 'none', boxSizing: 'border-box' }}
+                        />
+                        <button
+                          onClick={handleSendOtp}
+                          disabled={emailLoading}
+                          style={{ padding: '10px 20px', background: emailLoading ? '#888' : '#1B5E20', color: '#fff', fontFamily: '"Archivo Black", sans-serif', fontSize: '12px', border: '2px solid #111', cursor: emailLoading ? 'not-allowed' : 'pointer', letterSpacing: '0.5px', whiteSpace: 'nowrap' }}
+                        >
+                          {emailLoading ? 'SENDING...' : 'SEND CODE →'}
+                        </button>
+                      </div>
+                    ) : (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                        <div style={{ fontSize: '13px', color: '#555' }}>
+                          Enter the 6-digit code sent to <strong>{uniEmail}</strong>
+                        </div>
+                        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
+                          <input
+                            type="text"
+                            inputMode="numeric"
+                            value={otpCode}
+                            onChange={e => setOtpCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                            placeholder="000000"
+                            maxLength={6}
+                            style={{ width: '150px', padding: '10px 14px', border: '2px solid #111', fontFamily: '"Archivo Black", sans-serif', fontSize: '22px', letterSpacing: '8px', outline: 'none', textAlign: 'center' }}
+                          />
+                          <button
+                            onClick={handleConfirmOtp}
+                            disabled={emailLoading}
+                            style={{ padding: '10px 20px', background: emailLoading ? '#888' : '#5d3fd3', color: '#fff', fontFamily: '"Archivo Black", sans-serif', fontSize: '12px', border: '2px solid #111', cursor: emailLoading ? 'not-allowed' : 'pointer', letterSpacing: '0.5px' }}
+                          >
+                            {emailLoading ? 'VERIFYING...' : 'VERIFY →'}
+                          </button>
+                          <button
+                            onClick={() => { setEmailStep('idle'); setOtpCode(''); setEmailMsg('') }}
+                            style={{ padding: '10px 14px', background: '#fff', color: '#666', fontWeight: 600, border: '2px solid #ddd', cursor: 'pointer', fontFamily: '"Space Grotesk", sans-serif', fontSize: '12px' }}
+                          >
+                            Change email
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                    {emailMsg && (
+                      <div style={{
+                        marginTop: '12px', padding: '8px 14px', fontSize: '13px', fontWeight: 600,
+                        background: /error|fail|invalid|expired/i.test(emailMsg) ? '#fee2e2' : '#dcfce7',
+                        color: /error|fail|invalid|expired/i.test(emailMsg) ? '#dc2626' : '#15803d',
+                        border: `1px solid ${/error|fail|invalid|expired/i.test(emailMsg) ? '#ef4444' : '#16a34a'}`,
+                      }}>
+                        {emailMsg}
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+            </div>
+
             {/* Account Quick Links */}
             <div style={{ marginTop: '24px', border: '2px solid #111', background: '#fff', boxShadow: '4px 4px 0 #111' }}>
               <div style={{ background: '#f0f0f0', padding: '14px 24px', borderBottom: '2px solid #111' }}>
@@ -610,9 +899,87 @@ export default function ProfilePage() {
                 </Link>
               </div>
             </div>
+
+            {/* Danger Zone */}
+            <div style={{ marginTop: '40px', border: '2px solid #dc2626', background: '#fff' }}>
+              <div style={{ background: '#dc2626', padding: '14px 24px' }}>
+                <span style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '14px', letterSpacing: '0.5px', color: '#fff' }}>DANGER ZONE</span>
+              </div>
+              <div style={{ padding: '24px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
+                  <div>
+                    <div style={{ fontWeight: 700, fontSize: '14px', color: '#111', marginBottom: '4px' }}>Delete Account</div>
+                    <div style={{ fontSize: '13px', color: '#666', lineHeight: 1.5 }}>
+                      Permanently removes your profile, all listings, and data. This cannot be undone.
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setShowDeleteModal(true)}
+                    style={{ padding: '10px 20px', background: '#fff', color: '#dc2626', border: '2px solid #dc2626', fontFamily: '"Archivo Black", sans-serif', fontSize: '12px', letterSpacing: '0.5px', cursor: 'pointer', whiteSpace: 'nowrap' }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#dc2626'; (e.currentTarget as HTMLElement).style.color = '#fff' }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#fff'; (e.currentTarget as HTMLElement).style.color = '#dc2626' }}
+                  >
+                    DELETE ACCOUNT
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
+
+    {/* Delete Account Modal */}
+
+    {showDeleteModal && (
+      <div
+        style={{ position: 'fixed', inset: 0, zIndex: 9999, background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}
+        onClick={e => { if (e.target === e.currentTarget && !deleting) setShowDeleteModal(false) }}
+      >
+        <div style={{ background: '#fff', border: '3px solid #dc2626', boxShadow: '8px 8px 0 #dc2626', maxWidth: '440px', width: '100%' }}>
+          <div style={{ background: '#dc2626', color: '#fff', padding: '16px 24px', fontFamily: '"Archivo Black", sans-serif', fontSize: '15px', letterSpacing: '0.5px' }}>
+            CONFIRM ACCOUNT DELETION
+          </div>
+          <div style={{ padding: '28px 24px' }}>
+            <p style={{ fontSize: '14px', color: '#444', lineHeight: 1.7, marginBottom: '20px' }}>
+              This will permanently delete your account, all listings, and profile data. <strong>This action cannot be undone.</strong>
+            </p>
+            <div style={{ background: '#fee2e2', border: '1px solid #dc2626', padding: '12px 16px', fontSize: '13px', color: '#991b1b', marginBottom: '20px', lineHeight: 1.5 }}>
+              ⚠ Type <strong>DELETE</strong> to confirm you understand this is irreversible.
+            </div>
+            <input
+              type="text"
+              value={deleteConfirm}
+              onChange={e => setDeleteConfirm(e.target.value)}
+              placeholder="Type DELETE to confirm"
+              disabled={deleting}
+              style={{ width: '100%', padding: '12px 14px', border: '2px solid #dc2626', fontFamily: '"Archivo Black", sans-serif', fontSize: '16px', letterSpacing: '2px', outline: 'none', boxSizing: 'border-box', textTransform: 'uppercase', marginBottom: '16px' }}
+            />
+            {deleteError && (
+              <div style={{ padding: '10px 14px', background: '#fee2e2', color: '#dc2626', fontSize: '13px', fontWeight: 600, marginBottom: '16px', border: '1px solid #dc2626' }}>
+                {deleteError}
+              </div>
+            )}
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <button
+                onClick={handleDeleteAccount}
+                disabled={deleteConfirm !== 'DELETE' || deleting}
+                style={{ flex: 1, padding: '14px 20px', background: deleteConfirm === 'DELETE' && !deleting ? '#dc2626' : '#ccc', color: '#fff', fontFamily: '"Archivo Black", sans-serif', fontSize: '13px', letterSpacing: '0.5px', border: '2px solid #111', cursor: deleteConfirm === 'DELETE' && !deleting ? 'pointer' : 'not-allowed' }}
+              >
+                {deleting ? 'DELETING...' : 'YES, DELETE MY ACCOUNT'}
+              </button>
+              <button
+                onClick={() => { setShowDeleteModal(false); setDeleteConfirm(''); setDeleteError(null) }}
+                disabled={deleting}
+                style={{ padding: '14px 20px', background: '#fff', color: '#111', fontWeight: 700, border: '2px solid #111', cursor: 'pointer', fontFamily: '"Space Grotesk", sans-serif', fontSize: '13px' }}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    )}
+    </>
   )
 }
