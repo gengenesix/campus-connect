@@ -8,6 +8,7 @@ import GoodsCard from "@/components/GoodsCard"
 import ServiceCard from "@/components/ServiceCard"
 import type { Good, Service } from "@/lib/mockData"
 import { timeAgo } from "@/lib/utils"
+import SectionWrapper from '@/components/ui/SectionWrapper'
 
 const SHOWCASE = [
   { label: 'BRAIDS', sublabel: 'Box braids, cornrows & locs', href: '/services', img: '/images/showcase/braids.jpg', tag: 'HAIR' },
@@ -277,10 +278,9 @@ export default function HomePage() {
       </div>
 
       {/* UNIVERSITY FINDER — search-first */}
-      <section id="universities" style={{ background: '#fff', padding: '72px 20px', borderBottom: '2px solid #111' }}>
-        <div className="container">
+      <SectionWrapper id="universities" className="border-b-2 border-[#111]">
           {/* Header */}
-          <div style={{ textAlign: 'center', marginBottom: '48px' }}>
+          <div className="text-center mb-12">
             <div style={{
               display: 'inline-flex', alignItems: 'center', gap: '8px',
               background: '#1B5E20', color: '#fff', padding: '6px 16px',
@@ -424,12 +424,11 @@ export default function HomePage() {
               <span style={{ width: '8px', height: '8px', background: TYPE_COLOR.private, display: 'inline-block' }} /> Private
             </span>
           </div>
-        </div>
-      </section>
+      </SectionWrapper>
 
       {/* WHAT'S ON CAMPUS showcase scroll */}
-      <section style={{ background: '#0a0a0a', padding: '64px 0 48px', overflow: 'hidden' }}>
-        <div className="container" style={{ marginBottom: '32px', paddingLeft: 20, paddingRight: 20 }}>
+      <SectionWrapper dark fullBleed className="overflow-hidden">
+        <div className="max-w-6xl mx-auto px-4 mb-8">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '16px' }}>
             <div>
               <div style={{ fontFamily: '"Space Grotesk", sans-serif', fontSize: '11px', fontWeight: 700, letterSpacing: '3px', color: '#a78bfa', marginBottom: '10px' }}>
@@ -470,12 +469,11 @@ export default function HomePage() {
             </Link>
           </div>
         </div>
-      </section>
+      </SectionWrapper>
 
       {/* LATEST GOODS — hidden if empty */}
       {showGoods && (
-        <section className="trending-section" id="featured">
-          <div className="container">
+        <SectionWrapper id="featured" className="border-t-2 border-[#111]">
             <div className="trending-header">
               <h3>Latest Goods</h3>
               <Link href="/goods">See All →</Link>
@@ -497,14 +495,12 @@ export default function HomePage() {
                 {goods.map(good => <GoodsCard key={good.id} good={good} />)}
               </div>
             )}
-          </div>
-        </section>
+        </SectionWrapper>
       )}
 
       {/* POPULAR SERVICES — hidden if empty */}
       {showServices && (
-        <section className="trending-section" style={{ background: '#f5f5f5' }}>
-          <div className="container">
+        <SectionWrapper className="bg-[#f5f5f5] border-t-2 border-[#111]">
             <div className="trending-header">
               <h3>Popular Services</h3>
               <Link href="/services">See All →</Link>
@@ -527,14 +523,12 @@ export default function HomePage() {
                 {services.map(service => <ServiceCard key={service.id} service={service} />)}
               </div>
             )}
-          </div>
-        </section>
+        </SectionWrapper>
       )}
 
       {/* HOW IT WORKS */}
-      <section style={{ background: '#fff', padding: '60px 20px', borderTop: '2px solid #111' }}>
-        <div className="container">
-          <div style={{ textAlign: 'center', marginBottom: '48px' }}>
+      <SectionWrapper className="border-t-2 border-[#111]">
+          <div className="text-center mb-12">
             <div style={{ fontFamily: '"Space Grotesk", sans-serif', fontSize: '11px', fontWeight: 700, letterSpacing: '3px', color: '#5d3fd3', marginBottom: '12px' }}>SIMPLE PROCESS</div>
             <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: 'clamp(28px, 5vw, 40px)', marginBottom: '8px' }}>HOW IT WORKS</div>
             <p style={{ color: '#666', fontSize: '16px', margin: 0 }}>Three simple steps to buy, sell, or book on campus</p>
@@ -582,12 +576,10 @@ export default function HomePage() {
               </div>
             ))}
           </div>
-        </div>
-      </section>
+      </SectionWrapper>
 
       {/* TRUST STRIP — dark, left-bordered */}
-      <section style={{ background: '#111', padding: '48px 20px', borderTop: '2px solid #1a1a1a' }}>
-        <div className="container">
+      <SectionWrapper dark className="border-t border-[#1a1a1a]">
           <div className="trust-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '32px' }}>
             {([
               {
@@ -635,12 +627,10 @@ export default function HomePage() {
               </div>
             ))}
           </div>
-        </div>
-      </section>
+      </SectionWrapper>
 
       {/* CTA */}
-      <section style={{ background: '#1B5E20', padding: '64px 20px', textAlign: 'center', color: '#fff', borderTop: '3px solid #111' }}>
-        <div className="container">
+      <SectionWrapper className="bg-[#1B5E20] text-white text-center border-t-[3px] border-[#111]">
           <div style={{ fontFamily: '"Space Grotesk", sans-serif', fontSize: '11px', fontWeight: 700, letterSpacing: '3px', color: 'rgba(255,255,255,0.55)', marginBottom: '16px' }}>JOIN THE COMMUNITY</div>
           <h2 style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: 'clamp(28px, 5vw, 42px)', marginBottom: '16px', lineHeight: 1.1 }}>
             READY TO JOIN<br />YOUR CAMPUS?
@@ -656,8 +646,7 @@ export default function HomePage() {
               FIND YOUR UNI
             </a>
           </div>
-        </div>
-      </section>
+      </SectionWrapper>
     </>
   )
 }
