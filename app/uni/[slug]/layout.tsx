@@ -4,11 +4,12 @@ import { getUniversityBySlug } from '@/lib/ghana-universities'
 
 interface Props {
   children: ReactNode
-  params: { slug: string }
+  params: Promise<{ slug: string }>
 }
 
 export async function generateMetadata({ params }: Props) {
-  const uni = getUniversityBySlug(params.slug)
+  const { slug } = await params
+  const uni = getUniversityBySlug(slug)
   if (!uni) return { title: 'Not Found' }
   return {
     title: `${uni.shortName} Marketplace — Campus Connect`,
@@ -16,8 +17,9 @@ export async function generateMetadata({ params }: Props) {
   }
 }
 
-export default function UniLayout({ children, params }: Props) {
-  const uni = getUniversityBySlug(params.slug)
+export default async function UniLayout({ children, params }: Props) {
+  const { slug } = await params
+  const uni = getUniversityBySlug(slug)
   if (!uni) notFound()
   return <>{children}</>
 }
