@@ -631,7 +631,9 @@ function MessagesInner() {
             {/* Empty state */}
             {!convLoading && conversations.length === 0 && !activePartner && !showNewMsg && (
               <div style={{ padding: '32px 16px', textAlign: 'center', color: '#aaa' }}>
-                <div style={{ fontSize: '36px', marginBottom: '8px' }}>💬</div>
+                <div style={{ marginBottom: '8px', display: 'flex', justifyContent: 'center', color: '#ccc' }}>
+                  <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                </div>
                 <div style={{ fontWeight: 700, fontSize: '12px', letterSpacing: '0.5px' }}>NO CONVERSATIONS YET</div>
                 <div style={{ fontSize: '11px', marginTop: '6px', lineHeight: 1.5 }}>Tap <strong style={{ color: '#1B5E20' }}>+ NEW</strong> to message anyone,<br />or browse listings and tap "Message Seller"</div>
               </div>
@@ -711,7 +713,9 @@ function MessagesInner() {
                     </div>
                   ) : messages.length === 0 ? (
                     <div style={{ textAlign: 'center', padding: '60px 20px', color: '#888' }}>
-                      <div style={{ fontSize: '40px', marginBottom: '12px' }}>👋</div>
+                      <div style={{ marginBottom: '12px', display: 'flex', justifyContent: 'center', color: '#ccc' }}>
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
+                      </div>
                       <div style={{ fontWeight: 600 }}>Say hello to get started!</div>
                       <div style={{ fontSize: '12px', marginTop: '6px' }}>You can talk about listings, prices, delivery — anything.</div>
                     </div>
@@ -777,7 +781,9 @@ function MessagesInner() {
             ) : (
               /* No active conversation */
               <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '60px 24px', color: '#888', textAlign: 'center' }}>
-                <div style={{ fontSize: '56px', marginBottom: '16px' }}>💬</div>
+                <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'center', color: '#ddd' }}>
+                  <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                </div>
                 <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '22px', color: '#111', marginBottom: '10px' }}>START A CONVERSATION</div>
                 <p style={{ fontSize: '14px', maxWidth: '320px', lineHeight: 1.7, marginBottom: '24px' }}>
                   Pick someone from the left, or hit <strong style={{ color: '#1B5E20' }}>+ NEW</strong> to message any buyer, seller, or service provider on campus.

@@ -191,7 +191,7 @@ export default function MyListingsPage() {
                     {topPerformer.image_url ? (
                       <Image src={topPerformer.image_url} alt={topPerformer.title} width={52} height={52} style={{ objectFit: 'cover', border: '2px solid #111', flexShrink: 0 }} />
                     ) : (
-                      <div style={{ width: '52px', height: '52px', background: '#f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', flexShrink: 0, border: '2px solid #eee' }}>📦</div>
+                      <div style={{ width: '52px', height: '52px', background: '#f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, border: '2px solid #eee', color: '#ccc' }}><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M16.5 9.4l-9-5.19M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg></div>
                     )}
                     <div style={{ minWidth: 0 }}>
                       <Link href={`/goods/${topPerformer.id}`} style={{ fontWeight: 700, fontSize: '12px', color: '#111', textDecoration: 'none', display: 'block', marginBottom: '6px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
@@ -252,7 +252,7 @@ export default function MyListingsPage() {
         {/* Listings */}
         {listings.length === 0 ? (
           <div style={{ border: '2px solid #111', background: '#fff', boxShadow: '6px 6px 0 #111', padding: '60px', textAlign: 'center' }}>
-            <div style={{ fontSize: '64px', marginBottom: '20px' }}>📦</div>
+            <div style={{ marginBottom: '20px', display: 'flex', justifyContent: 'center', color: '#ddd' }}><svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"><path d="M16.5 9.4l-9-5.19M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></div>
             <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '24px', marginBottom: '12px' }}>No listings yet</div>
             <p style={{ color: '#888', marginBottom: '28px' }}>List your first item and start connecting with fellow students.</p>
             <Link href="/sell" style={{ display: 'inline-block', padding: '14px 32px', background: '#1B5E20', color: '#fff', fontFamily: '"Archivo Black", sans-serif', fontSize: '14px', textDecoration: 'none', border: '2px solid #111', boxShadow: '4px 4px 0 #111' }}>
@@ -282,7 +282,7 @@ export default function MyListingsPage() {
                             {listing.image_url ? (
                               <Image src={listing.image_url} alt={listing.title} width={44} height={44} style={{ objectFit: 'cover', border: '1px solid #eee', flexShrink: 0 }} />
                             ) : (
-                              <div style={{ width: '44px', height: '44px', background: '#f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px', flexShrink: 0 }}>📦</div>
+                              <div style={{ width: '44px', height: '44px', background: '#f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, color: '#ccc' }}><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M16.5 9.4l-9-5.19M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg></div>
                             )}
                             <div>
                               <Link href={`/goods/${listing.id}`} style={{ fontWeight: 700, fontSize: '13px', textDecoration: 'none', color: '#111', display: 'block' }}>{listing.title}</Link>

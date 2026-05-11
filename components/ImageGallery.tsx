@@ -20,7 +20,7 @@ export default function ImageGallery({ images, alt, height = 420 }: Props) {
   if (!images.length) {
     return (
       <div style={{ border: '3px solid #111', background: '#f0f0f0', height, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '8px 8px 0 #111' }}>
-        <span style={{ fontSize: '48px' }}>📷</span>
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#ccc" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
       </div>
     )
   }

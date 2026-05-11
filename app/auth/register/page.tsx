@@ -129,7 +129,11 @@ export default function RegisterPage() {
     return (
       <div style={{ minHeight: '80vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 20px', background: '#f8f8f8' }}>
         <div style={{ width: '100%', maxWidth: '480px', border: '3px solid #1B5E20', background: '#fff', boxShadow: '8px 8px 0 #1B5E20', padding: '40px' }}>
-          <div style={{ fontSize: '48px', marginBottom: '16px' }}>✅</div>
+          <div style={{ width: '56px', height: '56px', borderRadius: '50%', background: '#e8f5e9', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '20px' }}>
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#1B5E20" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+          </div>
           <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '28px', marginBottom: '12px', color: '#1B5E20' }}>
             CHECK YOUR EMAIL
           </div>
@@ -177,8 +181,9 @@ export default function RegisterPage() {
 
           <div style={{ padding: '32px' }}>
             {error && (
-              <div style={{ background: '#fee2e2', border: '2px solid #ef4444', padding: '12px 16px', marginBottom: '20px', fontSize: '14px', color: '#dc2626', fontWeight: 600, display: 'flex', gap: '8px' }}>
-                <span>⚠️</span><span>{error}</span>
+              <div style={{ background: '#fee2e2', border: '2px solid #ef4444', padding: '12px 16px', marginBottom: '20px', fontSize: '14px', color: '#dc2626', fontWeight: 600, display: 'flex', gap: '8px', alignItems: 'flex-start' }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#dc2626" strokeWidth="2.2" strokeLinecap="round" style={{ flexShrink: 0, marginTop: '1px' }}><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                <span>{error}</span>
               </div>
             )}
 
@@ -287,9 +292,18 @@ export default function RegisterPage() {
                   </label>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
                     {[
-                      { val: 'buyer', label: 'BUYER', icon: '🛒', desc: 'Buy goods & book services' },
-                      { val: 'seller', label: 'SELLER', icon: '📦', desc: 'Sell items on campus' },
-                      { val: 'provider', label: 'PROVIDER', icon: '🛠️', desc: 'Offer campus services' },
+                      {
+                        val: 'buyer', label: 'BUYER', desc: 'Buy goods & book services',
+                        icon: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>,
+                      },
+                      {
+                        val: 'seller', label: 'SELLER', desc: 'Sell items on campus',
+                        icon: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M16.5 9.4l-9-5.19M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>,
+                      },
+                      {
+                        val: 'provider', label: 'PROVIDER', desc: 'Offer campus services',
+                        icon: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>,
+                      },
                     ].map(r => (
                       <button
                         key={r.val}
@@ -304,7 +318,9 @@ export default function RegisterPage() {
                           transition: 'all 0.15s',
                         }}
                       >
-                        <div style={{ fontSize: '22px', marginBottom: '4px' }}>{r.icon}</div>
+                        <div style={{ marginBottom: '6px', display: 'flex', justifyContent: 'center', color: form.role === r.val ? '#1B5E20' : '#888' }}>
+                          {r.icon}
+                        </div>
                         <div style={{ fontWeight: 700, fontSize: '11px', letterSpacing: '0.5px', color: form.role === r.val ? '#1B5E20' : '#666' }}>
                           {r.label}
                         </div>
@@ -312,8 +328,9 @@ export default function RegisterPage() {
                     ))}
                   </div>
                   {isSeller && (
-                    <div style={{ marginTop: '8px', padding: '8px 12px', background: '#fff8e1', border: '1px solid #f59e0b', fontSize: '12px', color: '#92400e' }}>
-                      ℹ️ Sellers & providers must provide phone and department for trust & safety.
+                    <div style={{ marginTop: '8px', padding: '8px 12px', background: '#fff8e1', border: '1px solid #f59e0b', fontSize: '12px', color: '#92400e', display: 'flex', gap: '8px', alignItems: 'flex-start' }}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#92400e" strokeWidth="2.2" strokeLinecap="round" style={{ flexShrink: 0, marginTop: '1px' }}><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                      <span>Sellers &amp; providers must provide phone and department for trust &amp; safety.</span>
                     </div>
                   )}
                 </div>

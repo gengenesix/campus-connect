@@ -219,7 +219,9 @@ export default function OfferServicePage() {
       </div>
       <div className="container" style={{ paddingTop: '60px', paddingBottom: '80px' }}>
         <div style={{ maxWidth: '520px', border: '3px solid #1B5E20', background: '#fff', boxShadow: '8px 8px 0 #1B5E20', padding: '40px' }}>
-          <div style={{ fontSize: '48px', marginBottom: '16px' }}>🛠️</div>
+          <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'center', color: '#1B5E20' }}>
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+          </div>
           <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '26px', letterSpacing: '-0.5px', marginBottom: '14px' }}>
             SELLER SUBSCRIPTION REQUIRED
           </div>
@@ -249,7 +251,9 @@ export default function OfferServicePage() {
     return (
       <div style={{ minHeight: '70vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 20px', background: '#f8f8f8' }}>
         <div style={{ width: '100%', maxWidth: '480px', border: '3px solid #1B5E20', background: '#fff', boxShadow: '8px 8px 0 #1B5E20', padding: '40px', textAlign: 'center' }}>
-          <div style={{ fontSize: '56px', marginBottom: '16px' }}>🛠️</div>
+          <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'center', color: '#1B5E20' }}>
+            <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+          </div>
           <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '28px', color: '#1B5E20', marginBottom: '12px' }}>
             SERVICE LISTED!
           </div>
@@ -291,7 +295,7 @@ export default function OfferServicePage() {
           {/* Profile incomplete warning */}
           {!profileReady && (
             <div style={{ background: '#fff8e1', border: '2px solid #f59e0b', padding: '16px 20px', marginBottom: '24px', display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
-              <span style={{ fontSize: '20px', flexShrink: 0 }}>⚠️</span>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2" strokeLinecap="round" style={{ flexShrink: 0, marginTop: '1px' }}><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
               <div>
                 <div style={{ fontWeight: 700, fontSize: '14px', color: '#92400e', marginBottom: '4px' }}>
                   Complete your profile first
@@ -311,7 +315,7 @@ export default function OfferServicePage() {
 
           {error && (
             <div style={{ background: '#fee2e2', border: '2px solid #ef4444', padding: '12px 16px', marginBottom: '24px', fontSize: '14px', color: '#dc2626', fontWeight: 600, display: 'flex', gap: '8px' }}>
-              <span>⚠️</span><span>{error}</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#dc2626" strokeWidth="2.2" strokeLinecap="round" style={{ flexShrink: 0 }}><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><span>{error}</span>
             </div>
           )}
 
@@ -333,7 +337,9 @@ export default function OfferServicePage() {
                   </div>
                 ) : (
                   <div>
-                    <div style={{ fontSize: '32px', marginBottom: '8px' }}>🖼️</div>
+                    <div style={{ marginBottom: '8px', display: 'flex', justifyContent: 'center', color: '#888' }}>
+                      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                    </div>
                     <div style={{ fontWeight: 700, fontSize: '14px', marginBottom: '4px' }}>Add a photo of your work</div>
                     <div style={{ color: '#888', fontSize: '12px' }}>JPG, PNG · Max 5MB</div>
                   </div>

@@ -150,19 +150,24 @@ export default async function ServiceDetailPage({ params }: { params: Params }) 
                 {service.category.toUpperCase()}
               </span>
               {service.response_time && (
-                <span style={{ padding: '6px 14px', background: '#fff', fontWeight: 600, fontSize: '11px', border: '2px solid #ddd', color: '#888' }}>
-                  ⏱ {service.response_time}
+                <span style={{ padding: '6px 14px', background: '#fff', fontWeight: 600, fontSize: '11px', border: '2px solid #ddd', color: '#888', display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  {service.response_time}
                 </span>
               )}
-              <span style={{ padding: '6px 14px', background: '#fff', fontWeight: 600, fontSize: '11px', border: '2px solid #ddd', color: '#888' }}>
-                ✅ {service.total_bookings} bookings
+              <span style={{ padding: '6px 14px', background: '#fff', fontWeight: 600, fontSize: '11px', border: '2px solid #ddd', color: '#888', display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#1B5E20" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                {service.total_bookings} bookings
               </span>
             </div>
 
             {service.availability && (
               <div style={{ marginTop: '20px', border: '2px solid #1B5E20', padding: '16px', background: '#e8f5e9' }}>
                 <div style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '1px', color: '#1B5E20', marginBottom: '6px' }}>AVAILABILITY</div>
-                <div style={{ fontWeight: 700, color: '#1B5E20', fontSize: '15px' }}>📅 {service.availability}</div>
+                <div style={{ fontWeight: 700, color: '#1B5E20', fontSize: '15px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                  {service.availability}
+                </div>
               </div>
             )}
           </div>
@@ -201,7 +206,12 @@ export default async function ServiceDetailPage({ params }: { params: Params }) 
                 <div>
                   <div style={{ fontWeight: 700, fontSize: '16px', marginBottom: '2px' }}>{service.provider?.name ?? 'Provider'}</div>
                   <div style={{ fontSize: '13px', color: '#888' }}>
-                    {service.provider?.rating ? `⭐ ${service.provider.rating.toFixed(1)}/5` : '★ New provider'} · Campus Provider
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                      {service.provider?.rating
+                        ? (<><svg width="12" height="12" viewBox="0 0 24 24" fill="#f59e0b" stroke="#f59e0b" strokeWidth="1"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> {service.provider.rating.toFixed(1)}/5</>)
+                        : (<><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#888" strokeWidth="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> New provider</>)
+                      }
+                    </span>{' '}· Campus Provider
                   </div>
                   {service.provider?.id && (
                     <Link
@@ -224,7 +234,10 @@ export default async function ServiceDetailPage({ params }: { params: Params }) 
             />
 
             <div style={{ padding: '14px 16px', background: '#e8f5e9', border: '2px solid #1B5E20', fontSize: '13px', color: '#1B5E20', lineHeight: 1.5 }}>
-              ✅ <strong>Active provider:</strong> {service.response_time ? `Response time is ${service.response_time}.` : ''} This provider is active on campus.
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#1B5E20" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                <strong>Active provider:</strong> {service.response_time ? `Response time is ${service.response_time}.` : ''} This provider is active on campus.
+              </span>
             </div>
           </div>
         </div>

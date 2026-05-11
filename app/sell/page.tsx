@@ -235,7 +235,9 @@ export default function SellPage() {
       </div>
       <div className="container" style={{ paddingTop: '60px', paddingBottom: '80px' }}>
         <div style={{ maxWidth: '520px', border: '3px solid #1B5E20', background: '#fff', boxShadow: '8px 8px 0 #1B5E20', padding: '40px' }}>
-          <div style={{ fontSize: '48px', marginBottom: '16px' }}>🏪</div>
+          <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'center', color: '#1B5E20' }}>
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+          </div>
           <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '26px', letterSpacing: '-0.5px', marginBottom: '14px' }}>
             SELLER SUBSCRIPTION REQUIRED
           </div>
@@ -313,7 +315,7 @@ export default function SellPage() {
           {/* Profile incomplete warning */}
           {!profileReady && (
             <div style={{ background: '#fff8e1', border: '2px solid #f59e0b', padding: '16px 20px', marginBottom: '24px', display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
-              <span style={{ fontSize: '20px', flexShrink: 0 }}>⚠️</span>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2" strokeLinecap="round" style={{ flexShrink: 0, marginTop: '2px' }}><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
               <div>
                 <div style={{ fontWeight: 700, fontSize: '14px', color: '#92400e', marginBottom: '4px' }}>Complete your profile first</div>
                 <p style={{ fontSize: '13px', color: '#78350f', margin: '0 0 10px' }}>
@@ -328,7 +330,7 @@ export default function SellPage() {
 
           {error && (
             <div style={{ background: '#fee2e2', border: '2px solid #ef4444', padding: '12px 16px', marginBottom: '24px', fontSize: '14px', color: '#dc2626', fontWeight: 600, display: 'flex', gap: '8px' }}>
-              <span>⚠️</span><span>{error}</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#dc2626" strokeWidth="2" strokeLinecap="round" style={{ flexShrink: 0 }}><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><span>{error}</span>
             </div>
           )}
 
@@ -357,7 +359,9 @@ export default function SellPage() {
                   </div>
                 ) : (
                   <div>
-                    <div style={{ fontSize: '36px', marginBottom: '8px' }}>📷</div>
+                    <div style={{ marginBottom: '8px', display: 'flex', justifyContent: 'center', color: '#888' }}>
+                      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                    </div>
                     <div style={{ fontWeight: 700, fontSize: '14px', marginBottom: '4px' }}>Click to upload a photo</div>
                     <div style={{ color: '#888', fontSize: '12px' }}>JPG, PNG or WebP · Max 5MB</div>
                   </div>

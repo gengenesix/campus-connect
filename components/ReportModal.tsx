@@ -50,12 +50,21 @@ export default function ReportModal({ productId, serviceId, reportedUserId, item
     }
   }
 
+  const reportBtnContent = (
+    <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/>
+      </svg>
+      Report
+    </span>
+  )
+
   if (!user) return (
     <button
       onClick={() => router.push('/auth/login')}
       style={{ background: 'none', border: 'none', color: '#bbb', fontSize: '12px', cursor: 'pointer', fontFamily: '"Space Grotesk", sans-serif', padding: '4px 0' }}
     >
-      ⚑ Report
+      {reportBtnContent}
     </button>
   )
 
@@ -67,7 +76,7 @@ export default function ReportModal({ productId, serviceId, reportedUserId, item
         onMouseEnter={e => (e.currentTarget.style.color = '#ff3366')}
         onMouseLeave={e => (e.currentTarget.style.color = '#bbb')}
       >
-        ⚑ Report
+        {reportBtnContent}
       </button>
 
       {open && (

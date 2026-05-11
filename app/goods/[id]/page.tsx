@@ -202,11 +202,13 @@ export default async function GoodDetailPage({ params }: { params: Params }) {
               }}>
                 {product.in_stock ? '✓ IN STOCK' : '✕ OUT OF STOCK'}
               </span>
-              <span style={{ padding: '6px 14px', background: '#fff', fontWeight: 600, fontSize: '11px', border: '2px solid #eee', color: '#888' }}>
-                👁 {product.views} views
+              <span style={{ padding: '6px 14px', background: '#fff', fontWeight: 600, fontSize: '11px', border: '2px solid #eee', color: '#888', display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                {product.views} views
               </span>
-              <span style={{ padding: '6px 14px', background: '#fff', fontWeight: 600, fontSize: '11px', border: '2px solid #eee', color: '#888' }}>
-                🕐 {timeAgo(product.created_at)}
+              <span style={{ padding: '6px 14px', background: '#fff', fontWeight: 600, fontSize: '11px', border: '2px solid #eee', color: '#888', display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                {timeAgo(product.created_at)}
               </span>
             </div>
           </div>
@@ -249,7 +251,7 @@ export default async function GoodDetailPage({ params }: { params: Params }) {
                     )}
                   </div>
                   <div style={{ fontSize: '13px', color: '#888', marginTop: '2px' }}>
-                    {product.seller?.rating ? `⭐ ${product.seller.rating.toFixed(1)}/5` : '★ New seller'} · Campus Seller
+                    {product.seller?.rating ? <><svg width="12" height="12" viewBox="0 0 24 24" fill="#f59e0b" style={{display:'inline',verticalAlign:'middle',marginRight:'3px'}}><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>{product.seller.rating.toFixed(1)}/5</> : '★ New seller'} · Campus Seller
                   </div>
                   {product.seller?.id && (
                     <Link
@@ -272,7 +274,10 @@ export default async function GoodDetailPage({ params }: { params: Params }) {
             />
 
             <div style={{ padding: '14px 16px', background: '#fffbeb', border: '2px solid #f59e0b', fontSize: '13px', color: '#92400e', lineHeight: 1.5 }}>
-              🛡️ <strong>Safety tip:</strong> Always meet in a public place on campus (library, SRC). Never transfer money before seeing the item in person.
+              <span style={{ display: 'inline-flex', alignItems: 'flex-start', gap: '8px' }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#92400e" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: '1px' }}><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+                <span><strong>Safety tip:</strong> Always meet in a public place on campus (library, SRC). Never transfer money before seeing the item in person.</span>
+              </span>
             </div>
           </div>
         </div>

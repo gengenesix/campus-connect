@@ -166,7 +166,11 @@ export default function UniServicesPage() {
                 boxShadow: allUnis ? '3px 3px 0 #111' : 'none',
               }}
             >
-              {allUnis ? '🌍 ALL UNIS' : '🏫 THIS UNI'}
+              {allUnis ? (
+                <><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" style={{display:'inline',verticalAlign:'middle',marginRight:'5px'}}><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>ALL UNIS</>
+              ) : (
+                <><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" style={{display:'inline',verticalAlign:'middle',marginRight:'5px'}}><rect x="3" y="9" width="18" height="12"/><path d="M3 9l9-6 9 6"/><path d="M9 21V12h6v9"/></svg>THIS UNI</>
+              )}
             </button>
           </div>
         </div>
@@ -207,7 +211,9 @@ export default function UniServicesPage() {
           </div>
         ) : services.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '80px 20px' }}>
-            <div style={{ fontSize: '48px', marginBottom: '16px' }}>🔍</div>
+            <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'center', color: '#ccc' }}>
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            </div>
             <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '28px', marginBottom: '10px' }}>
               {hasFilters ? 'NO SERVICES FOUND' : allUnis ? 'NO SERVICES YET' : `NO SERVICES AT ${uni.shortName.toUpperCase()} YET`}
             </div>

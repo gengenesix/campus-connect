@@ -480,7 +480,8 @@ body {
 
 @media (max-width: 768px) {
   .hero-visuals {
-    height: 400px;
+    height: auto;
+    min-height: 280px;
   }
 }
 

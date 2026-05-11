@@ -193,7 +193,10 @@ export default function PublicProfilePage() {
                   onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#1B5E20' }}
                   onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#111' }}
                 >
-                  💬 MESSAGE
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '7px' }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                    MESSAGE
+                  </span>
                 </button>
               )}
               {!user && (
@@ -205,7 +208,10 @@ export default function PublicProfilePage() {
                     border: '2px solid #111', textDecoration: 'none', display: 'inline-block',
                   }}
                 >
-                  🔒 LOGIN TO MESSAGE
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '7px' }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    LOGIN TO MESSAGE
+                  </span>
                 </Link>
               )}
             </div>
@@ -221,7 +227,10 @@ export default function PublicProfilePage() {
                 </span>
                 {profile.rating > 0 && (
                   <span style={{ fontSize: '13px', color: '#888', fontWeight: 600 }}>
-                    ⭐ {Number(profile.rating).toFixed(1)} · {profile.total_reviews} review{profile.total_reviews !== 1 ? 's' : ''}
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="#f59e0b" stroke="#f59e0b" strokeWidth="1"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                      {Number(profile.rating).toFixed(1)} · {profile.total_reviews} review{profile.total_reviews !== 1 ? 's' : ''}
+                    </span>
                   </span>
                 )}
                 <span style={{ fontSize: '12px', color: '#aaa' }}>Member since {memberSince}</span>
@@ -317,7 +326,9 @@ export default function PublicProfilePage() {
 
         {listings.length === 0 && (
           <div style={{ textAlign: 'center', padding: '40px 20px', color: '#888', border: '2px dashed #ddd', background: '#fff' }}>
-            <div style={{ fontSize: '36px', marginBottom: '8px' }}>📭</div>
+            <div style={{ marginBottom: '8px', display: 'flex', justifyContent: 'center', color: '#ccc' }}>
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>
+            </div>
             <div style={{ fontWeight: 700 }}>No active listings yet</div>
           </div>
         )}

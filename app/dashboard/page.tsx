@@ -92,10 +92,10 @@ export default function DashboardPage() {
   const firstName = profile?.name?.split(' ')[0] ?? 'there'
 
   const stats = [
-    { label: 'My Listings', value: dataLoading ? '—' : String(myListings.length), icon: '📦', color: '#5d3fd3', href: '/my-listings' },
-    { label: 'Active', value: dataLoading ? '—' : String(activeListings), icon: '✅', color: '#1B5E20', href: '/my-listings' },
-    { label: 'Unread Messages', value: dataLoading ? '—' : String(unreadCount), icon: '💬', color: '#ff3366', href: '/messages' },
-    { label: 'My Bookings', value: dataLoading ? '—' : String(myBookings.length), icon: '📅', color: '#111', href: '/bookings' },
+    { label: 'My Listings', value: dataLoading ? '—' : String(myListings.length), icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M16.5 9.4l-9-5.19M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>, color: '#5d3fd3', href: '/my-listings' },
+    { label: 'Active', value: dataLoading ? '—' : String(activeListings), icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>, color: '#1B5E20', href: '/my-listings' },
+    { label: 'Unread Messages', value: dataLoading ? '—' : String(unreadCount), icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>, color: '#ff3366', href: '/messages' },
+    { label: 'My Bookings', value: dataLoading ? '—' : String(myBookings.length), icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>, color: '#111', href: '/bookings' },
   ]
 
   if (loading) {
@@ -123,7 +123,7 @@ export default function DashboardPage() {
                 DASHBOARD
               </div>
               <p style={{ color: '#666', marginTop: '4px', fontSize: '14px' }}>
-                Welcome back, {firstName} 👋 · {profile?.department ?? 'Campus Student'}
+                Welcome back, {firstName} · {profile?.department ?? 'Campus Student'}
               </p>
             </div>
             <Link
@@ -152,7 +152,7 @@ export default function DashboardPage() {
                 onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = 'translate(-2px,-2px)'; (e.currentTarget as HTMLElement).style.boxShadow = '6px 6px 0 #111' }}
                 onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = 'none'; (e.currentTarget as HTMLElement).style.boxShadow = '4px 4px 0 #111' }}
               >
-                <div style={{ fontSize: '22px', marginBottom: '10px' }}>{stat.icon}</div>
+                <div style={{ marginBottom: '10px', color: stat.color }}>{stat.icon}</div>
                 <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '36px', color: stat.color, lineHeight: 1 }}>{stat.value}</div>
                 <div style={{ fontSize: '12px', color: '#888', fontWeight: 600, marginTop: '6px', letterSpacing: '0.5px' }}>{stat.label}</div>
               </div>
@@ -166,7 +166,7 @@ export default function DashboardPage() {
           if (!isActive) {
             return (
               <div style={{ marginBottom: '24px', padding: '18px 24px', background: '#fff', border: '2px solid #ff3366', display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap', boxShadow: '4px 4px 0 #ff3366' }}>
-                <div style={{ fontSize: '28px' }}>🔒</div>
+                <div style={{ color: '#ff3366' }}><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
                 <div style={{ flex: 1, minWidth: '200px' }}>
                   <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '15px', marginBottom: '3px' }}>NO ACTIVE SELLER SUBSCRIPTION</div>
                   <div style={{ color: '#888', fontSize: '13px' }}>Subscribe for GHS 20/month to list goods and services on Campus Connect.</div>
@@ -181,7 +181,7 @@ export default function DashboardPage() {
           const expiring = daysLeft <= 7
           return (
             <div style={{ marginBottom: '24px', padding: '16px 24px', background: '#fff', border: `2px solid ${expiring ? '#f59e0b' : '#1B5E20'}`, display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
-              <div style={{ fontSize: '22px' }}>{expiring ? '⚠️' : '✅'}</div>
+              <div style={{ color: expiring ? '#f59e0b' : '#1B5E20' }}>{expiring ? <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> : <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg>}</div>
               <div style={{ flex: 1, minWidth: '200px' }}>
                 <div style={{ fontWeight: 700, fontSize: '14px', color: expiring ? '#92400e' : '#1B5E20', marginBottom: '2px' }}>
                   {expiring ? `SUBSCRIPTION EXPIRING IN ${daysLeft} DAY${daysLeft !== 1 ? 'S' : ''}` : 'SELLER SUBSCRIPTION ACTIVE'}
@@ -228,7 +228,7 @@ export default function DashboardPage() {
                       {listing.image_url ? (
                         <Image src={listing.image_url} alt={listing.title} width={52} height={52} style={{ objectFit: 'cover', border: '1px solid #eee', flexShrink: 0 }} />
                       ) : (
-                        <div style={{ width: '52px', height: '52px', background: '#f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', flexShrink: 0 }}>📦</div>
+                        <div style={{ width: '52px', height: '52px', background: '#f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, color: '#bbb' }}><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M16.5 9.4l-9-5.19M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg></div>
                       )}
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ fontWeight: 700, fontSize: '13px', marginBottom: '2px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{listing.title}</div>
@@ -283,7 +283,7 @@ export default function DashboardPage() {
                       {booking.service?.image_url ? (
                         <Image src={booking.service.image_url} alt={booking.service.name} width={52} height={52} style={{ objectFit: 'cover', border: '1px solid #eee', flexShrink: 0 }} />
                       ) : (
-                        <div style={{ width: '52px', height: '52px', background: '#f0fdf4', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', flexShrink: 0 }}>🛠️</div>
+                        <div style={{ width: '52px', height: '52px', background: '#f0fdf4', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, color: '#86efac' }}><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></div>
                       )}
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ fontWeight: 700, fontSize: '13px', marginBottom: '2px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{booking.service?.name ?? 'Service'}</div>
@@ -317,11 +317,11 @@ export default function DashboardPage() {
           </div>
           <div style={{ padding: '20px', display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '12px' }}>
             {[
-              { href: '/sell', label: 'Sell Item', icon: '📦', color: '#5d3fd3' },
-              { href: '/offer-service', label: 'Offer Service', icon: '🛠️', color: '#1B5E20' },
-              { href: '/bookings', label: 'My Bookings', icon: '📅', color: '#111' },
-              { href: '/messages', label: 'Messages', icon: '💬', color: '#ff3366' },
-              { href: '/profile', label: 'Edit Profile', icon: '👤', color: '#444' },
+              { href: '/sell', label: 'Sell Item', color: '#5d3fd3', icon: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M16.5 9.4l-9-5.19M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg> },
+              { href: '/offer-service', label: 'Offer Service', color: '#1B5E20', icon: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg> },
+              { href: '/bookings', label: 'My Bookings', color: '#111', icon: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> },
+              { href: '/messages', label: 'Messages', color: '#ff3366', icon: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> },
+              { href: '/profile', label: 'Edit Profile', color: '#444', icon: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> },
             ].map(action => (
               <Link key={action.href} href={action.href} style={{ textDecoration: 'none' }}>
                 <div style={{ textAlign: 'center', padding: '20px 12px', border: '2px solid #eee', transition: '0.15s', background: '#fff', cursor: 'pointer' }}
@@ -336,7 +336,7 @@ export default function DashboardPage() {
                     ;(e.currentTarget as HTMLElement).style.boxShadow = 'none'
                   }}
                 >
-                  <div style={{ fontSize: '28px', marginBottom: '8px' }}>{action.icon}</div>
+                  <div style={{ marginBottom: '8px', display: 'flex', justifyContent: 'center', color: action.color }}>{action.icon}</div>
                   <div style={{ fontWeight: 700, fontSize: '12px', letterSpacing: '0.5px', color: '#111' }}>{action.label}</div>
                 </div>
               </Link>
@@ -347,7 +347,9 @@ export default function DashboardPage() {
         {/* Profile Setup Prompt */}
         {(!profile?.department || !profile?.phone) && (
           <div style={{ marginTop: '24px', padding: '20px 24px', background: '#fff', border: '2px solid #f59e0b', display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
-            <div style={{ fontSize: '32px' }}>⚡</div>
+            <div style={{ color: '#f59e0b' }}>
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            </div>
             <div style={{ flex: 1 }}>
               <div style={{ fontWeight: 700, fontSize: '15px', marginBottom: '4px' }}>Complete your profile to get more views</div>
               <div style={{ color: '#888', fontSize: '13px' }}>Add a profile photo, bio, and phone number to build trust with buyers and sellers.</div>

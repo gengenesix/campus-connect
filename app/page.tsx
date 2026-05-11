@@ -149,6 +149,7 @@ export default function HomePage() {
         }
         .showcase-inner { display: flex; gap: 14px; width: max-content; }
         .showcase-item { width: 210px; height: 310px; flex-shrink: 0; }
+        .hero-mobile-strip { display: none; }
         @media (max-width: 768px) {
           .showcase-scroll { overflow-x: visible; padding-left: 16px; padding-right: 16px; padding-bottom: 0; }
           .showcase-inner { display: grid; grid-template-columns: 1fr 1fr; width: 100%; gap: 10px; }
@@ -157,9 +158,10 @@ export default function HomePage() {
           .showcase-label { font-size: 15px !important; }
           .showcase-sublabel { display: none; }
           .uni-grid { grid-template-columns: repeat(2, 1fr) !important; }
-          .hero-photo-mosaic { display: none !important; }
           .trust-grid { grid-template-columns: 1fr 1fr !important; gap: 20px !important; }
           .how-grid { grid-template-columns: 1fr !important; }
+          .hero-photo-mosaic { display: none !important; }
+          .hero-mobile-strip { display: block !important; width: 100%; }
         }
         @media (min-width: 769px) and (max-width: 1024px) {
           .showcase-item { width: 175px; height: 260px; }
@@ -209,8 +211,9 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* RIGHT — clean 2×2 photo mosaic */}
+        {/* RIGHT — 2×2 photo mosaic (desktop full, mobile strip) */}
         <div className="hero-visuals" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          {/* Desktop mosaic */}
           <div className="hero-photo-mosaic" style={{ position: 'relative', width: '100%', maxWidth: '460px' }}>
             <div style={{
               display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px',
@@ -256,6 +259,20 @@ export default function HomePage() {
               43 UNIS · ZERO FEES
             </div>
           </div>
+
+          {/* Mobile hero image strip — shows below text on small screens */}
+          <div className="hero-mobile-strip">
+            <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', scrollbarWidth: 'none', paddingBottom: '4px' }}>
+              {HERO_PHOTOS.map((photo, i) => (
+                <div key={i} style={{ flexShrink: 0, width: '42vw', maxWidth: '160px', height: '130px', border: '2px solid #111', overflow: 'hidden', position: 'relative' }}>
+                  <img src={photo.src} alt={photo.alt} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/placeholder.jpg' }} />
+                  {i === 0 && <div style={{ position: 'absolute', bottom: 6, left: 6, background: '#1B5E20', color: '#fff', fontSize: '8px', fontWeight: 700, letterSpacing: '1px', padding: '2px 6px', fontFamily: '"Space Grotesk", sans-serif' }}>SERVICES</div>}
+                  {i === 2 && <div style={{ position: 'absolute', bottom: 6, left: 6, background: '#5d3fd3', color: '#fff', fontSize: '8px', fontWeight: 700, letterSpacing: '1px', padding: '2px 6px', fontFamily: '"Space Grotesk", sans-serif' }}>GOODS</div>}
+                </div>
+              ))}
+            </div>
+            <div style={{ marginTop: '8px', fontSize: '11px', color: '#999', fontWeight: 600, letterSpacing: '0.5px' }}>43 UNIS · ZERO FEES · ZERO COMMISSION</div>
+          </div>
         </div>
       </section>
 
@@ -288,68 +305,113 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* UNIVERSITY FINDER — search-first, 8 default */}
-      <section id="universities" style={{ background: '#f8f8f8', padding: '64px 20px', borderBottom: '2px solid #111' }}>
+      {/* UNIVERSITY FINDER — search-first */}
+      <section id="universities" style={{ background: '#fff', padding: '72px 20px', borderBottom: '2px solid #111' }}>
         <div className="container">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '16px', marginBottom: '32px' }}>
-            <div>
-              <div style={{ fontFamily: '"Space Grotesk", sans-serif', fontSize: '11px', fontWeight: 700, letterSpacing: '3px', color: '#5d3fd3', marginBottom: '8px' }}>
-                ALL 43 INSTITUTIONS
-              </div>
-              <h2 style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: 'clamp(28px, 5vw, 48px)', lineHeight: 1, margin: 0 }}>
-                FIND YOUR<br /><span style={{ color: '#1B5E20' }}>UNIVERSITY</span>
-              </h2>
+          {/* Header */}
+          <div style={{ textAlign: 'center', marginBottom: '48px' }}>
+            <div style={{
+              display: 'inline-flex', alignItems: 'center', gap: '8px',
+              background: '#1B5E20', color: '#fff', padding: '6px 16px',
+              fontFamily: '"Space Grotesk", sans-serif', fontSize: '11px',
+              fontWeight: 700, letterSpacing: '2px', marginBottom: '20px',
+              border: '1.5px solid #111',
+            }}>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="3" y="9" width="18" height="12" /><path d="M3 9l9-6 9 6" /><path d="M9 21V12h6v9" />
+              </svg>
+              EVERY ACCREDITED UNIVERSITY IN GHANA
             </div>
-            <p style={{ color: '#666', fontSize: '14px', maxWidth: '260px', textAlign: 'right', lineHeight: 1.6 }}>
-              Select your institution to browse goods &amp; services from your campus community
+            <h2 style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: 'clamp(32px, 5vw, 52px)', lineHeight: 0.95, margin: 0, letterSpacing: '-1px' }}>
+              FIND YOUR<br /><span style={{ color: '#1B5E20' }}>CAMPUS</span>
+            </h2>
+            <p style={{ color: '#666', fontSize: '16px', marginTop: '16px', maxWidth: '440px', marginLeft: 'auto', marginRight: 'auto', lineHeight: 1.6 }}>
+              Campus Connect serves all 43 accredited universities in Ghana — public, technical, and private.
             </p>
           </div>
 
-          <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginBottom: '28px', alignItems: 'center' }}>
-            <input
-              type="text"
-              placeholder="Search universities..."
-              value={uniSearch}
-              onChange={e => { setUniSearch(e.target.value); if (e.target.value) setShowAllUnis(true) }}
-              style={{
-                flex: '1', minWidth: '200px', maxWidth: '340px',
-                padding: '11px 16px', border: '2px solid #111',
-                fontFamily: '"Space Grotesk", sans-serif', fontSize: '14px',
-                fontWeight: 600, outline: 'none', background: '#fff',
-              }}
-            />
-            {([['', 'ALL'], ['public', 'PUBLIC'], ['technical', 'TECHNICAL'], ['private', 'PRIVATE']] as const).map(([val, label]) => (
-              <button
-                key={label}
-                onClick={() => { setUniType(val as '' | UniversityType); if (val) setShowAllUnis(true) }}
-                style={{
-                  padding: '11px 18px', border: '2px solid #111',
-                  fontFamily: '"Archivo Black", sans-serif', fontSize: '11px',
-                  letterSpacing: '0.5px', cursor: 'pointer', transition: 'all 0.15s',
-                  background: uniType === val ? '#111' : '#fff',
-                  color: uniType === val ? '#fff' : '#111',
-                }}
+          {/* Search bar — prominent */}
+          <div style={{ maxWidth: '560px', margin: '0 auto 36px', position: 'relative' }}>
+            <div style={{ position: 'relative' }}>
+              <svg
+                width="18" height="18" viewBox="0 0 24 24" fill="none"
+                stroke="#999" strokeWidth="2.2" strokeLinecap="round"
+                style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }}
               >
-                {label}
-              </button>
-            ))}
+                <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
+              </svg>
+              <input
+                type="text"
+                placeholder="Type your university name or city..."
+                value={uniSearch}
+                onChange={e => { setUniSearch(e.target.value); if (e.target.value) setShowAllUnis(true) }}
+                style={{
+                  width: '100%', padding: '16px 56px 16px 48px',
+                  border: '2px solid #111', fontSize: '15px',
+                  fontFamily: '"Space Grotesk", sans-serif', fontWeight: 600,
+                  outline: 'none', background: '#fff', boxSizing: 'border-box',
+                  boxShadow: '4px 4px 0 #111', transition: 'box-shadow 0.15s',
+                }}
+                onFocus={e => (e.currentTarget.style.boxShadow = '4px 4px 0 #1B5E20')}
+                onBlur={e => (e.currentTarget.style.boxShadow = '4px 4px 0 #111')}
+              />
+              {uniSearch && (
+                <button
+                  onClick={() => setUniSearch('')}
+                  style={{ position: 'absolute', right: '14px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#888', fontSize: '18px', lineHeight: 1, padding: '4px 6px' }}
+                >×</button>
+              )}
+            </div>
+
+            {/* Type filter pills */}
+            <div style={{ display: 'flex', gap: '8px', marginTop: '12px', flexWrap: 'wrap' }}>
+              {([['', 'ALL TYPES'], ['public', 'PUBLIC'], ['technical', 'TECHNICAL'], ['private', 'PRIVATE']] as const).map(([val, label]) => (
+                <button
+                  key={label}
+                  onClick={() => { setUniType(val as '' | UniversityType); if (val) setShowAllUnis(true) }}
+                  style={{
+                    padding: '7px 14px', border: '1.5px solid',
+                    borderColor: uniType === val ? '#111' : '#ddd',
+                    fontFamily: '"Space Grotesk", sans-serif', fontSize: '11px',
+                    fontWeight: 700, letterSpacing: '0.5px', cursor: 'pointer',
+                    background: uniType === val ? '#111' : '#fff',
+                    color: uniType === val ? '#fff' : '#555',
+                    transition: 'all 0.15s',
+                  }}
+                >
+                  {label}
+                </button>
+              ))}
+              <span style={{ marginLeft: 'auto', fontSize: '12px', color: '#999', display: 'flex', alignItems: 'center' }}>
+                {filteredUnis.length} universities
+              </span>
+            </div>
           </div>
 
+          {/* University grid */}
           <div className="uni-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px' }}>
             {displayedUnis.map(uni => (
               <Link key={uni.slug} href={`/uni/${uni.slug}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                <div className="uni-card" style={{ border: '2px solid #111', borderTop: `4px solid ${TYPE_COLOR[uni.type]}`, background: '#fff', padding: '16px', boxShadow: '3px 3px 0 #111', height: '100%', display: 'flex', flexDirection: 'column' }}>
+                <div className="uni-card" style={{
+                  border: '2px solid #e8e8e8', borderTop: `3px solid ${TYPE_COLOR[uni.type]}`,
+                  background: '#fff', padding: '16px',
+                  transition: 'all 0.15s', cursor: 'pointer',
+                  height: '100%', display: 'flex', flexDirection: 'column',
+                }}>
                   <div style={{ fontSize: '9px', fontFamily: '"Space Grotesk", sans-serif', fontWeight: 700, letterSpacing: '1.5px', color: TYPE_COLOR[uni.type], marginBottom: '6px', textTransform: 'uppercase' }}>
                     {uni.type}
                   </div>
-                  <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '22px', lineHeight: 1, marginBottom: '6px', color: '#111', letterSpacing: '-0.5px' }}>
+                  <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '20px', lineHeight: 1, marginBottom: '5px', color: '#111', letterSpacing: '-0.5px' }}>
                     {uni.shortName}
                   </div>
-                  <div style={{ fontSize: '11px', color: '#555', lineHeight: 1.45, flexGrow: 1, marginBottom: '10px' }}>
+                  <div style={{ fontSize: '11px', color: '#666', lineHeight: 1.45, flexGrow: 1, marginBottom: '10px' }}>
                     {uni.name}
                   </div>
-                  <div style={{ fontSize: '10px', color: '#999', fontWeight: 700, letterSpacing: '0.5px', borderTop: '1px solid #f0f0f0', paddingTop: '8px' }}>
-                    {uni.city} · {uni.region}
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: '1px solid #f5f5f5', paddingTop: '8px' }}>
+                    <span style={{ fontSize: '10px', color: '#aaa', fontWeight: 600 }}>{uni.city}</span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ccc" strokeWidth="2.5" strokeLinecap="round">
+                      <polyline points="9 18 15 12 9 6" />
+                    </svg>
                   </div>
                 </div>
               </Link>
@@ -357,16 +419,20 @@ export default function HomePage() {
           </div>
 
           {filteredUnis.length === 0 && (
-            <div style={{ textAlign: 'center', padding: '48px 20px', color: '#888', border: '2px dashed #ddd' }}>
-              <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '20px', marginBottom: '8px' }}>NO UNIVERSITIES FOUND</div>
-              <p style={{ fontSize: '14px' }}>Try a different search term or clear the filter.</p>
+            <div style={{ textAlign: 'center', padding: '48px 20px', color: '#888', border: '2px dashed #ddd', maxWidth: '400px', margin: '0 auto' }}>
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#ddd" strokeWidth="1.5" strokeLinecap="round" style={{ marginBottom: '12px' }}>
+                <rect x="3" y="9" width="18" height="12" /><path d="M3 9l9-6 9 6" /><path d="M9 21V12h6v9" />
+              </svg>
+              <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '16px', marginBottom: '6px' }}>NO MATCH FOUND</div>
+              <p style={{ fontSize: '13px' }}>Try a different name or city.</p>
             </div>
           )}
 
+          {/* Expand/collapse */}
           <div style={{ textAlign: 'center', marginTop: '28px', display: 'flex', justifyContent: 'center', gap: '12px', flexWrap: 'wrap' }}>
             {hasMoreUnis && (
               <button className="uni-expand-btn" onClick={() => setShowAllUnis(true)}>
-                SEE ALL {filteredUnis.length} UNIVERSITIES ↓
+                VIEW ALL {filteredUnis.length} UNIVERSITIES ↓
               </button>
             )}
             {!isUniFiltering && showAllUnis && filteredUnis.length > INITIAL_UNI_COUNT && (
@@ -376,12 +442,17 @@ export default function HomePage() {
             )}
           </div>
 
-          <p style={{ marginTop: '20px', fontSize: '12px', color: '#999', fontWeight: 600 }}>
-            Showing {displayedUnis.length} of {GHANA_UNIVERSITIES.length} institutions ·
-            <span style={{ color: TYPE_COLOR.public }}> ■ Public</span>
-            <span style={{ color: TYPE_COLOR.technical }}> ■ Technical</span>
-            <span style={{ color: TYPE_COLOR.private }}> ■ Private</span>
-          </p>
+          <div style={{ textAlign: 'center', marginTop: '16px', display: 'flex', justifyContent: 'center', gap: '16px', flexWrap: 'wrap' }}>
+            <span style={{ fontSize: '11px', color: '#aaa', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <span style={{ width: '8px', height: '8px', background: TYPE_COLOR.public, display: 'inline-block' }} /> Public
+            </span>
+            <span style={{ fontSize: '11px', color: '#aaa', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <span style={{ width: '8px', height: '8px', background: TYPE_COLOR.technical, display: 'inline-block' }} /> Technical
+            </span>
+            <span style={{ fontSize: '11px', color: '#aaa', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <span style={{ width: '8px', height: '8px', background: TYPE_COLOR.private, display: 'inline-block' }} /> Private
+            </span>
+          </div>
         </div>
       </section>
 

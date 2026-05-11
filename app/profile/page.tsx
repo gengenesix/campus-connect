@@ -399,8 +399,9 @@ export default function ProfilePage() {
                     PROFILE {completenessScore}% COMPLETE
                   </span>
                   {isSellerOrProvider && missingRequired.length > 0 && (
-                    <span style={{ fontSize: '11px', color: '#f59e0b', fontWeight: 700 }}>
-                      ⚠️ {missingRequired.join(', ')} required to list
+                    <span style={{ fontSize: '11px', color: '#f59e0b', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                      {missingRequired.join(', ')} required to list
                     </span>
                   )}
                 </div>
@@ -806,7 +807,9 @@ export default function ProfilePage() {
               <div style={{ padding: '20px 24px' }}>
                 {emailStep === 'verified' ? (
                   <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                    <div style={{ fontSize: '32px' }}>🎓</div>
+                    <div style={{ color: '#1B5E20' }}>
+                      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+                    </div>
                     <div>
                       <div style={{ fontWeight: 700, fontSize: '14px', color: '#1B5E20' }}>{verifiedUniEmail}</div>
                       <div style={{ fontSize: '12px', color: '#666', marginTop: '3px', lineHeight: 1.5 }}>
@@ -888,11 +891,13 @@ export default function ProfilePage() {
                 <span style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '14px', letterSpacing: '0.5px' }}>ACCOUNT</span>
               </div>
               <div style={{ padding: '20px 24px', display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-                <Link href="/messages" style={{ padding: '10px 20px', border: '2px solid #111', fontWeight: 700, fontSize: '13px', textDecoration: 'none', color: '#111', boxShadow: '3px 3px 0 #111' }}>
-                  💬 Messages
+                <Link href="/messages" style={{ padding: '10px 20px', border: '2px solid #111', fontWeight: 700, fontSize: '13px', textDecoration: 'none', color: '#111', boxShadow: '3px 3px 0 #111', display: 'inline-flex', alignItems: 'center', gap: '7px' }}>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                  Messages
                 </Link>
-                <Link href="/my-listings" style={{ padding: '10px 20px', border: '2px solid #111', fontWeight: 700, fontSize: '13px', textDecoration: 'none', color: '#111', boxShadow: '3px 3px 0 #111' }}>
-                  📦 My Listings
+                <Link href="/my-listings" style={{ padding: '10px 20px', border: '2px solid #111', fontWeight: 700, fontSize: '13px', textDecoration: 'none', color: '#111', boxShadow: '3px 3px 0 #111', display: 'inline-flex', alignItems: 'center', gap: '7px' }}>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+                  My Listings
                 </Link>
                 <Link href="/sell" style={{ padding: '10px 20px', background: '#1B5E20', color: '#fff', border: '2px solid #111', fontFamily: '"Archivo Black", sans-serif', fontSize: '13px', textDecoration: 'none', boxShadow: '3px 3px 0 #111' }}>
                   + SELL AN ITEM

@@ -218,7 +218,7 @@ export default function AdminDashboard() {
     if (!confirm(current ? 'Unban this user?' : 'Ban this user?')) return
     setActionId(userId)
     const { error } = await supabase.from('profiles').update({ is_banned: !current }).eq('id', userId)
-    if (!error) { setUsers(prev => prev.map(u => u.id === userId ? { ...u, is_banned: !current } : u)); showToast(current ? 'User unbanned.' : '🚫 User banned.') }
+    if (!error) { setUsers(prev => prev.map(u => u.id === userId ? { ...u, is_banned: !current } : u)); showToast(current ? 'User unbanned.' : 'User banned.') }
     else showToast(error.message, 'err')
     setActionId(null)
   }
@@ -306,7 +306,7 @@ export default function AdminDashboard() {
   }
 
   const tabs = [
-    { key: 'pending' as const,  label: pendingCount > 0 ? `⚠ PENDING (${pendingCount})` : 'PENDING', urgent: pendingCount > 0 },
+    { key: 'pending' as const,  label: pendingCount > 0 ? `! PENDING (${pendingCount})` : 'PENDING', urgent: pendingCount > 0 },
     { key: 'users' as const,    label: `USERS (${users.length})`, urgent: false },
     { key: 'listings' as const, label: `LISTINGS (${products.filter(p => p.status !== 'pending').length})`, urgent: false },
     { key: 'services' as const, label: `SERVICES (${services.filter(s => s.status !== 'pending').length})`, urgent: false },
@@ -325,7 +325,10 @@ export default function AdminDashboard() {
               <span style={{ background: '#ff3366', color: '#fff', fontSize: '11px', fontWeight: 700, padding: '3px 10px', letterSpacing: '1px' }}>SUPER ADMIN</span>
               {pendingCount > 0 && (
                 <span style={{ background: '#f59e0b', color: '#000', fontSize: '11px', fontWeight: 900, padding: '3px 10px', letterSpacing: '1px' }}>
-                  ⚠ {pendingCount} AWAITING APPROVAL
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                    {pendingCount} AWAITING APPROVAL
+                  </span>
                 </span>
               )}
             </div>
@@ -408,7 +411,9 @@ export default function AdminDashboard() {
         {!loadingData && activeTab === 'pending' && (
           pendingCount === 0 ? (
             <div style={{ textAlign: 'center', padding: '80px 20px', border: '2px solid #111', background: '#fff', boxShadow: '6px 6px 0 #111' }}>
-              <div style={{ fontSize: '56px', marginBottom: '16px' }}>✅</div>
+              <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'center', color: '#1B5E20' }}>
+                <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+              </div>
               <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '24px', marginBottom: '10px' }}>ALL CLEAR</div>
               <p style={{ color: '#888' }}>No listings or services awaiting approval.</p>
             </div>
@@ -425,7 +430,7 @@ export default function AdminDashboard() {
                       <div key={p.id} style={{ background: '#fff', border: '2px solid #f59e0b', borderLeft: '5px solid #f59e0b', padding: '16px', display: 'grid', gridTemplateColumns: '60px 1fr auto', gap: '16px', alignItems: 'center' }}>
                         {p.image_url
                           ? <Image src={p.image_url} alt={p.title} width={60} height={60} style={{ objectFit: 'cover', border: '1px solid #eee' }} />
-                          : <div style={{ width: '60px', height: '60px', background: '#f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px' }}>📦</div>
+                          : <div style={{ width: '60px', height: '60px', background: '#f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#888' }}><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg></div>
                         }
                         <div>
                           <div style={{ fontWeight: 700, fontSize: '15px', marginBottom: '4px' }}>{p.title}</div>
@@ -464,7 +469,7 @@ export default function AdminDashboard() {
                       <div key={s.id} style={{ background: '#fff', border: '2px solid #f59e0b', borderLeft: '5px solid #f59e0b', padding: '16px', display: 'grid', gridTemplateColumns: '60px 1fr auto', gap: '16px', alignItems: 'center' }}>
                         {s.image_url
                           ? <Image src={s.image_url} alt={s.name} width={60} height={60} style={{ objectFit: 'cover', border: '1px solid #eee' }} />
-                          : <div style={{ width: '60px', height: '60px', background: '#f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px' }}>🛠</div>
+                          : <div style={{ width: '60px', height: '60px', background: '#f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#888' }}><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></div>
                         }
                         <div>
                           <div style={{ fontWeight: 700, fontSize: '15px', marginBottom: '4px' }}>{s.name}</div>
@@ -561,7 +566,7 @@ export default function AdminDashboard() {
                           cursor: actionId === u.id ? 'not-allowed' : 'pointer', whiteSpace: 'nowrap',
                         }}
                       >
-                        {actionId === u.id ? '...' : u.is_banned ? '↩ UNBAN' : '🚫 BAN'}
+                        {actionId === u.id ? '...' : u.is_banned ? '↩ UNBAN' : '⊘ BAN'}
                       </button>
                     )}
                   </div>
@@ -584,7 +589,7 @@ export default function AdminDashboard() {
                   <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flex: 1, minWidth: 0 }}>
                     {p.image_url
                       ? <Image src={p.image_url} alt={p.title} width={52} height={52} style={{ objectFit: 'cover', border: '1px solid #eee', flexShrink: 0 }} />
-                      : <div style={{ width: '52px', height: '52px', background: '#f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', flexShrink: 0 }}>📦</div>
+                      : <div style={{ width: '52px', height: '52px', background: '#f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#888', flexShrink: 0 }}><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg></div>
                     }
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ fontWeight: 700, fontSize: '14px', marginBottom: '3px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.title}</div>
@@ -653,7 +658,9 @@ export default function AdminDashboard() {
               <div style={{ textAlign: 'center', padding: '60px', color: '#888' }}>Loading reports...</div>
             ) : reports.length === 0 ? (
               <div style={{ textAlign: 'center', padding: '80px 20px', border: '2px solid #111', background: '#fff', boxShadow: '6px 6px 0 #111' }}>
-                <div style={{ fontSize: '48px', marginBottom: '12px' }}>🛡️</div>
+                <div style={{ marginBottom: '12px', display: 'flex', justifyContent: 'center', color: '#1B5E20' }}>
+                  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                </div>
                 <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '22px', marginBottom: '8px' }}>ALL CLEAR</div>
                 <p style={{ color: '#888', fontSize: '14px' }}>No pending reports.</p>
               </div>

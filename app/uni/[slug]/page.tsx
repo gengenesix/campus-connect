@@ -53,30 +53,30 @@ export default function UniHomePage() {
               href: `/uni/${uni.slug}/goods`,
               label: 'BROWSE GOODS',
               desc: 'Buy and sell second-hand items — electronics, books, clothing and more.',
-              icon: '📦',
+              icon: <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#5d3fd3" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M16.5 9.4l-9-5.19M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>,
               accent: '#5d3fd3',
             },
             {
               href: `/uni/${uni.slug}/services`,
               label: 'FIND SERVICES',
               desc: 'Book student services — tutoring, barbing, laundry, photography and more.',
-              icon: '🛠️',
+              icon: <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#1B5E20" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>,
               accent: '#1B5E20',
             },
             {
               href: `/sell?uni=${uni.slug}`,
               label: 'SELL AN ITEM',
               desc: 'List something for sale. Reach every student at ' + uni.shortName + '.',
-              icon: '💰',
+              icon: <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ff3366" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>,
               accent: '#ff3366',
             },
             {
               href: `/offer-service?uni=${uni.slug}`,
               label: 'OFFER A SERVICE',
               desc: 'Got skills? List your service and start earning on campus.',
-              icon: '⚡',
-              accent: '#ccff00',
-              dark: true,
+              icon: <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#b45309" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>,
+              accent: '#b45309',
+              dark: false,
             },
           ].map(card => (
             <Link
@@ -103,7 +103,7 @@ export default function UniHomePage() {
                   ;(e.currentTarget as HTMLElement).style.boxShadow = '4px 4px 0 #111'
                 }}
               >
-                <div style={{ fontSize: '32px', marginBottom: '12px' }}>{card.icon}</div>
+                <div style={{ marginBottom: '14px' }}>{card.icon}</div>
                 <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '18px', marginBottom: '8px', color: '#111' }}>
                   {card.label}
                 </div>

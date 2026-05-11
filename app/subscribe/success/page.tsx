@@ -4,7 +4,9 @@ export default function SubscribeSuccessPage() {
   return (
     <div style={{ background: '#f8f8f8', minHeight: '80vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 20px' }}>
       <div style={{ width: '100%', maxWidth: '480px', border: '3px solid #1B5E20', background: '#fff', boxShadow: '10px 10px 0 #1B5E20', padding: '48px 40px', textAlign: 'center' }}>
-        <div style={{ fontSize: '64px', marginBottom: '20px' }}>🎉</div>
+        <div style={{ marginBottom: '20px', display: 'flex', justifyContent: 'center', color: '#1B5E20' }}>
+          <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        </div>
         <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '32px', color: '#1B5E20', letterSpacing: '-1px', marginBottom: '12px' }}>
           YOU'RE IN!
         </div>
