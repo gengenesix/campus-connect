@@ -71,12 +71,13 @@ export async function POST(request: NextRequest) {
     : new Date()
   const newExpiry = new Date(base.getTime() + 30 * 24 * 60 * 60 * 1000)
 
+  const db = getServiceClient()
   await Promise.all([
-    serviceSupabase
+    db
       .from('profiles')
       .update({ subscription_expires_at: newExpiry.toISOString() })
       .eq('id', sub.user_id),
-    serviceSupabase
+    db
       .from('subscriptions')
       .update({ status: 'active', starts_at: new Date().toISOString(), ends_at: newExpiry.toISOString() })
       .eq('paystack_ref', reference),
