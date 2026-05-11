@@ -176,7 +176,20 @@ export default function ServicesPageClient({
       <div className="container" style={{ paddingTop: '28px', paddingBottom: '60px' }}>
         {services.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '80px 20px' }}>
-            <div style={{ fontSize: '48px', marginBottom: '16px' }}>{campusOnly ? '🏫' : '🔍'}</div>
+            <div style={{ marginBottom: '20px', display: 'flex', justifyContent: 'center' }}>
+              {campusOnly ? (
+                <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#1B5E20" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="3" y="9" width="18" height="12" />
+                  <path d="M3 9l9-6 9 6" />
+                  <path d="M9 21V12h6v9" />
+                </svg>
+              ) : (
+                <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#bbb" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="11" cy="11" r="8" />
+                  <path d="M21 21l-4.35-4.35" />
+                </svg>
+              )}
+            </div>
             <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '28px', marginBottom: '10px' }}>
               {campusOnly ? 'NO CAMPUS SERVICES YET' : hasFilters ? 'NO SERVICES FOUND' : 'NO SERVICES YET'}
             </div>

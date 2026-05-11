@@ -217,10 +217,10 @@ export default function SiteNav() {
                       {[
                         { href: '/dashboard', label: 'Dashboard' },
                         { href: '/my-listings', label: 'My Listings' },
-                        { href: '/bookings', label: '📅 My Bookings' },
+                        { href: '/bookings', label: 'My Bookings' },
                         { href: '/messages', label: 'Messages' },
                         { href: '/profile', label: 'Edit Profile' },
-                        ...(profile?.role === 'admin' ? [{ href: '/admin', label: '⚙ Admin Panel' }] : []),
+                        ...(profile?.role === 'admin' ? [{ href: '/admin', label: 'Admin Panel' }] : []),
                       ].map(item => (
                         <Link
                           key={item.href}

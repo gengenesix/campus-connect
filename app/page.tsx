@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { GHANA_UNIVERSITIES, type UniversityType } from '@/lib/ghana-universities'
@@ -171,7 +171,7 @@ export default function HomePage() {
       {/* HERO */}
       <section className="hero-section">
         <div className="hero-content" style={{ animation: 'fadeUp 0.55s ease both' }}>
-          <div className="season-badge" style={{ background: '#1B5E20', color: '#fff', border: '2px solid #111', boxShadow: '2px 2px 0 #111', display: 'inline-block' }}>
+          <div className="season-badge">
             GHANA'S CAMPUS MARKETPLACE · 43 UNIVERSITIES
           </div>
           <h1 className="hero-headline">
@@ -498,14 +498,43 @@ export default function HomePage() {
             <p style={{ color: '#666', fontSize: '16px', margin: 0 }}>Three simple steps to buy, sell, or book on campus</p>
           </div>
           <div className="how-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px' }}>
-            {[
-              { step: '01', title: 'Find Your Uni', desc: 'Select your university and browse your campus marketplace — only students from your school.', icon: '🎓', accent: '#1B5E20' },
-              { step: '02', title: 'List or Browse', desc: 'Post items for sale or find goods and services offered by fellow students near you.', icon: '📋', accent: '#5d3fd3' },
-              { step: '03', title: 'Connect & Deal', desc: 'Message sellers directly, book services, and meet safely on campus. Zero fees.', icon: '🤝', accent: '#111' },
-            ].map(item => (
+            {([
+              {
+                step: '01', title: 'Find Your Uni', accent: '#1B5E20',
+                desc: 'Select your university and browse your campus marketplace — only students from your school.',
+                icon: (
+                  <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#1B5E20" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="10" r="3" />
+                    <path d="M12 2a8 8 0 0 1 8 8c0 6-8 13-8 13s-8-7-8-13a8 8 0 0 1 8-8z" />
+                  </svg>
+                ),
+              },
+              {
+                step: '02', title: 'List or Browse', accent: '#5d3fd3',
+                desc: 'Post items for sale or find goods and services offered by fellow students near you.',
+                icon: (
+                  <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#5d3fd3" strokeWidth="1.75" strokeLinecap="round">
+                    <rect x="3" y="3" width="7" height="7" />
+                    <rect x="14" y="3" width="7" height="7" />
+                    <rect x="14" y="14" width="7" height="7" />
+                    <rect x="3" y="14" width="7" height="7" />
+                  </svg>
+                ),
+              },
+              {
+                step: '03', title: 'Connect & Deal', accent: '#ff3366',
+                desc: 'Message sellers directly, book services, and meet safely on campus. Zero fees.',
+                icon: (
+                  <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#ff3366" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                    <path d="m9 12 2 2 4-4" />
+                  </svg>
+                ),
+              },
+            ] as { step: string; title: string; accent: string; desc: string; icon: React.ReactNode }[]).map(item => (
               <div key={item.step} className="how-card" style={{ border: '2px solid #111', borderTop: `4px solid ${item.accent}`, padding: '32px 28px', boxShadow: '4px 4px 0 #111', background: '#fff' }}>
                 <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '52px', color: '#f0f0f0', lineHeight: 1, marginBottom: '4px' }}>{item.step}</div>
-                <div style={{ fontSize: '34px', marginBottom: '14px' }}>{item.icon}</div>
+                <div style={{ marginBottom: '16px' }}>{item.icon}</div>
                 <h3 style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '20px', marginBottom: '10px', color: '#111' }}>{item.title}</h3>
                 <p style={{ color: '#666', fontSize: '14px', lineHeight: 1.65, margin: 0 }}>{item.desc}</p>
               </div>
@@ -518,14 +547,47 @@ export default function HomePage() {
       <section style={{ background: '#111', padding: '48px 20px', borderTop: '2px solid #1a1a1a' }}>
         <div className="container">
           <div className="trust-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '32px' }}>
-            {[
-              { icon: '🔒', title: 'SAFE & VERIFIED', desc: 'All users are real students. Meet safely on campus.' },
-              { icon: '💸', title: 'ZERO COMMISSION', desc: 'Keep 100% of what you earn. Always free.' },
-              { icon: '⚡', title: 'INSTANT CONTACT', desc: 'Direct WhatsApp — no middlemen, no delays.' },
-              { icon: '🇬🇭', title: '43 UNIVERSITIES', desc: 'Every accredited university in Ghana, one platform.' },
-            ].map(item => (
-              <div key={item.title} style={{ borderLeft: '3px solid #1B5E20', paddingLeft: '20px' }}>
-                <span style={{ fontSize: '26px', display: 'block', marginBottom: '10px' }}>{item.icon}</span>
+            {([
+              {
+                title: 'SAFE & VERIFIED', desc: 'All users are real students. Meet safely on campus.', accent: '#1B5E20',
+                icon: (
+                  <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#1B5E20" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                    <polyline points="9 12 11 14 15 10" />
+                  </svg>
+                ),
+              },
+              {
+                title: 'ZERO COMMISSION', desc: 'Keep 100% of what you earn. Always free.', accent: '#a78bfa',
+                icon: (
+                  <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" strokeWidth="2" strokeLinecap="round">
+                    <line x1="19" y1="5" x2="5" y2="19" />
+                    <circle cx="6.5" cy="6.5" r="2.5" />
+                    <circle cx="17.5" cy="17.5" r="2.5" />
+                  </svg>
+                ),
+              },
+              {
+                title: 'INSTANT CONTACT', desc: 'Direct WhatsApp — no middlemen, no delays.', accent: '#ff3366',
+                icon: (
+                  <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#ff3366" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+                  </svg>
+                ),
+              },
+              {
+                title: '43 UNIVERSITIES', desc: 'Every accredited university in Ghana, one platform.', accent: '#5d3fd3',
+                icon: (
+                  <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#5d3fd3" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="3" y="9" width="18" height="12" />
+                    <path d="M3 9l9-6 9 6" />
+                    <path d="M9 21V12h6v9" />
+                  </svg>
+                ),
+              },
+            ] as { title: string; desc: string; accent: string; icon: React.ReactNode }[]).map(item => (
+              <div key={item.title} style={{ borderLeft: `3px solid ${item.accent}`, paddingLeft: '20px' }}>
+                <span style={{ display: 'block', marginBottom: '12px' }}>{item.icon}</span>
                 <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '13px', marginBottom: '6px', color: '#fff', letterSpacing: '0.5px' }}>{item.title}</div>
                 <div style={{ fontSize: '12px', color: '#555', lineHeight: 1.55 }}>{item.desc}</div>
               </div>
