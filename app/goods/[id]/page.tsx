@@ -157,21 +157,22 @@ export default async function GoodDetailPage({ params }: { params: Params }) {
       />
 
       {isPending && (
-        <div style={{ background: '#fff8e1', borderBottom: '3px solid #f59e0b', padding: '12px 20px', textAlign: 'center' }}>
-          <span style={{ fontWeight: 700, color: '#92400e', fontSize: '14px' }}>
-            ⏳ This listing is under admin review. It will become visible once approved.
+        <div style={{ background: '#fff8e1', borderBottom: '2px solid #fcd34d', padding: '12px 20px', textAlign: 'center' }}>
+          <span style={{ fontWeight: 700, color: '#92400e', fontSize: '14px', display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#92400e" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            This listing is under admin review. It will become visible once approved.
           </span>
         </div>
       )}
 
       {/* Breadcrumb */}
-      <div style={{ background: '#111', padding: '12px 20px' }}>
-        <div className="container" style={{ display: 'flex', gap: '8px', alignItems: 'center', fontSize: '13px', color: '#666' }}>
-          <Link href="/" style={{ color: '#666', textDecoration: 'none' }}>Home</Link>
+      <div style={{ background: '#FAFAF8', borderBottom: '1px solid #E8E5E0', padding: '12px 20px' }}>
+        <div className="container" style={{ display: 'flex', gap: '8px', alignItems: 'center', fontSize: '13px', color: '#9A9590' }}>
+          <Link href="/" style={{ color: '#9A9590', textDecoration: 'none' }}>Home</Link>
           <span>›</span>
-          <Link href="/goods" style={{ color: '#666', textDecoration: 'none' }}>Goods</Link>
+          <Link href="/goods" style={{ color: '#9A9590', textDecoration: 'none' }}>Goods</Link>
           <span>›</span>
-          <span style={{ color: '#a78bfa' }}>{product.title}</span>
+          <span style={{ color: '#1B5E20', fontWeight: 600 }}>{product.title}</span>
         </div>
       </div>
 
@@ -190,24 +191,24 @@ export default async function GoodDetailPage({ params }: { params: Params }) {
               )}
             </div>
             <div style={{ display: 'flex', gap: '8px', marginTop: '12px', flexWrap: 'wrap' }}>
-              <span style={{ padding: '6px 14px', background: cond.bg, color: cond.text, fontWeight: 700, fontSize: '11px', letterSpacing: '0.5px', border: '2px solid #111' }}>
+              <span style={{ padding: '5px 12px', background: cond.bg, color: cond.text, fontWeight: 700, fontSize: '11px', letterSpacing: '0.5px', borderRadius: '20px' }}>
                 {product.condition.toUpperCase()}
               </span>
-              <span style={{ padding: '6px 14px', background: '#f0f0f0', fontWeight: 700, fontSize: '11px', letterSpacing: '0.5px', border: '2px solid #ddd' }}>
+              <span style={{ padding: '5px 12px', background: '#F0F0EE', color: '#555', fontWeight: 700, fontSize: '11px', letterSpacing: '0.5px', borderRadius: '20px' }}>
                 {product.category.toUpperCase()}
               </span>
               <span style={{
-                padding: '6px 14px', fontWeight: 700, fontSize: '11px', letterSpacing: '0.5px', border: '2px solid #111',
+                padding: '5px 12px', fontWeight: 700, fontSize: '11px', letterSpacing: '0.5px', borderRadius: '20px',
                 background: product.in_stock ? '#dcfce7' : '#fee2e2',
                 color: product.in_stock ? '#15803d' : '#dc2626',
               }}>
                 {product.in_stock ? '✓ IN STOCK' : '✕ OUT OF STOCK'}
               </span>
-              <span style={{ padding: '6px 14px', background: '#fff', fontWeight: 600, fontSize: '11px', border: '2px solid #eee', color: '#888', display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+              <span style={{ padding: '5px 12px', background: '#F0F0EE', fontWeight: 600, fontSize: '11px', borderRadius: '20px', color: '#6B6660', display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
                 <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                 {product.views} views
               </span>
-              <span style={{ padding: '6px 14px', background: '#fff', fontWeight: 600, fontSize: '11px', border: '2px solid #eee', color: '#888', display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+              <span style={{ padding: '5px 12px', background: '#F0F0EE', fontWeight: 600, fontSize: '11px', borderRadius: '20px', color: '#6B6660', display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
                 <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                 {timeAgo(product.created_at)}
               </span>
@@ -220,27 +221,27 @@ export default async function GoodDetailPage({ params }: { params: Params }) {
               {product.title}
             </h1>
 
-            <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '44px', color: '#5d3fd3', marginBottom: '20px', lineHeight: 1 }}>
+            <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '44px', color: '#1B5E20', marginBottom: '20px', lineHeight: 1 }}>
               GHS {product.price.toLocaleString()}
             </div>
 
-            <p style={{ fontSize: '15px', lineHeight: 1.75, color: '#444', marginBottom: '28px', paddingLeft: '16px', borderLeft: '4px solid #111' }}>
+            <p style={{ fontSize: '15px', lineHeight: 1.75, color: '#444', marginBottom: '28px', paddingLeft: '16px', borderLeft: '4px solid #1B5E20' }}>
               {product.description}
             </p>
 
             {/* Seller Card */}
-            <div style={{ border: '2px solid #111', padding: '20px', background: '#fff', marginBottom: '20px', boxShadow: '4px 4px 0 #111' }}>
-              <div style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '1.5px', marginBottom: '12px', color: '#888' }}>SELLER</div>
+            <div style={{ border: '1px solid #E8E5E0', padding: '20px', background: '#fff', marginBottom: '20px', borderRadius: '14px', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+              <div style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '1.5px', marginBottom: '12px', color: '#9A9590' }}>SELLER</div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                 {product.seller?.avatar_url ? (
                   <Image
                     src={product.seller.avatar_url}
                     alt={product.seller.name}
                     width={52} height={52}
-                    style={{ borderRadius: '50%', border: '2px solid #111', objectFit: 'cover' }}
+                    style={{ borderRadius: '50%', border: '2px solid #E8E5E0', objectFit: 'cover' }}
                   />
                 ) : (
-                  <div style={{ width: '52px', height: '52px', borderRadius: '50%', background: '#1B5E20', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '18px', border: '2px solid #111' }}>
+                  <div style={{ width: '52px', height: '52px', borderRadius: '50%', background: '#1B5E20', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '18px', border: '2px solid #E8E5E0' }}>
                     {(product.seller?.name ?? 'S').split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
                   </div>
                 )}
@@ -274,7 +275,7 @@ export default async function GoodDetailPage({ params }: { params: Params }) {
               productTitle={product.title}
             />
 
-            <div style={{ padding: '14px 16px', background: '#fffbeb', border: '2px solid #f59e0b', fontSize: '13px', color: '#92400e', lineHeight: 1.5 }}>
+            <div style={{ padding: '14px 16px', background: '#fffbeb', border: '1px solid #fcd34d', borderRadius: '10px', fontSize: '13px', color: '#92400e', lineHeight: 1.5 }}>
               <span style={{ display: 'inline-flex', alignItems: 'flex-start', gap: '8px' }}>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#92400e" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: '1px' }}><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
                 <span><strong>Safety tip:</strong> Always meet in a public place on campus (library, SRC). Never transfer money before seeing the item in person.</span>
@@ -290,7 +291,7 @@ export default async function GoodDetailPage({ params }: { params: Params }) {
 
         {/* Related Items */}
         {relatedItems.length > 0 && (
-          <div style={{ marginTop: '60px', paddingTop: '40px', borderTop: '2px solid #111' }}>
+          <div style={{ marginTop: '60px', paddingTop: '40px', borderTop: '1px solid #E8E5E0' }}>
             <div className="trending-header" style={{ marginBottom: '24px' }}>
               <h3 style={{ fontFamily: '"Syne", sans-serif', fontSize: '22px', textTransform: 'uppercase' }}>
                 More {product.category}
@@ -300,13 +301,13 @@ export default async function GoodDetailPage({ params }: { params: Params }) {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '20px' }}>
               {relatedItems.map(g => (
                 <Link key={g.id} href={`/goods/${g.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                  <div style={{ border: '2px solid #eee', background: '#fff', overflow: 'hidden' }}>
+                  <div style={{ border: '1px solid #E8E5E0', background: '#fff', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.06)', transition: 'box-shadow 0.2s, transform 0.2s' }}>
                     <div style={{ position: 'relative', height: '180px', overflow: 'hidden' }}>
                       <Image src={g.image_url ?? '/placeholder.jpg'} alt={g.title} fill style={{ objectFit: 'cover' }} sizes="33vw" />
                     </div>
                     <div style={{ padding: '12px' }}>
                       <div style={{ fontWeight: 700, fontSize: '14px', marginBottom: '4px' }}>{g.title}</div>
-                      <div style={{ fontFamily: '"Archivo Black"', fontSize: '18px', color: '#5d3fd3' }}>GHS {g.price.toLocaleString()}</div>
+                      <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '18px', color: '#1B5E20' }}>GHS {g.price.toLocaleString()}</div>
                     </div>
                   </div>
                 </Link>

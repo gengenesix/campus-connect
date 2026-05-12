@@ -130,7 +130,7 @@ export default function RegisterPage() {
   if (success) {
     return (
       <div style={{ minHeight: '80vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 20px', background: '#f8f8f8' }}>
-        <div style={{ width: '100%', maxWidth: '480px', border: '3px solid #1B5E20', background: '#fff', boxShadow: '8px 8px 0 #1B5E20', padding: '40px' }}>
+        <div style={{ width: '100%', maxWidth: '480px', border: '1px solid #86efac', borderRadius: '16px', background: '#fff', boxShadow: '0 4px 24px rgba(0,0,0,0.08)', padding: '40px' }}>
           <div style={{ width: '56px', height: '56px', borderRadius: '50%', background: '#e8f5e9', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '20px' }}>
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#1B5E20" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <polyline points="20 6 9 17 4 12" />
@@ -146,8 +146,7 @@ export default function RegisterPage() {
             display: 'block', textAlign: 'center', padding: '14px 32px',
             background: '#1B5E20', color: '#fff',
             fontFamily: '"Syne", sans-serif', fontSize: '15px',
-            textDecoration: 'none', border: '2px solid #111',
-            boxShadow: '4px 4px 0 #111',
+            textDecoration: 'none', borderRadius: '10px',
           }}>
             GO TO SIGN IN
           </Link>
@@ -161,7 +160,7 @@ export default function RegisterPage() {
   return (
     <div style={{ minHeight: '80vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 20px', background: '#f8f8f8' }}>
       <div style={{ width: '100%', maxWidth: '500px' }}>
-        <div style={{ border: '3px solid #111', background: '#fff', boxShadow: '8px 8px 0 #111' }}>
+        <div style={{ border: '1px solid #E8E5E0', borderRadius: '16px', background: '#fff', boxShadow: '0 4px 24px rgba(0,0,0,0.08)', overflow: 'hidden' }}>
 
           {/* Header */}
           <div style={{ background: '#1B5E20', padding: '28px 32px' }}>
@@ -323,7 +322,7 @@ export default function RegisterPage() {
                     <select
                       value={form.department}
                       onChange={e => update('department', e.target.value)}
-                      style={{ width: '100%', padding: '13px 16px', border: '2px solid #111', fontFamily: '"Plus Jakarta Sans", sans-serif', fontSize: '14px', background: '#fff', boxSizing: 'border-box', outline: 'none' }}
+                      style={{ width: '100%', padding: '13px 16px', border: '1px solid #E8E5E0', borderRadius: '8px', fontFamily: '"Plus Jakarta Sans", sans-serif', fontSize: '14px', background: '#fff', boxSizing: 'border-box', outline: 'none' }}
                     >
                       <option value="">Select your programme</option>
                       {FACULTIES.map(f => (
@@ -351,7 +350,7 @@ export default function RegisterPage() {
                   <select
                     value={form.class_year}
                     onChange={e => update('class_year', e.target.value)}
-                    style={{ width: '100%', padding: '13px 16px', border: '2px solid #ddd', fontFamily: '"Plus Jakarta Sans", sans-serif', fontSize: '14px', background: '#fff', boxSizing: 'border-box', outline: 'none' }}
+                    style={{ width: '100%', padding: '13px 16px', border: '1px solid #E8E5E0', borderRadius: '8px', fontFamily: '"Plus Jakarta Sans", sans-serif', fontSize: '14px', background: '#fff', boxSizing: 'border-box', outline: 'none' }}
                   >
                     <option value="">Select year (optional)</option>
                     {CLASS_YEARS.map(y => <option key={y} value={y}>{y}</option>)}
@@ -367,7 +366,7 @@ export default function RegisterPage() {
                     <select
                       value={form.hostel}
                       onChange={e => update('hostel', e.target.value)}
-                      style={{ width: '100%', padding: '13px 16px', border: '2px solid #ddd', fontFamily: '"Plus Jakarta Sans", sans-serif', fontSize: '14px', background: '#fff', boxSizing: 'border-box', outline: 'none' }}
+                      style={{ width: '100%', padding: '13px 16px', border: '1px solid #E8E5E0', borderRadius: '8px', fontFamily: '"Plus Jakarta Sans", sans-serif', fontSize: '14px', background: '#fff', boxSizing: 'border-box', outline: 'none' }}
                     >
                       <option value="">Select hostel (optional)</option>
                       <optgroup label="Main Halls of Residence">
@@ -436,7 +435,7 @@ export default function RegisterPage() {
 
             <div style={{ marginTop: '24px', paddingTop: '20px', borderTop: '1px solid #eee', textAlign: 'center', fontSize: '14px', color: '#666' }}>
               Already have an account?{' '}
-              <Link href="/auth/login" style={{ color: '#5d3fd3', fontWeight: 700 }}>
+              <Link href="/auth/login" style={{ color: '#1B5E20', fontWeight: 700 }}>
                 Sign in →
               </Link>
             </div>

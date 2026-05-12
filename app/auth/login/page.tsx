@@ -62,13 +62,13 @@ function LoginForm() {
   return (
     <div style={{ minHeight: '80vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 20px', background: '#f8f8f8' }}>
       <div style={{ width: '100%', maxWidth: '460px' }}>
-        <div style={{ border: '3px solid #111', background: '#fff', boxShadow: '8px 8px 0 #111' }}>
+        <div style={{ border: '1px solid #E8E5E0', background: '#fff', borderRadius: '16px', boxShadow: '0 4px 24px rgba(0,0,0,0.08)', overflow: 'hidden' }}>
 
           {/* Header */}
-          <div style={{ background: '#111', padding: '28px 32px' }}>
+          <div style={{ background: '#1B5E20', padding: '28px 32px' }}>
             <Link href="/" style={{ textDecoration: 'none' }}>
               <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '20px', color: '#fff', marginBottom: '8px', opacity: 0.8 }}>
-                CAMPUS<span style={{ color: '#a78bfa' }}>.</span>CONNECT
+                CAMPUS<span style={{ color: '#86efac' }}>.</span>CONNECT
               </div>
             </Link>
             <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '30px', color: '#fff', letterSpacing: '-0.5px' }}>
@@ -156,7 +156,7 @@ function LoginForm() {
 
             <div style={{ marginTop: '28px', paddingTop: '24px', borderTop: '1px solid #eee', textAlign: 'center', fontSize: '14px', color: '#666' }}>
               New to Campus Connect?{' '}
-              <Link href="/auth/register" style={{ color: '#5d3fd3', fontWeight: 700 }}>
+              <Link href="/auth/register" style={{ color: '#1B5E20', fontWeight: 700 }}>
                 Create free account →
               </Link>
             </div>

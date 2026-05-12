@@ -364,11 +364,11 @@ export default function ProfilePage() {
         @keyframes spin { to { transform: rotate(360deg); } }
       `}</style>
       {/* Header */}
-      <div style={{ background: '#111', color: '#fff', padding: '36px 20px' }}>
+      <div style={{ background: '#FAFAF8', borderBottom: '1px solid #E8E5E0', padding: '36px 20px' }}>
         <div className="container">
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
-            <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '36px', letterSpacing: '-1px' }}>
-              MY PROFILE
+            <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '36px', letterSpacing: '-1px', color: '#111' }}>
+              My Profile
             </div>
             {profile?.is_verified && (
               <span
@@ -384,13 +384,13 @@ export default function ProfilePage() {
               </span>
             )}
           </div>
-          <p style={{ color: '#888', marginTop: '4px', fontSize: '14px' }}>{user.email}</p>
+          <p style={{ color: '#6B6660', marginTop: '4px', fontSize: '14px' }}>{user.email}</p>
         </div>
       </div>
 
       {/* Profile completion bar */}
       {completenessScore < 100 && (
-        <div style={{ background: '#fff', borderBottom: '2px solid #111', padding: '14px 20px' }}>
+        <div style={{ background: '#fff', borderBottom: '1px solid #E8E5E0', padding: '14px 20px' }}>
           <div className="container">
             <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
               <div style={{ flex: 1, minWidth: '200px' }}>
@@ -417,7 +417,7 @@ export default function ProfilePage() {
               {!editing && (
                 <button
                   onClick={() => setEditing(true)}
-                  style={{ padding: '8px 16px', background: '#111', color: '#fff', fontFamily: '"Syne", sans-serif', fontSize: '11px', border: 'none', cursor: 'pointer', letterSpacing: '0.5px', flexShrink: 0 }}
+                  style={{ padding: '8px 16px', background: '#1B5E20', color: '#fff', fontFamily: '"Syne", sans-serif', fontSize: '11px', border: 'none', borderRadius: '8px', cursor: 'pointer', letterSpacing: '0.5px', flexShrink: 0 }}
                 >
                   COMPLETE NOW →
                 </button>
@@ -443,7 +443,7 @@ export default function ProfilePage() {
 
           {/* Sidebar */}
           <div>
-            <div style={{ border: '2px solid #111', background: '#fff', boxShadow: '6px 6px 0 #111', padding: '28px 20px', textAlign: 'center' }}>
+            <div style={{ border: '1px solid #E8E5E0', background: '#fff', borderRadius: '14px', boxShadow: '0 1px 3px rgba(0,0,0,0.06)', padding: '28px 20px', textAlign: 'center' }}>
               {/* Avatar — click anywhere to change */}
               <div
                 style={{ position: 'relative', display: 'inline-block', marginBottom: '16px', cursor: 'pointer' }}
@@ -457,10 +457,10 @@ export default function ProfilePage() {
                   <img
                     src={avatarPreview ?? profile!.avatar_url!}
                     alt={profile?.name ?? 'Avatar'}
-                    style={{ width: '110px', height: '110px', borderRadius: '50%', objectFit: 'cover', border: '3px solid #111', display: 'block' }}
+                    style={{ width: '110px', height: '110px', borderRadius: '50%', objectFit: 'cover', border: '3px solid #E8E5E0', display: 'block' }}
                   />
                 ) : (
-                  <div style={{ width: '110px', height: '110px', borderRadius: '50%', background: '#1B5E20', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: '"Syne", sans-serif', fontSize: '34px', border: '3px solid #111', margin: '0 auto' }}>
+                  <div style={{ width: '110px', height: '110px', borderRadius: '50%', background: '#1B5E20', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: '"Syne", sans-serif', fontSize: '34px', border: '3px solid #E8E5E0', margin: '0 auto' }}>
                     {initials}
                   </div>
                 )}
@@ -469,7 +469,7 @@ export default function ProfilePage() {
                 <div style={{
                   position: 'absolute', inset: 0, borderRadius: '50%',
                   background: uploadingAvatar
-                    ? 'rgba(93,63,211,0.75)'
+                    ? 'rgba(27,94,32,0.8)'
                     : avatarHover ? 'rgba(0,0,0,0.55)' : 'transparent',
                   display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
                   transition: 'background 0.2s', pointerEvents: 'none', gap: '4px',
@@ -491,7 +491,7 @@ export default function ProfilePage() {
 
                 {/* Purple badge bottom-right */}
                 {!uploadingAvatar && (
-                  <div style={{ position: 'absolute', bottom: 2, right: 2, width: '26px', height: '26px', borderRadius: '50%', background: '#5d3fd3', border: '2px solid #fff', display: 'flex', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none' }}>
+                  <div style={{ position: 'absolute', bottom: 2, right: 2, width: '26px', height: '26px', borderRadius: '50%', background: '#1B5E20', border: '2px solid #fff', display: 'flex', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none' }}>
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
                       <circle cx="12" cy="13" r="3"/>
@@ -504,7 +504,7 @@ export default function ProfilePage() {
 
               {/* Upload status text */}
               {uploadingAvatar && (
-                <div style={{ fontSize: '11px', color: '#5d3fd3', fontWeight: 700, marginBottom: '8px', letterSpacing: '0.5px' }}>
+                <div style={{ fontSize: '11px', color: '#1B5E20', fontWeight: 700, marginBottom: '8px', letterSpacing: '0.5px' }}>
                   UPLOADING...
                 </div>
               )}
@@ -535,13 +535,13 @@ export default function ProfilePage() {
 
               {/* Stats */}
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '20px' }}>
-                <div style={{ border: '2px solid #eee', padding: '12px 8px', textAlign: 'center' }}>
+                <div style={{ border: '1px solid #E8E5E0', borderRadius: '10px', padding: '12px 8px', textAlign: 'center' }}>
                   <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '22px', color: '#1B5E20' }}>
                     {(profile?.total_reviews ?? 0) > 0 ? (profile?.rating?.toFixed(1) ?? '—') : '—'}
                   </div>
                   <div style={{ fontSize: '11px', color: '#888', marginTop: '2px' }}>Rating</div>
                 </div>
-                <div style={{ border: '2px solid #eee', padding: '12px 8px', textAlign: 'center' }}>
+                <div style={{ border: '1px solid #E8E5E0', borderRadius: '10px', padding: '12px 8px', textAlign: 'center' }}>
                   <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '22px', color: '#1B5E20' }}>
                     {profile?.total_reviews ?? 0}
                   </div>
@@ -557,10 +557,10 @@ export default function ProfilePage() {
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                <Link href="/my-listings" style={{ display: 'block', padding: '10px', background: '#111', color: '#fff', fontFamily: '"Syne", sans-serif', fontSize: '12px', textDecoration: 'none', letterSpacing: '0.5px' }}>
+                <Link href="/my-listings" style={{ display: 'block', padding: '10px', background: '#1B5E20', color: '#fff', fontFamily: '"Syne", sans-serif', fontSize: '12px', textDecoration: 'none', letterSpacing: '0.5px', borderRadius: '8px' }}>
                   MY LISTINGS →
                 </Link>
-                <Link href="/dashboard" style={{ display: 'block', padding: '10px', background: '#fff', color: '#111', fontFamily: '"Syne", sans-serif', fontSize: '12px', textDecoration: 'none', border: '2px solid #111', letterSpacing: '0.5px' }}>
+                <Link href="/dashboard" style={{ display: 'block', padding: '10px', background: '#fff', color: '#111', fontFamily: '"Syne", sans-serif', fontSize: '12px', textDecoration: 'none', border: '1px solid #E8E5E0', borderRadius: '8px', letterSpacing: '0.5px' }}>
                   DASHBOARD
                 </Link>
                 <button
@@ -575,13 +575,13 @@ export default function ProfilePage() {
 
           {/* Main — Edit Form */}
           <div>
-            <div style={{ border: '2px solid #111', background: '#fff', boxShadow: '6px 6px 0 #111' }}>
-              <div style={{ background: '#f0f0f0', padding: '16px 24px', borderBottom: '2px solid #111', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontFamily: '"Syne", sans-serif', fontSize: '14px', letterSpacing: '0.5px' }}>PROFILE INFORMATION</span>
+            <div style={{ border: '1px solid #E8E5E0', background: '#fff', borderRadius: '14px', boxShadow: '0 1px 3px rgba(0,0,0,0.06)', overflow: 'hidden' }}>
+              <div style={{ background: '#FAFAF8', padding: '16px 24px', borderBottom: '1px solid #E8E5E0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontFamily: '"Syne", sans-serif', fontSize: '14px', letterSpacing: '0.5px', color: '#111' }}>Profile Information</span>
                 {!editing && (
                   <button
                     onClick={() => setEditing(true)}
-                    style={{ padding: '8px 20px', background: '#5d3fd3', color: '#fff', fontFamily: '"Syne", sans-serif', fontSize: '12px', border: '2px solid #111', cursor: 'pointer', letterSpacing: '0.5px' }}
+                    style={{ padding: '8px 20px', background: '#1B5E20', color: '#fff', fontFamily: '"Syne", sans-serif', fontSize: '12px', border: 'none', borderRadius: '8px', cursor: 'pointer', letterSpacing: '0.5px' }}
                   >
                     EDIT
                   </button>
@@ -599,7 +599,7 @@ export default function ProfilePage() {
                         value={form.name}
                         onChange={e => setForm(p => ({ ...p, name: e.target.value }))}
                         placeholder="Kwame Asante"
-                        style={{ width: '100%', padding: '12px 16px', border: '2px solid #111', fontFamily: '"Plus Jakarta Sans", sans-serif', fontSize: '14px', outline: 'none', boxSizing: 'border-box' }}
+                        style={{ width: '100%', padding: '12px 16px', border: '1px solid #E8E5E0', borderRadius: '8px', fontFamily: '"Plus Jakarta Sans", sans-serif', fontSize: '14px', outline: 'none', boxSizing: 'border-box' }}
                       />
                     </div>
 
@@ -616,7 +616,7 @@ export default function ProfilePage() {
                           onChange={e => setForm(p => ({ ...p, phone: e.target.value.replace(/\D/g, '') }))}
                           placeholder="241234567"
                           maxLength={9}
-                          style={{ width: '100%', padding: '12px 16px 12px 58px', border: '2px solid #111', fontFamily: '"Plus Jakarta Sans", sans-serif', fontSize: '14px', outline: 'none', boxSizing: 'border-box' }}
+                          style={{ width: '100%', padding: '12px 16px 12px 58px', border: '1px solid #E8E5E0', borderRadius: '8px', fontFamily: '"Plus Jakarta Sans", sans-serif', fontSize: '14px', outline: 'none', boxSizing: 'border-box' }}
                         />
                       </div>
                       <p style={{ marginTop: '4px', fontSize: '11px', color: '#888' }}>Enter the 9 digits after +233</p>
@@ -641,7 +641,7 @@ export default function ProfilePage() {
                         <select
                           value={form.department}
                           onChange={e => setForm(p => ({ ...p, department: e.target.value }))}
-                          style={{ width: '100%', padding: '12px 16px', border: '2px solid #111', fontFamily: '"Plus Jakarta Sans", sans-serif', fontSize: '14px', background: '#fff', boxSizing: 'border-box' }}
+                          style={{ width: '100%', padding: '12px 16px', border: '1px solid #E8E5E0', borderRadius: '8px', fontFamily: '"Plus Jakarta Sans", sans-serif', fontSize: '14px', background: '#fff', boxSizing: 'border-box' }}
                         >
                           <option value="">Select your programme</option>
                           {FACULTIES.map(f => (
@@ -656,7 +656,7 @@ export default function ProfilePage() {
                           value={form.department}
                           onChange={e => setForm(p => ({ ...p, department: e.target.value }))}
                           placeholder="e.g. BSc Computer Science"
-                          style={{ width: '100%', padding: '12px 16px', border: '2px solid #111', fontFamily: '"Plus Jakarta Sans", sans-serif', fontSize: '14px', outline: 'none', boxSizing: 'border-box' }}
+                          style={{ width: '100%', padding: '12px 16px', border: '1px solid #E8E5E0', borderRadius: '8px', fontFamily: '"Plus Jakarta Sans", sans-serif', fontSize: '14px', outline: 'none', boxSizing: 'border-box' }}
                         />
                       )}
                     </div>
@@ -687,7 +687,7 @@ export default function ProfilePage() {
                           <select
                             value={form.hostel}
                             onChange={e => setForm(p => ({ ...p, hostel: e.target.value }))}
-                            style={{ width: '100%', padding: '12px 16px', border: '2px solid #111', fontFamily: '"Plus Jakarta Sans", sans-serif', fontSize: '14px', background: '#fff', boxSizing: 'border-box' }}
+                            style={{ width: '100%', padding: '12px 16px', border: '1px solid #E8E5E0', borderRadius: '8px', fontFamily: '"Plus Jakarta Sans", sans-serif', fontSize: '14px', background: '#fff', boxSizing: 'border-box' }}
                           >
                             <option value="">Select hostel</option>
                             {form.hostel && !hostels.all.includes(form.hostel) && (
@@ -710,7 +710,7 @@ export default function ProfilePage() {
                           value={form.hostel}
                           onChange={e => setForm(p => ({ ...p, hostel: e.target.value }))}
                           placeholder={selectedUni ? `Hostel or area near ${selectedUni.shortName}` : 'Hostel or residential area'}
-                          style={{ width: '100%', padding: '12px 16px', border: '2px solid #111', fontFamily: '"Plus Jakarta Sans", sans-serif', fontSize: '14px', outline: 'none', boxSizing: 'border-box' }}
+                          style={{ width: '100%', padding: '12px 16px', border: '1px solid #E8E5E0', borderRadius: '8px', fontFamily: '"Plus Jakarta Sans", sans-serif', fontSize: '14px', outline: 'none', boxSizing: 'border-box' }}
                         />
                       )}
                     </div>
@@ -723,18 +723,18 @@ export default function ProfilePage() {
                         onChange={e => setForm(p => ({ ...p, bio: e.target.value }))}
                         placeholder="Tell other students about yourself..."
                         rows={4}
-                        style={{ width: '100%', padding: '12px 16px', border: '2px solid #111', fontFamily: '"Plus Jakarta Sans", sans-serif', fontSize: '14px', outline: 'none', boxSizing: 'border-box', resize: 'vertical' }}
+                        style={{ width: '100%', padding: '12px 16px', border: '1px solid #E8E5E0', borderRadius: '8px', fontFamily: '"Plus Jakarta Sans", sans-serif', fontSize: '14px', outline: 'none', boxSizing: 'border-box', resize: 'vertical' }}
                       />
                     </div>
 
                     {/* Role */}
                     {profile?.role !== 'admin' && (
-                      <div style={{ border: '2px solid #f59e0b', background: '#fffbeb', padding: '16px' }}>
+                      <div style={{ border: '1px solid #fcd34d', borderRadius: '10px', background: '#fffbeb', padding: '16px' }}>
                         <label style={{ display: 'block', fontWeight: 700, fontSize: '12px', letterSpacing: '1.5px', marginBottom: '8px', color: '#92400e' }}>ACCOUNT TYPE</label>
                         <select
                           value={form.role ?? profile?.role ?? 'buyer'}
                           onChange={e => setForm(p => ({ ...p, role: e.target.value }))}
-                          style={{ width: '100%', padding: '12px 16px', border: '2px solid #111', fontFamily: '"Plus Jakarta Sans", sans-serif', fontSize: '14px', background: '#fff', boxSizing: 'border-box' }}
+                          style={{ width: '100%', padding: '12px 16px', border: '1px solid #E8E5E0', borderRadius: '8px', fontFamily: '"Plus Jakarta Sans", sans-serif', fontSize: '14px', background: '#fff', boxSizing: 'border-box' }}
                         >
                           <option value="buyer">Buyer — Browse and buy items</option>
                           <option value="seller">Seller — List and sell goods</option>
@@ -750,14 +750,14 @@ export default function ProfilePage() {
                       <button
                         type="submit"
                         disabled={saving}
-                        style={{ flex: 1, padding: '14px', background: saving ? '#888' : '#1B5E20', color: '#fff', fontFamily: '"Syne", sans-serif', fontSize: '14px', border: '2px solid #111', cursor: saving ? 'not-allowed' : 'pointer', boxShadow: '3px 3px 0 #111' }}
+                        style={{ flex: 1, padding: '14px', background: saving ? '#888' : '#1B5E20', color: '#fff', fontFamily: '"Syne", sans-serif', fontSize: '14px', border: 'none', borderRadius: '10px', cursor: saving ? 'not-allowed' : 'pointer' }}
                       >
                         {saving ? 'SAVING...' : 'SAVE CHANGES →'}
                       </button>
                       <button
                         type="button"
                         onClick={() => { setEditing(false); setSaveMsg('') }}
-                        style={{ padding: '14px 24px', background: '#fff', color: '#666', fontWeight: 600, border: '2px solid #ddd', cursor: 'pointer', fontFamily: '"Plus Jakarta Sans", sans-serif' }}
+                        style={{ padding: '14px 24px', background: '#fff', color: '#666', fontWeight: 600, border: '1px solid #E8E5E0', borderRadius: '10px', cursor: 'pointer', fontFamily: '"Plus Jakarta Sans", sans-serif' }}
                       >
                         Cancel
                       </button>
@@ -793,10 +793,10 @@ export default function ProfilePage() {
             </div>
 
             {/* University Email Verification */}
-            <div style={{ marginTop: '24px', border: '2px solid #111', background: '#fff', boxShadow: '4px 4px 0 #111' }}>
-              <div style={{ background: '#f0f0f0', padding: '14px 24px', borderBottom: '2px solid #111', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <span style={{ fontFamily: '"Syne", sans-serif', fontSize: '14px', letterSpacing: '0.5px' }}>
-                  UNIVERSITY EMAIL VERIFICATION
+            <div style={{ marginTop: '24px', border: '1px solid #E8E5E0', borderRadius: '14px', background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.06)', overflow: 'hidden' }}>
+              <div style={{ background: '#FAFAF8', padding: '14px 24px', borderBottom: '1px solid #E8E5E0', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <span style={{ fontFamily: '"Syne", sans-serif', fontSize: '14px', letterSpacing: '0.5px', color: '#111' }}>
+                  University Email Verification
                 </span>
                 {emailStep === 'verified' && (
                   <span style={{ background: '#1B5E20', color: '#fff', padding: '3px 10px', fontSize: '11px', fontWeight: 700, letterSpacing: '0.5px' }}>
@@ -829,12 +829,12 @@ export default function ProfilePage() {
                           value={uniEmail}
                           onChange={e => setUniEmail(e.target.value)}
                           placeholder="yourname@st.umat.edu.gh"
-                          style={{ flex: 1, minWidth: '220px', padding: '10px 14px', border: '2px solid #111', fontFamily: '"Plus Jakarta Sans", sans-serif', fontSize: '14px', outline: 'none', boxSizing: 'border-box' }}
+                          style={{ flex: 1, minWidth: '220px', padding: '10px 14px', border: '1px solid #E8E5E0', borderRadius: '8px', fontFamily: '"Plus Jakarta Sans", sans-serif', fontSize: '14px', outline: 'none', boxSizing: 'border-box' }}
                         />
                         <button
                           onClick={handleSendOtp}
                           disabled={emailLoading}
-                          style={{ padding: '10px 20px', background: emailLoading ? '#888' : '#1B5E20', color: '#fff', fontFamily: '"Syne", sans-serif', fontSize: '12px', border: '2px solid #111', cursor: emailLoading ? 'not-allowed' : 'pointer', letterSpacing: '0.5px', whiteSpace: 'nowrap' }}
+                          style={{ padding: '10px 20px', background: emailLoading ? '#888' : '#1B5E20', color: '#fff', fontFamily: '"Syne", sans-serif', fontSize: '12px', border: 'none', borderRadius: '8px', cursor: emailLoading ? 'not-allowed' : 'pointer', letterSpacing: '0.5px', whiteSpace: 'nowrap' }}
                         >
                           {emailLoading ? 'SENDING...' : 'SEND CODE →'}
                         </button>
@@ -852,18 +852,18 @@ export default function ProfilePage() {
                             onChange={e => setOtpCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
                             placeholder="000000"
                             maxLength={6}
-                            style={{ width: '150px', padding: '10px 14px', border: '2px solid #111', fontFamily: '"Syne", sans-serif', fontSize: '22px', letterSpacing: '8px', outline: 'none', textAlign: 'center' }}
+                            style={{ width: '150px', padding: '10px 14px', border: '1px solid #E8E5E0', borderRadius: '8px', fontFamily: '"Syne", sans-serif', fontSize: '22px', letterSpacing: '8px', outline: 'none', textAlign: 'center' }}
                           />
                           <button
                             onClick={handleConfirmOtp}
                             disabled={emailLoading}
-                            style={{ padding: '10px 20px', background: emailLoading ? '#888' : '#5d3fd3', color: '#fff', fontFamily: '"Syne", sans-serif', fontSize: '12px', border: '2px solid #111', cursor: emailLoading ? 'not-allowed' : 'pointer', letterSpacing: '0.5px' }}
+                            style={{ padding: '10px 20px', background: emailLoading ? '#888' : '#1B5E20', color: '#fff', fontFamily: '"Syne", sans-serif', fontSize: '12px', border: 'none', borderRadius: '8px', cursor: emailLoading ? 'not-allowed' : 'pointer', letterSpacing: '0.5px' }}
                           >
                             {emailLoading ? 'VERIFYING...' : 'VERIFY →'}
                           </button>
                           <button
                             onClick={() => { setEmailStep('idle'); setOtpCode(''); setEmailMsg('') }}
-                            style={{ padding: '10px 14px', background: '#fff', color: '#666', fontWeight: 600, border: '2px solid #ddd', cursor: 'pointer', fontFamily: '"Plus Jakarta Sans", sans-serif', fontSize: '12px' }}
+                            style={{ padding: '10px 14px', background: '#fff', color: '#666', fontWeight: 600, border: '1px solid #E8E5E0', borderRadius: '8px', cursor: 'pointer', fontFamily: '"Plus Jakarta Sans", sans-serif', fontSize: '12px' }}
                           >
                             Change email
                           </button>
@@ -886,20 +886,20 @@ export default function ProfilePage() {
             </div>
 
             {/* Account Quick Links */}
-            <div style={{ marginTop: '24px', border: '2px solid #111', background: '#fff', boxShadow: '4px 4px 0 #111' }}>
-              <div style={{ background: '#f0f0f0', padding: '14px 24px', borderBottom: '2px solid #111' }}>
-                <span style={{ fontFamily: '"Syne", sans-serif', fontSize: '14px', letterSpacing: '0.5px' }}>ACCOUNT</span>
+            <div style={{ marginTop: '24px', border: '1px solid #E8E5E0', borderRadius: '14px', background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.06)', overflow: 'hidden' }}>
+              <div style={{ background: '#FAFAF8', padding: '14px 24px', borderBottom: '1px solid #E8E5E0' }}>
+                <span style={{ fontFamily: '"Syne", sans-serif', fontSize: '14px', letterSpacing: '0.5px', color: '#111' }}>Account</span>
               </div>
               <div style={{ padding: '20px 24px', display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-                <Link href="/messages" style={{ padding: '10px 20px', border: '2px solid #111', fontWeight: 700, fontSize: '13px', textDecoration: 'none', color: '#111', boxShadow: '3px 3px 0 #111', display: 'inline-flex', alignItems: 'center', gap: '7px' }}>
+                <Link href="/messages" style={{ padding: '10px 20px', border: '1px solid #E8E5E0', borderRadius: '8px', fontWeight: 700, fontSize: '13px', textDecoration: 'none', color: '#111', display: 'inline-flex', alignItems: 'center', gap: '7px' }}>
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
                   Messages
                 </Link>
-                <Link href="/my-listings" style={{ padding: '10px 20px', border: '2px solid #111', fontWeight: 700, fontSize: '13px', textDecoration: 'none', color: '#111', boxShadow: '3px 3px 0 #111', display: 'inline-flex', alignItems: 'center', gap: '7px' }}>
+                <Link href="/my-listings" style={{ padding: '10px 20px', border: '1px solid #E8E5E0', borderRadius: '8px', fontWeight: 700, fontSize: '13px', textDecoration: 'none', color: '#111', display: 'inline-flex', alignItems: 'center', gap: '7px' }}>
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
                   My Listings
                 </Link>
-                <Link href="/sell" style={{ padding: '10px 20px', background: '#1B5E20', color: '#fff', border: '2px solid #111', fontFamily: '"Syne", sans-serif', fontSize: '13px', textDecoration: 'none', boxShadow: '3px 3px 0 #111' }}>
+                <Link href="/sell" style={{ padding: '10px 20px', background: '#1B5E20', color: '#fff', border: 'none', borderRadius: '8px', fontFamily: '"Syne", sans-serif', fontSize: '13px', textDecoration: 'none' }}>
                   + SELL AN ITEM
                 </Link>
               </div>
@@ -940,7 +940,7 @@ export default function ProfilePage() {
         style={{ position: 'fixed', inset: 0, zIndex: 9999, background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}
         onClick={e => { if (e.target === e.currentTarget && !deleting) setShowDeleteModal(false) }}
       >
-        <div style={{ background: '#fff', border: '3px solid #dc2626', boxShadow: '8px 8px 0 #dc2626', maxWidth: '440px', width: '100%' }}>
+        <div style={{ background: '#fff', border: '1px solid #fca5a5', borderRadius: '16px', boxShadow: '0 8px 32px rgba(0,0,0,0.12)', maxWidth: '440px', width: '100%', overflow: 'hidden' }}>
           <div style={{ background: '#dc2626', color: '#fff', padding: '16px 24px', fontFamily: '"Syne", sans-serif', fontSize: '15px', letterSpacing: '0.5px' }}>
             CONFIRM ACCOUNT DELETION
           </div>

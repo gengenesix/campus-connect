@@ -67,12 +67,12 @@ export default function ServiceActionsClient({ serviceId, serviceName, providerI
   if (isOwn) {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '24px' }}>
-        <div style={{ padding: '12px 16px', background: '#f0fdf4', border: '2px solid #1B5E20', fontSize: '13px', color: '#15803d', fontWeight: 700 }}>
+        <div style={{ padding: '12px 16px', background: '#f0fdf4', border: '1px solid #86efac', borderRadius: '10px', fontSize: '13px', color: '#15803d', fontWeight: 700 }}>
           ✓ This is your service listing
         </div>
         <Link
           href="/dashboard"
-          style={{ textAlign: 'center', display: 'block', textDecoration: 'none', padding: '14px 40px', background: '#111', color: '#fff', fontFamily: '"Syne", sans-serif', fontSize: '14px', border: '2px solid #111', boxShadow: '4px 4px 0 #111' }}
+          style={{ textAlign: 'center', display: 'block', textDecoration: 'none', padding: '14px 40px', background: '#1B5E20', color: '#fff', fontFamily: '"Syne", sans-serif', fontSize: '14px', borderRadius: '10px' }}
         >
           MANAGE MY SERVICES →
         </Link>
@@ -88,7 +88,7 @@ export default function ServiceActionsClient({ serviceId, serviceName, providerI
       <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '24px' }}>
         <Link
           href={`/auth/login?redirect=/services/${serviceId}`}
-          style={{ textAlign: 'center', display: 'block', textDecoration: 'none', padding: '18px 40px', background: '#111', color: '#fff', fontFamily: '"Syne", sans-serif', fontSize: '16px', border: '2px solid #111', boxShadow: '4px 4px 0 #111' }}
+          style={{ textAlign: 'center', display: 'block', textDecoration: 'none', padding: '18px 40px', background: '#1B5E20', color: '#fff', fontFamily: '"Syne", sans-serif', fontSize: '16px', borderRadius: '10px' }}
         >
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
@@ -107,7 +107,7 @@ export default function ServiceActionsClient({ serviceId, serviceName, providerI
             <button
               onClick={handleShare}
               title={copied ? 'Link copied!' : 'Share service'}
-              style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '6px 12px', background: copied ? '#dcfce7' : '#fff', border: '2px solid #ddd', cursor: 'pointer', fontFamily: '"Plus Jakarta Sans", sans-serif', fontWeight: 700, fontSize: '12px', color: copied ? '#15803d' : '#555', transition: 'all 0.2s' }}
+              style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '6px 12px', background: copied ? '#dcfce7' : '#fff', border: '1px solid #E8E5E0', borderRadius: '8px', cursor: 'pointer', fontFamily: '"Plus Jakarta Sans", sans-serif', fontWeight: 700, fontSize: '12px', color: copied ? '#15803d' : '#555', transition: 'all 0.2s' }}
             >
               {copied ? '✓ COPIED' : '↗ SHARE'}
             </button>
@@ -121,7 +121,7 @@ export default function ServiceActionsClient({ serviceId, serviceName, providerI
   if (success) {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '24px' }}>
-        <div style={{ padding: '20px 24px', background: '#e8f5e9', border: '2px solid #1B5E20', boxShadow: '4px 4px 0 #1B5E20' }}>
+        <div style={{ padding: '20px 24px', background: '#e8f5e9', border: '1px solid #86efac', borderRadius: '12px' }}>
           <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '16px', color: '#1B5E20', marginBottom: '6px' }}>
             ✓ BOOKING REQUESTED!
           </div>
@@ -129,7 +129,7 @@ export default function ServiceActionsClient({ serviceId, serviceName, providerI
             Your request has been sent to the provider. You&apos;ll get notified when they confirm.
           </div>
         </div>
-        <Link href="/bookings" style={{ textAlign: 'center', display: 'block', textDecoration: 'none', padding: '14px 40px', background: '#111', color: '#fff', fontFamily: '"Syne", sans-serif', fontSize: '13px', border: '2px solid #111', boxShadow: '3px 3px 0 #111' }}>
+        <Link href="/bookings" style={{ textAlign: 'center', display: 'block', textDecoration: 'none', padding: '14px 40px', background: '#1B5E20', color: '#fff', fontFamily: '"Syne", sans-serif', fontSize: '13px', borderRadius: '10px' }}>
           VIEW MY BOOKINGS →
         </Link>
       </div>
@@ -155,10 +155,10 @@ export default function ServiceActionsClient({ serviceId, serviceName, providerI
             textAlign: 'center', display: 'block', width: '100%', cursor: 'pointer',
             padding: '18px 40px', background: '#1B5E20', color: '#fff',
             fontFamily: '"Syne", sans-serif', fontSize: '16px',
-            border: '2px solid #111', boxShadow: '4px 4px 0 #111', transition: 'all 0.15s',
+            border: 'none', borderRadius: '10px', transition: 'all 0.15s',
           }}
-          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = 'translate(-2px,-2px)'; (e.currentTarget as HTMLElement).style.boxShadow = '6px 6px 0 #111' }}
-          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = 'none'; (e.currentTarget as HTMLElement).style.boxShadow = '4px 4px 0 #111' }}
+          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.opacity = '0.9' }}
+          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.opacity = '1' }}
         >
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
@@ -174,7 +174,7 @@ export default function ServiceActionsClient({ serviceId, serviceName, providerI
               textAlign: 'center', display: 'block', width: '100%', cursor: 'pointer',
               padding: '14px 40px', background: '#fff', color: '#111',
               fontFamily: '"Syne", sans-serif', fontSize: '14px',
-              border: '2px solid #111', boxShadow: '3px 3px 0 #111', transition: 'all 0.15s',
+              border: '1px solid #E8E5E0', borderRadius: '10px', transition: 'all 0.15s',
             }}
             onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#f8f8f8' }}
             onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#fff' }}
@@ -191,7 +191,7 @@ export default function ServiceActionsClient({ serviceId, serviceName, providerI
           href={whatsappHref}
           target="_blank"
           rel="noopener noreferrer"
-          style={{ textAlign: 'center', display: 'block', textDecoration: 'none', padding: '12px 40px', background: '#f0fdf4', color: '#1B5E20', fontWeight: 700, fontSize: '14px', border: '2px dashed #86efac', transition: 'all 0.15s' }}
+          style={{ textAlign: 'center', display: 'block', textDecoration: 'none', padding: '12px 40px', background: '#f0fdf4', color: '#1B5E20', fontWeight: 700, fontSize: '14px', border: '1px dashed #86efac', borderRadius: '10px', transition: 'all 0.15s' }}
         >
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
             <svg width="15" height="15" viewBox="0 0 24 24" fill="#1B5E20"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.117.554 4.103 1.523 5.828L.057 23.704a.5.5 0 0 0 .613.63l5.701-1.494A11.955 11.955 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.892 0-3.657-.528-5.16-1.444l-.37-.22-3.834 1.005.987-3.715-.242-.383A9.952 9.952 0 0 1 2 12c0-5.514 4.486-10 10-10s10 4.486 10 10-4.486 10-10 10z"/></svg>
@@ -212,7 +212,7 @@ export default function ServiceActionsClient({ serviceId, serviceName, providerI
             <button
               onClick={handleShare}
               title={copied ? 'Link copied!' : 'Share service'}
-              style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '6px 12px', background: copied ? '#dcfce7' : '#fff', border: '2px solid #ddd', cursor: 'pointer', fontFamily: '"Plus Jakarta Sans", sans-serif', fontWeight: 700, fontSize: '12px', color: copied ? '#15803d' : '#555', transition: 'all 0.2s' }}
+              style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '6px 12px', background: copied ? '#dcfce7' : '#fff', border: '1px solid #E8E5E0', borderRadius: '8px', cursor: 'pointer', fontFamily: '"Plus Jakarta Sans", sans-serif', fontWeight: 700, fontSize: '12px', color: copied ? '#15803d' : '#555', transition: 'all 0.2s' }}
             >
               {copied ? '✓ COPIED' : '↗ SHARE'}
             </button>
@@ -233,17 +233,18 @@ export default function ServiceActionsClient({ serviceId, serviceName, providerI
           onClick={e => { if (e.target === e.currentTarget) setShowModal(false) }}
         >
           <div style={{
-            background: '#fff', border: '3px solid #111', boxShadow: '8px 8px 0 #111',
-            maxWidth: '480px', width: '100%',
+            background: '#fff', border: '1px solid #E8E5E0', borderRadius: '16px',
+            boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+            maxWidth: '480px', width: '100%', overflow: 'hidden',
           }}>
             {/* Modal header */}
-            <div style={{ background: '#111', color: '#fff', padding: '16px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontFamily: '"Syne", sans-serif', fontSize: '15px', letterSpacing: '0.5px' }}>
-                BOOK SERVICE
+            <div style={{ background: '#FAFAF8', borderBottom: '1px solid #E8E5E0', padding: '16px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ fontFamily: '"Syne", sans-serif', fontSize: '15px', letterSpacing: '0.5px', color: '#111' }}>
+                Book Service
               </span>
               <button
                 onClick={() => setShowModal(false)}
-                style={{ background: 'none', border: 'none', color: '#fff', fontSize: '20px', cursor: 'pointer', lineHeight: 1, padding: '0 4px' }}
+                style={{ background: 'none', border: 'none', color: '#6B6660', fontSize: '20px', cursor: 'pointer', lineHeight: 1, padding: '0 4px' }}
               >
                 ×
               </button>
@@ -265,8 +266,8 @@ export default function ServiceActionsClient({ serviceId, serviceName, providerI
                   onChange={e => setScheduledAt(e.target.value)}
                   min={new Date().toISOString().slice(0, 16)}
                   style={{
-                    width: '100%', padding: '10px 12px', border: '2px solid #ddd',
-                    fontSize: '14px', outline: 'none', boxSizing: 'border-box',
+                    width: '100%', padding: '10px 12px', border: '1px solid #E8E5E0',
+                    borderRadius: '8px', fontSize: '14px', outline: 'none', boxSizing: 'border-box',
                     fontFamily: 'inherit',
                   }}
                   onFocus={e => (e.currentTarget.style.borderColor = '#1B5E20')}
@@ -285,8 +286,8 @@ export default function ServiceActionsClient({ serviceId, serviceName, providerI
                   maxLength={500}
                   placeholder="What do you need? Any specific details..."
                   style={{
-                    width: '100%', padding: '10px 12px', border: '2px solid #ddd',
-                    fontSize: '14px', resize: 'vertical', outline: 'none',
+                    width: '100%', padding: '10px 12px', border: '1px solid #E8E5E0',
+                    borderRadius: '8px', fontSize: '14px', resize: 'vertical', outline: 'none',
                     fontFamily: 'inherit', lineHeight: 1.5, boxSizing: 'border-box',
                   }}
                   onFocus={e => (e.currentTarget.style.borderColor = '#1B5E20')}
@@ -302,7 +303,7 @@ export default function ServiceActionsClient({ serviceId, serviceName, providerI
                   style={{
                     flex: 1, padding: '14px', background: loading ? '#888' : '#1B5E20', color: '#fff',
                     fontFamily: '"Syne", sans-serif', fontSize: '14px',
-                    border: '2px solid #111', boxShadow: '3px 3px 0 #111',
+                    border: 'none', borderRadius: '10px',
                     cursor: loading ? 'not-allowed' : 'pointer', transition: 'all 0.15s',
                   }}
                 >
@@ -311,9 +312,9 @@ export default function ServiceActionsClient({ serviceId, serviceName, providerI
                 <button
                   onClick={() => setShowModal(false)}
                   style={{
-                    padding: '14px 20px', background: '#f0f0f0', color: '#111',
+                    padding: '14px 20px', background: '#F0F0EE', color: '#111',
                     fontWeight: 700, fontSize: '14px',
-                    border: '2px solid #ddd', cursor: 'pointer',
+                    border: '1px solid #E8E5E0', borderRadius: '10px', cursor: 'pointer',
                   }}
                 >
                   Cancel
