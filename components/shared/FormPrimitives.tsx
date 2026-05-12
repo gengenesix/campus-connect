@@ -13,7 +13,7 @@ export function ProfileIncompleteWarning({ message }: { message: string }) {
       <div>
         <div style={{ fontWeight: 700, fontSize: '14px', color: '#92400e', marginBottom: '4px' }}>Complete your profile first</div>
         <p style={{ fontSize: '13px', color: '#78350f', margin: '0 0 10px' }}>{message}</p>
-        <a href="/profile" style={{ display: 'inline-block', padding: '8px 18px', background: '#f59e0b', color: '#fff', fontFamily: '"Archivo Black", sans-serif', fontSize: '12px', textDecoration: 'none', border: '2px solid #111', letterSpacing: '0.5px' }}>
+        <a href="/profile" style={{ display: 'inline-block', padding: '8px 18px', background: '#f59e0b', color: '#fff', fontFamily: '"Syne", sans-serif', fontSize: '12px', textDecoration: 'none', border: '2px solid #111', letterSpacing: '0.5px' }}>
           COMPLETE PROFILE →
         </a>
       </div>
@@ -69,7 +69,7 @@ export function BrutalTextarea({
       <style>{`.brutal-ta:focus { border-color: ${focusColor} !important; }`}</style>
       <textarea
         className={`brutal-ta${className ? ` ${className}` : ''}`}
-        style={{ width: '100%', padding: '13px 16px', border: '2px solid #111', fontFamily: '"Space Grotesk", sans-serif', fontSize: '15px', outline: 'none', boxSizing: 'border-box', resize: 'vertical', transition: 'border-color 0.15s' }}
+        style={{ width: '100%', padding: '13px 16px', border: '2px solid #111', fontFamily: '"Plus Jakarta Sans", sans-serif', fontSize: '15px', outline: 'none', boxSizing: 'border-box', resize: 'vertical', transition: 'border-color 0.15s' }}
         {...props}
       />
     </>

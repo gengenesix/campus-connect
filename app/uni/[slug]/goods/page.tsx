@@ -142,7 +142,7 @@ export default function UniGoodsPage() {
               {uni.shortName}
             </Link> · GOODS
           </div>
-          <h1 style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '44px', letterSpacing: '-1px', marginBottom: '4px' }}>
+          <h1 style={{ fontFamily: '"Syne", sans-serif', fontSize: '44px', letterSpacing: '-1px', marginBottom: '4px' }}>
             {uni.shortName} GOODS
           </h1>
           <p style={{ color: '#666', fontSize: '14px' }}>
@@ -159,17 +159,17 @@ export default function UniGoodsPage() {
             placeholder="Search goods..."
             value={search}
             onChange={e => setSearch(e.target.value)}
-            style={{ flex: 1, minWidth: '180px', padding: '10px 14px', border: '2px solid #111', fontFamily: '"Space Grotesk", sans-serif', fontSize: '14px', fontWeight: 600, outline: 'none' }}
+            style={{ flex: 1, minWidth: '180px', padding: '10px 14px', border: '2px solid #111', fontFamily: '"Plus Jakarta Sans", sans-serif', fontSize: '14px', fontWeight: 600, outline: 'none' }}
           />
-          <select value={condition} onChange={e => setCondition(e.target.value)} style={{ padding: '10px 14px', border: '2px solid #111', fontFamily: '"Space Grotesk", sans-serif', fontWeight: 600, cursor: 'pointer', background: '#fff', fontSize: '14px' }}>
+          <select value={condition} onChange={e => setCondition(e.target.value)} style={{ padding: '10px 14px', border: '2px solid #111', fontFamily: '"Plus Jakarta Sans", sans-serif', fontWeight: 600, cursor: 'pointer', background: '#fff', fontSize: '14px' }}>
             <option value="">All Conditions</option>
             {CONDITIONS.map(c => <option key={c} value={c}>{c}</option>)}
           </select>
-          <select value={category} onChange={e => setCategory(e.target.value)} style={{ padding: '10px 14px', border: '2px solid #111', fontFamily: '"Space Grotesk", sans-serif', fontWeight: 600, cursor: 'pointer', background: '#fff', fontSize: '14px' }}>
+          <select value={category} onChange={e => setCategory(e.target.value)} style={{ padding: '10px 14px', border: '2px solid #111', fontFamily: '"Plus Jakarta Sans", sans-serif', fontWeight: 600, cursor: 'pointer', background: '#fff', fontSize: '14px' }}>
             <option value="">All Categories</option>
             {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
           </select>
-          <select value={sortBy} onChange={e => setSortBy(e.target.value)} style={{ padding: '10px 14px', border: '2px solid #111', fontFamily: '"Space Grotesk", sans-serif', fontWeight: 600, cursor: 'pointer', background: '#fff', fontSize: '14px' }}>
+          <select value={sortBy} onChange={e => setSortBy(e.target.value)} style={{ padding: '10px 14px', border: '2px solid #111', fontFamily: '"Plus Jakarta Sans", sans-serif', fontWeight: 600, cursor: 'pointer', background: '#fff', fontSize: '14px' }}>
             <option value="newest">Newest First</option>
             <option value="price-low">Price: Low → High</option>
             <option value="price-high">Price: High → Low</option>
@@ -179,7 +179,7 @@ export default function UniGoodsPage() {
             onClick={() => setAllUnis(v => !v)}
             style={{
               padding: '10px 16px', border: '2px solid #111',
-              fontFamily: '"Archivo Black", sans-serif', fontSize: '11px',
+              fontFamily: '"Syne", sans-serif', fontSize: '11px',
               cursor: 'pointer', letterSpacing: '0.5px', whiteSpace: 'nowrap',
               background: allUnis ? '#5d3fd3' : '#fff',
               color: allUnis ? '#fff' : '#111',
@@ -193,7 +193,7 @@ export default function UniGoodsPage() {
             )}
           </button>
           {hasFilters && (
-            <button onClick={() => { setCondition(''); setCategory(''); setSearch(''); setDebouncedSearch('') }} style={{ padding: '10px 18px', background: '#ff3366', color: '#fff', border: '2px solid #111', fontWeight: 700, cursor: 'pointer', fontFamily: '"Space Grotesk", sans-serif', fontSize: '13px' }}>
+            <button onClick={() => { setCondition(''); setCategory(''); setSearch(''); setDebouncedSearch('') }} style={{ padding: '10px 18px', background: '#ff3366', color: '#fff', border: '2px solid #111', fontWeight: 700, cursor: 'pointer', fontFamily: '"Plus Jakarta Sans", sans-serif', fontSize: '13px' }}>
               ✕ CLEAR
             </button>
           )}
@@ -219,7 +219,7 @@ export default function UniGoodsPage() {
             <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'center', color: '#ccc' }}>
               <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
             </div>
-            <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '28px', marginBottom: '10px' }}>
+            <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '28px', marginBottom: '10px' }}>
               {hasFilters ? 'NO RESULTS FOUND' : allUnis ? 'NO LISTINGS YET' : `NO LISTINGS AT ${uni.shortName.toUpperCase()} YET`}
             </div>
             <p style={{ color: '#666', marginBottom: '24px' }}>
@@ -231,7 +231,7 @@ export default function UniGoodsPage() {
           </div>
         ) : (
           <>
-            <p style={{ marginBottom: '20px', fontWeight: 700, color: '#888', fontSize: '12px', letterSpacing: '1px', fontFamily: '"Space Grotesk", sans-serif' }}>
+            <p style={{ marginBottom: '20px', fontWeight: 700, color: '#888', fontSize: '12px', letterSpacing: '1px', fontFamily: '"Plus Jakarta Sans", sans-serif' }}>
               SHOWING <strong style={{ color: '#111' }}>{products.length}</strong> ITEM{products.length !== 1 ? 'S' : ''}
               {allUnis && <span style={{ color: '#5d3fd3' }}> · ALL UNIVERSITIES</span>}
               {hasFilters && <span style={{ color: '#5d3fd3' }}> · FILTERED</span>}
@@ -254,7 +254,7 @@ export default function UniGoodsPage() {
                 <button
                   onClick={loadMore}
                   disabled={loadingMore}
-                  style={{ padding: '14px 48px', background: loadingMore ? '#888' : '#111', color: '#fff', fontFamily: '"Archivo Black", sans-serif', fontSize: '14px', border: '2px solid #111', boxShadow: loadingMore ? 'none' : '4px 4px 0 #5d3fd3', cursor: loadingMore ? 'not-allowed' : 'pointer', letterSpacing: '0.5px' }}
+                  style={{ padding: '14px 48px', background: loadingMore ? '#888' : '#111', color: '#fff', fontFamily: '"Syne", sans-serif', fontSize: '14px', border: '2px solid #111', boxShadow: loadingMore ? 'none' : '4px 4px 0 #5d3fd3', cursor: loadingMore ? 'not-allowed' : 'pointer', letterSpacing: '0.5px' }}
                 >
                   {loadingMore ? 'LOADING...' : 'LOAD MORE'}
                 </button>

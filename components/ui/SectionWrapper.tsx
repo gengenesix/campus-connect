@@ -45,7 +45,7 @@ export default function SectionWrapper({
     <div className="text-center mb-10">
       {label && (
         <p style={{
-          fontFamily: '"Space Grotesk", sans-serif',
+          fontFamily: '"Plus Jakarta Sans", sans-serif',
           fontSize: '11px',
           fontWeight: 700,
           letterSpacing: '3px',
@@ -58,7 +58,7 @@ export default function SectionWrapper({
       )}
       {title && (
         <h2 style={{
-          fontFamily: '"Archivo Black", sans-serif',
+          fontFamily: '"Syne", sans-serif',
           fontSize: 'clamp(28px, 4vw, 48px)',
           lineHeight: 1,
           margin: 0,

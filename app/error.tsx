@@ -37,7 +37,7 @@ export default function Error({
             )}
           </div>
           <h1 style={{
-            fontFamily: '"Archivo Black", sans-serif', fontSize: '22px',
+            fontFamily: '"Syne", sans-serif', fontSize: '22px',
             letterSpacing: '-0.5px', marginBottom: '12px', color: '#111',
           }}>
             {isOffline ? 'NO CONNECTION' : 'SOMETHING WENT WRONG'}
@@ -52,7 +52,7 @@ export default function Error({
               onClick={reset}
               style={{
                 padding: '12px 24px', background: '#1B5E20', color: '#fff',
-                border: '2px solid #111', fontFamily: '"Archivo Black", sans-serif',
+                border: '2px solid #111', fontFamily: '"Syne", sans-serif',
                 fontSize: '13px', cursor: 'pointer', boxShadow: '3px 3px 0 #111',
                 letterSpacing: '0.5px',
               }}
@@ -63,7 +63,7 @@ export default function Error({
               href="/"
               style={{
                 padding: '12px 24px', background: '#fff', color: '#111',
-                border: '2px solid #111', fontFamily: '"Archivo Black", sans-serif',
+                border: '2px solid #111', fontFamily: '"Syne", sans-serif',
                 fontSize: '13px', textDecoration: 'none', display: 'inline-block',
                 boxShadow: '3px 3px 0 #888', letterSpacing: '0.5px',
               }}

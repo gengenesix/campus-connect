@@ -102,14 +102,14 @@ export default function DashboardPage() {
   if (loading) {
     return (
       <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ fontFamily: '"Archivo Black", sans-serif', color: '#888' }}>Loading...</div>
+        <div style={{ fontFamily: '"Syne", sans-serif', color: '#888' }}>Loading...</div>
       </div>
     )
   }
 
   if (!user) return (
     <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <div style={{ fontFamily: '"Archivo Black", sans-serif', color: '#888' }}>Loading...</div>
+      <div style={{ fontFamily: '"Syne", sans-serif', color: '#888' }}>Loading...</div>
     </div>
   )
 
@@ -120,7 +120,7 @@ export default function DashboardPage() {
         <div className="container">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
             <div>
-              <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '36px', letterSpacing: '-1px' }}>
+              <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '36px', letterSpacing: '-1px' }}>
                 DASHBOARD
               </div>
               <p style={{ color: '#666', marginTop: '4px', fontSize: '14px' }}>
@@ -132,7 +132,7 @@ export default function DashboardPage() {
               style={{
                 display: 'inline-block', padding: '12px 28px',
                 background: '#a78bfa', color: '#111',
-                fontFamily: '"Archivo Black", sans-serif', fontSize: '14px',
+                fontFamily: '"Syne", sans-serif', fontSize: '14px',
                 textDecoration: 'none', border: '2px solid #a78bfa',
                 boxShadow: '3px 3px 0 #fff',
               }}
@@ -154,7 +154,7 @@ export default function DashboardPage() {
                 onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = 'none'; (e.currentTarget as HTMLElement).style.boxShadow = '4px 4px 0 #111' }}
               >
                 <div style={{ marginBottom: '10px', color: stat.color }}>{stat.icon}</div>
-                <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '36px', color: stat.color, lineHeight: 1 }}>{stat.value}</div>
+                <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '36px', color: stat.color, lineHeight: 1 }}>{stat.value}</div>
                 <div style={{ fontSize: '12px', color: '#888', fontWeight: 600, marginTop: '6px', letterSpacing: '0.5px' }}>{stat.label}</div>
               </div>
             </Link>
@@ -169,10 +169,10 @@ export default function DashboardPage() {
               <div style={{ marginBottom: '24px', padding: '18px 24px', background: '#fff', border: '2px solid #ff3366', display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap', boxShadow: '4px 4px 0 #ff3366' }}>
                 <div style={{ color: '#ff3366' }}><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
                 <div style={{ flex: 1, minWidth: '200px' }}>
-                  <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '15px', marginBottom: '3px' }}>NO ACTIVE SELLER SUBSCRIPTION</div>
+                  <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '15px', marginBottom: '3px' }}>NO ACTIVE SELLER SUBSCRIPTION</div>
                   <div style={{ color: '#888', fontSize: '13px' }}>Subscribe for GHS 20/month to list goods and services on Campus Connect.</div>
                 </div>
-                <Link href="/subscribe" style={{ display: 'inline-block', padding: '10px 24px', background: '#ff3366', color: '#fff', fontFamily: '"Archivo Black", sans-serif', fontSize: '13px', textDecoration: 'none', border: '2px solid #111', boxShadow: '3px 3px 0 #111', whiteSpace: 'nowrap' }}>
+                <Link href="/subscribe" style={{ display: 'inline-block', padding: '10px 24px', background: '#ff3366', color: '#fff', fontFamily: '"Syne", sans-serif', fontSize: '13px', textDecoration: 'none', border: '2px solid #111', boxShadow: '3px 3px 0 #111', whiteSpace: 'nowrap' }}>
                   SUBSCRIBE →
                 </Link>
               </div>
@@ -192,7 +192,7 @@ export default function DashboardPage() {
                 </div>
               </div>
               {expiring && (
-                <Link href="/subscribe" style={{ display: 'inline-block', padding: '9px 20px', background: '#f59e0b', color: '#111', fontFamily: '"Archivo Black", sans-serif', fontSize: '12px', textDecoration: 'none', border: '2px solid #111', boxShadow: '3px 3px 0 #111', whiteSpace: 'nowrap' }}>
+                <Link href="/subscribe" style={{ display: 'inline-block', padding: '9px 20px', background: '#f59e0b', color: '#111', fontFamily: '"Syne", sans-serif', fontSize: '12px', textDecoration: 'none', border: '2px solid #111', boxShadow: '3px 3px 0 #111', whiteSpace: 'nowrap' }}>
                   RENEW NOW →
                 </Link>
               )}
@@ -206,7 +206,7 @@ export default function DashboardPage() {
           {/* My Listings */}
           <div style={{ border: '2px solid #111', background: '#fff', boxShadow: '4px 4px 0 #111' }}>
             <div style={{ background: '#111', color: '#fff', padding: '14px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '14px', letterSpacing: '0.5px' }}>MY LISTINGS</span>
+              <span style={{ fontFamily: '"Syne", sans-serif', fontSize: '14px', letterSpacing: '0.5px' }}>MY LISTINGS</span>
               <Link href="/my-listings" style={{ color: '#a78bfa', fontSize: '12px', textDecoration: 'none', fontWeight: 700 }}>View All →</Link>
             </div>
             <div>
@@ -261,7 +261,7 @@ export default function DashboardPage() {
           {/* Bookings */}
           <div style={{ border: '2px solid #111', background: '#fff', boxShadow: '4px 4px 0 #111' }}>
             <div style={{ background: '#1B5E20', color: '#fff', padding: '14px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '14px', letterSpacing: '0.5px' }}>MY BOOKINGS</span>
+              <span style={{ fontFamily: '"Syne", sans-serif', fontSize: '14px', letterSpacing: '0.5px' }}>MY BOOKINGS</span>
               <Link href="/bookings" style={{ color: '#86efac', fontSize: '12px', textDecoration: 'none', fontWeight: 700 }}>View All →</Link>
             </div>
             <div>
@@ -314,7 +314,7 @@ export default function DashboardPage() {
         {/* Quick Actions */}
         <div style={{ border: '2px solid #111', background: '#fff', boxShadow: '4px 4px 0 #111' }}>
           <div style={{ background: '#f0f0f0', padding: '14px 20px', borderBottom: '2px solid #111' }}>
-            <span style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '14px', letterSpacing: '0.5px' }}>QUICK ACTIONS</span>
+            <span style={{ fontFamily: '"Syne", sans-serif', fontSize: '14px', letterSpacing: '0.5px' }}>QUICK ACTIONS</span>
           </div>
           <div style={{ padding: '20px', display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '12px' }}>
             {[
@@ -358,7 +358,7 @@ export default function DashboardPage() {
             <Link href="/profile" style={{
               display: 'inline-block', padding: '10px 24px',
               background: '#f59e0b', color: '#111',
-              fontFamily: '"Archivo Black", sans-serif', fontSize: '13px',
+              fontFamily: '"Syne", sans-serif', fontSize: '13px',
               textDecoration: 'none', border: '2px solid #111',
               boxShadow: '3px 3px 0 #111', whiteSpace: 'nowrap',
             }}>

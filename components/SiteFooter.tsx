@@ -8,7 +8,7 @@ export default function SiteFooter() {
       <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 20px' }}>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: '40px', paddingBottom: '32px', borderBottom: '1px solid #333' }}>
           <div>
-            <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '20px', color: '#fff', marginBottom: '12px' }}>
+            <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '20px', color: '#fff', marginBottom: '12px' }}>
               CAMPUS<span style={{ color: '#a78bfa' }}>.</span>CONNECT
             </div>
             <p style={{ color: '#888', fontSize: '14px', lineHeight: 1.6 }}>

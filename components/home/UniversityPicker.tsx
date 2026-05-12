@@ -36,7 +36,7 @@ export default function UniversityPicker() {
         .uni-card:hover { transform: translate(-2px, -2px); box-shadow: 5px 5px 0 #111 !important; }
         .uni-expand-btn {
           padding: 12px 32px; border: 2px solid #111; background: #fff;
-          font-family: "Archivo Black", sans-serif; font-size: 12px;
+          font-family: "Syne", sans-serif; font-size: 12px;
           letter-spacing: 1px; cursor: pointer; box-shadow: 3px 3px 0 #111; transition: all 0.15s;
         }
         .uni-expand-btn:hover { transform: translate(-2px,-2px); box-shadow: 5px 5px 0 #111; }
@@ -51,7 +51,7 @@ export default function UniversityPicker() {
           <div style={{
             display: 'inline-flex', alignItems: 'center', gap: '8px',
             background: '#1B5E20', color: '#fff', padding: '6px 16px',
-            fontFamily: '"Space Grotesk", sans-serif', fontSize: '11px',
+            fontFamily: '"Plus Jakarta Sans", sans-serif', fontSize: '11px',
             fontWeight: 700, letterSpacing: '2px', marginBottom: '20px',
             border: '1.5px solid #111',
           }}>
@@ -60,7 +60,7 @@ export default function UniversityPicker() {
             </svg>
             EVERY ACCREDITED UNIVERSITY IN GHANA
           </div>
-          <h2 style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: 'clamp(32px, 5vw, 52px)', lineHeight: 0.95, margin: 0, letterSpacing: '-1px' }}>
+          <h2 style={{ fontFamily: '"Syne", sans-serif', fontSize: 'clamp(32px, 5vw, 52px)', lineHeight: 0.95, margin: 0, letterSpacing: '-1px' }}>
             FIND YOUR<br /><span style={{ color: '#1B5E20' }}>CAMPUS</span>
           </h2>
           <p style={{ color: '#666', fontSize: '16px', marginTop: '16px', maxWidth: '440px', marginLeft: 'auto', marginRight: 'auto', lineHeight: 1.6 }}>
@@ -86,7 +86,7 @@ export default function UniversityPicker() {
               style={{
                 width: '100%', padding: '16px 56px 16px 48px',
                 border: '2px solid #111', fontSize: '15px',
-                fontFamily: '"Space Grotesk", sans-serif', fontWeight: 600,
+                fontFamily: '"Plus Jakarta Sans", sans-serif', fontWeight: 600,
                 outline: 'none', background: '#fff', boxSizing: 'border-box',
                 boxShadow: '4px 4px 0 #111', transition: 'box-shadow 0.15s',
               }}
@@ -110,7 +110,7 @@ export default function UniversityPicker() {
                 style={{
                   padding: '7px 14px', border: '1.5px solid',
                   borderColor: uniType === val ? '#111' : '#ddd',
-                  fontFamily: '"Space Grotesk", sans-serif', fontSize: '11px',
+                  fontFamily: '"Plus Jakarta Sans", sans-serif', fontSize: '11px',
                   fontWeight: 700, letterSpacing: '0.5px', cursor: 'pointer',
                   background: uniType === val ? '#111' : '#fff',
                   color: uniType === val ? '#fff' : '#555',
@@ -137,10 +137,10 @@ export default function UniversityPicker() {
                 display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
               }}>
                 <div>
-                  <div style={{ fontSize: '9px', fontFamily: '"Space Grotesk", sans-serif', fontWeight: 700, letterSpacing: '1.5px', color: TYPE_COLOR[uni.type], marginBottom: '4px', textTransform: 'uppercase' }}>
+                  <div style={{ fontSize: '9px', fontFamily: '"Plus Jakarta Sans", sans-serif', fontWeight: 700, letterSpacing: '1.5px', color: TYPE_COLOR[uni.type], marginBottom: '4px', textTransform: 'uppercase' }}>
                     {uni.type}
                   </div>
-                  <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '17px', lineHeight: 1, color: '#111', letterSpacing: '-0.5px', marginBottom: '3px' }}>
+                  <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '17px', lineHeight: 1, color: '#111', letterSpacing: '-0.5px', marginBottom: '3px' }}>
                     {uni.shortName}
                   </div>
                   <div style={{ fontSize: '10px', color: '#777', lineHeight: 1.3, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 1, WebkitBoxOrient: 'vertical' }}>
@@ -157,7 +157,7 @@ export default function UniversityPicker() {
 
         {filteredUnis.length === 0 && (
           <div style={{ textAlign: 'center', padding: '48px 20px', color: '#888', border: '2px dashed #ddd', maxWidth: '400px', margin: '0 auto' }}>
-            <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '16px', marginBottom: '6px' }}>NO MATCH FOUND</div>
+            <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '16px', marginBottom: '6px' }}>NO MATCH FOUND</div>
             <p style={{ fontSize: '13px' }}>Try a different name or city.</p>
           </div>
         )}

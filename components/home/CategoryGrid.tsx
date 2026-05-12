@@ -53,18 +53,18 @@ export default function CategoryGrid() {
         <div className="max-w-6xl mx-auto px-4 mb-8">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '16px' }}>
             <div>
-              <div style={{ fontFamily: '"Space Grotesk", sans-serif', fontSize: '11px', fontWeight: 700, letterSpacing: '3px', color: '#a78bfa', marginBottom: '10px' }}>
+              <div style={{ fontFamily: '"Plus Jakarta Sans", sans-serif', fontSize: '11px', fontWeight: 700, letterSpacing: '3px', color: '#a78bfa', marginBottom: '10px' }}>
                 CAMPUS MARKET
               </div>
-              <h2 style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: 'clamp(32px, 5vw, 52px)', color: '#fff', lineHeight: 1, margin: 0 }}>
+              <h2 style={{ fontFamily: '"Syne", sans-serif', fontSize: 'clamp(32px, 5vw, 52px)', color: '#fff', lineHeight: 1, margin: 0 }}>
                 WHAT&apos;S ON<br /><span style={{ color: '#a78bfa' }}>CAMPUS</span>
               </h2>
             </div>
             <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-              <Link href="/goods" style={{ padding: '10px 22px', border: '1px solid #333', color: '#aaa', fontSize: '12px', fontWeight: 700, textDecoration: 'none', letterSpacing: '1px', fontFamily: '"Space Grotesk", sans-serif' }}>
+              <Link href="/goods" style={{ padding: '10px 22px', border: '1px solid #333', color: '#aaa', fontSize: '12px', fontWeight: 700, textDecoration: 'none', letterSpacing: '1px', fontFamily: '"Plus Jakarta Sans", sans-serif' }}>
                 BROWSE GOODS
               </Link>
-              <Link href="/services" style={{ padding: '10px 22px', background: '#5d3fd3', color: '#fff', fontSize: '12px', fontWeight: 700, textDecoration: 'none', letterSpacing: '1px', fontFamily: '"Archivo Black", sans-serif', border: '1px solid #5d3fd3' }}>
+              <Link href="/services" style={{ padding: '10px 22px', background: '#5d3fd3', color: '#fff', fontSize: '12px', fontWeight: 700, textDecoration: 'none', letterSpacing: '1px', fontFamily: '"Syne", sans-serif', border: '1px solid #5d3fd3' }}>
                 BOOK SERVICES
               </Link>
             </div>
@@ -78,16 +78,16 @@ export default function CategoryGrid() {
                 <img src={item.img} alt={item.label} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/placeholder.jpg' }} loading="lazy" />
                 <div className="showcase-overlay" style={{ position: 'absolute', inset: 0, background: 'linear-gradient(transparent 30%, rgba(0,0,0,0.85))', transition: 'background 0.3s' }} />
                 <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '14px 12px 12px' }}>
-                  <div style={{ fontSize: '9px', fontWeight: 700, letterSpacing: '1.5px', color: '#a78bfa', marginBottom: '4px', fontFamily: '"Space Grotesk", sans-serif' }}>{item.tag}</div>
-                  <div className="showcase-label" style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '18px', color: '#fff', lineHeight: 1.1, marginBottom: '2px' }}>{item.label}</div>
+                  <div style={{ fontSize: '9px', fontWeight: 700, letterSpacing: '1.5px', color: '#a78bfa', marginBottom: '4px', fontFamily: '"Plus Jakarta Sans", sans-serif' }}>{item.tag}</div>
+                  <div className="showcase-label" style={{ fontFamily: '"Syne", sans-serif', fontSize: '18px', color: '#fff', lineHeight: 1.1, marginBottom: '2px' }}>{item.label}</div>
                   <div className="showcase-sublabel" style={{ fontSize: '11px', color: '#ccc', marginBottom: '6px' }}>{item.sublabel}</div>
-                  <div className="showcase-arrow" style={{ fontSize: '11px', color: '#a78bfa', fontWeight: 700, letterSpacing: '1px', fontFamily: '"Space Grotesk", sans-serif', opacity: 0, transform: 'translateX(-6px)', transition: 'all 0.25s' }}>SHOP NOW →</div>
+                  <div className="showcase-arrow" style={{ fontSize: '11px', color: '#a78bfa', fontWeight: 700, letterSpacing: '1px', fontFamily: '"Plus Jakarta Sans", sans-serif', opacity: 0, transform: 'translateX(-6px)', transition: 'all 0.25s' }}>SHOP NOW →</div>
                 </div>
               </Link>
             ))}
             <Link href="/goods" className="showcase-end-card" style={{ textDecoration: 'none', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '150px', flexShrink: 0, border: '2px dashed #333', color: '#666', gap: '12px' }}>
-              <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '36px', color: '#5d3fd3' }}>+</div>
-              <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '13px', color: '#888', textAlign: 'center', lineHeight: 1.4 }}>200+<br />MORE ITEMS</div>
+              <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '36px', color: '#5d3fd3' }}>+</div>
+              <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '13px', color: '#888', textAlign: 'center', lineHeight: 1.4 }}>200+<br />MORE ITEMS</div>
               <div style={{ fontSize: '11px', color: '#a78bfa', fontWeight: 700, letterSpacing: '1px' }}>BROWSE ALL →</div>
             </Link>
           </div>

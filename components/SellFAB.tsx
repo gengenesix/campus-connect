@@ -45,7 +45,7 @@ export default function SellFAB() {
               style={{
                 display: 'flex', alignItems: 'center', gap: '10px',
                 padding: '10px 16px', background: '#1B5E20', color: '#fff',
-                textDecoration: 'none', fontFamily: '"Archivo Black", sans-serif',
+                textDecoration: 'none', fontFamily: '"Syne", sans-serif',
                 fontSize: '12px', letterSpacing: '0.5px',
                 border: '2px solid #111', boxShadow: '3px 3px 0 #111',
                 whiteSpace: 'nowrap',
@@ -60,7 +60,7 @@ export default function SellFAB() {
               style={{
                 display: 'flex', alignItems: 'center', gap: '10px',
                 padding: '10px 16px', background: '#5d3fd3', color: '#fff',
-                textDecoration: 'none', fontFamily: '"Archivo Black", sans-serif',
+                textDecoration: 'none', fontFamily: '"Syne", sans-serif',
                 fontSize: '12px', letterSpacing: '0.5px',
                 border: '2px solid #111', boxShadow: '3px 3px 0 #111',
                 whiteSpace: 'nowrap',

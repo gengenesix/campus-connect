@@ -72,7 +72,7 @@ export default function ServiceActionsClient({ serviceId, serviceName, providerI
         </div>
         <Link
           href="/dashboard"
-          style={{ textAlign: 'center', display: 'block', textDecoration: 'none', padding: '14px 40px', background: '#111', color: '#fff', fontFamily: '"Archivo Black", sans-serif', fontSize: '14px', border: '2px solid #111', boxShadow: '4px 4px 0 #111' }}
+          style={{ textAlign: 'center', display: 'block', textDecoration: 'none', padding: '14px 40px', background: '#111', color: '#fff', fontFamily: '"Syne", sans-serif', fontSize: '14px', border: '2px solid #111', boxShadow: '4px 4px 0 #111' }}
         >
           MANAGE MY SERVICES →
         </Link>
@@ -88,7 +88,7 @@ export default function ServiceActionsClient({ serviceId, serviceName, providerI
       <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '24px' }}>
         <Link
           href={`/auth/login?redirect=/services/${serviceId}`}
-          style={{ textAlign: 'center', display: 'block', textDecoration: 'none', padding: '18px 40px', background: '#111', color: '#fff', fontFamily: '"Archivo Black", sans-serif', fontSize: '16px', border: '2px solid #111', boxShadow: '4px 4px 0 #111' }}
+          style={{ textAlign: 'center', display: 'block', textDecoration: 'none', padding: '18px 40px', background: '#111', color: '#fff', fontFamily: '"Syne", sans-serif', fontSize: '16px', border: '2px solid #111', boxShadow: '4px 4px 0 #111' }}
         >
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
@@ -101,13 +101,13 @@ export default function ServiceActionsClient({ serviceId, serviceName, providerI
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: '10px', borderTop: '1px solid #eee' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <WishlistButton serviceId={serviceId} size={36} />
-            <span style={{ fontSize: '12px', color: '#888', fontFamily: '"Space Grotesk", sans-serif' }}>Save to wishlist</span>
+            <span style={{ fontSize: '12px', color: '#888', fontFamily: '"Plus Jakarta Sans", sans-serif' }}>Save to wishlist</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <button
               onClick={handleShare}
               title={copied ? 'Link copied!' : 'Share service'}
-              style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '6px 12px', background: copied ? '#dcfce7' : '#fff', border: '2px solid #ddd', cursor: 'pointer', fontFamily: '"Space Grotesk", sans-serif', fontWeight: 700, fontSize: '12px', color: copied ? '#15803d' : '#555', transition: 'all 0.2s' }}
+              style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '6px 12px', background: copied ? '#dcfce7' : '#fff', border: '2px solid #ddd', cursor: 'pointer', fontFamily: '"Plus Jakarta Sans", sans-serif', fontWeight: 700, fontSize: '12px', color: copied ? '#15803d' : '#555', transition: 'all 0.2s' }}
             >
               {copied ? '✓ COPIED' : '↗ SHARE'}
             </button>
@@ -122,14 +122,14 @@ export default function ServiceActionsClient({ serviceId, serviceName, providerI
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '24px' }}>
         <div style={{ padding: '20px 24px', background: '#e8f5e9', border: '2px solid #1B5E20', boxShadow: '4px 4px 0 #1B5E20' }}>
-          <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '16px', color: '#1B5E20', marginBottom: '6px' }}>
+          <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '16px', color: '#1B5E20', marginBottom: '6px' }}>
             ✓ BOOKING REQUESTED!
           </div>
           <div style={{ fontSize: '13px', color: '#15803d', lineHeight: 1.5 }}>
             Your request has been sent to the provider. You&apos;ll get notified when they confirm.
           </div>
         </div>
-        <Link href="/bookings" style={{ textAlign: 'center', display: 'block', textDecoration: 'none', padding: '14px 40px', background: '#111', color: '#fff', fontFamily: '"Archivo Black", sans-serif', fontSize: '13px', border: '2px solid #111', boxShadow: '3px 3px 0 #111' }}>
+        <Link href="/bookings" style={{ textAlign: 'center', display: 'block', textDecoration: 'none', padding: '14px 40px', background: '#111', color: '#fff', fontFamily: '"Syne", sans-serif', fontSize: '13px', border: '2px solid #111', boxShadow: '3px 3px 0 #111' }}>
           VIEW MY BOOKINGS →
         </Link>
       </div>
@@ -154,7 +154,7 @@ export default function ServiceActionsClient({ serviceId, serviceName, providerI
           style={{
             textAlign: 'center', display: 'block', width: '100%', cursor: 'pointer',
             padding: '18px 40px', background: '#1B5E20', color: '#fff',
-            fontFamily: '"Archivo Black", sans-serif', fontSize: '16px',
+            fontFamily: '"Syne", sans-serif', fontSize: '16px',
             border: '2px solid #111', boxShadow: '4px 4px 0 #111', transition: 'all 0.15s',
           }}
           onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = 'translate(-2px,-2px)'; (e.currentTarget as HTMLElement).style.boxShadow = '6px 6px 0 #111' }}
@@ -173,7 +173,7 @@ export default function ServiceActionsClient({ serviceId, serviceName, providerI
             style={{
               textAlign: 'center', display: 'block', width: '100%', cursor: 'pointer',
               padding: '14px 40px', background: '#fff', color: '#111',
-              fontFamily: '"Archivo Black", sans-serif', fontSize: '14px',
+              fontFamily: '"Syne", sans-serif', fontSize: '14px',
               border: '2px solid #111', boxShadow: '3px 3px 0 #111', transition: 'all 0.15s',
             }}
             onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#f8f8f8' }}
@@ -206,13 +206,13 @@ export default function ServiceActionsClient({ serviceId, serviceName, providerI
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: '10px', borderTop: '1px solid #eee' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <WishlistButton serviceId={serviceId} size={36} />
-            <span style={{ fontSize: '12px', color: '#888', fontFamily: '"Space Grotesk", sans-serif' }}>Save to wishlist</span>
+            <span style={{ fontSize: '12px', color: '#888', fontFamily: '"Plus Jakarta Sans", sans-serif' }}>Save to wishlist</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <button
               onClick={handleShare}
               title={copied ? 'Link copied!' : 'Share service'}
-              style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '6px 12px', background: copied ? '#dcfce7' : '#fff', border: '2px solid #ddd', cursor: 'pointer', fontFamily: '"Space Grotesk", sans-serif', fontWeight: 700, fontSize: '12px', color: copied ? '#15803d' : '#555', transition: 'all 0.2s' }}
+              style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '6px 12px', background: copied ? '#dcfce7' : '#fff', border: '2px solid #ddd', cursor: 'pointer', fontFamily: '"Plus Jakarta Sans", sans-serif', fontWeight: 700, fontSize: '12px', color: copied ? '#15803d' : '#555', transition: 'all 0.2s' }}
             >
               {copied ? '✓ COPIED' : '↗ SHARE'}
             </button>
@@ -238,7 +238,7 @@ export default function ServiceActionsClient({ serviceId, serviceName, providerI
           }}>
             {/* Modal header */}
             <div style={{ background: '#111', color: '#fff', padding: '16px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '15px', letterSpacing: '0.5px' }}>
+              <span style={{ fontFamily: '"Syne", sans-serif', fontSize: '15px', letterSpacing: '0.5px' }}>
                 BOOK SERVICE
               </span>
               <button
@@ -301,7 +301,7 @@ export default function ServiceActionsClient({ serviceId, serviceName, providerI
                   disabled={loading}
                   style={{
                     flex: 1, padding: '14px', background: loading ? '#888' : '#1B5E20', color: '#fff',
-                    fontFamily: '"Archivo Black", sans-serif', fontSize: '14px',
+                    fontFamily: '"Syne", sans-serif', fontSize: '14px',
                     border: '2px solid #111', boxShadow: '3px 3px 0 #111',
                     cursor: loading ? 'not-allowed' : 'pointer', transition: 'all 0.15s',
                   }}

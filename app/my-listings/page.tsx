@@ -34,14 +34,14 @@ export default function MyListingsPage() {
   if (authLoading || (loading && !listings.length)) {
     return (
       <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ fontFamily: '"Archivo Black", sans-serif', color: '#888' }}>Loading...</div>
+        <div style={{ fontFamily: '"Syne", sans-serif', color: '#888' }}>Loading...</div>
       </div>
     )
   }
 
   if (!user) return (
     <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <div style={{ fontFamily: '"Archivo Black", sans-serif', color: '#888' }}>Loading...</div>
+      <div style={{ fontFamily: '"Syne", sans-serif', color: '#888' }}>Loading...</div>
     </div>
   )
 
@@ -60,14 +60,14 @@ export default function MyListingsPage() {
         <div className="container">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
             <div>
-              <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '36px', letterSpacing: '-1px' }}>MY LISTINGS</div>
+              <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '36px', letterSpacing: '-1px' }}>MY LISTINGS</div>
               <p style={{ color: '#888', marginTop: '4px', fontSize: '14px' }}>Manage your items and track performance</p>
             </div>
             <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-              <Link href="/sell" style={{ padding: '12px 24px', background: '#1B5E20', color: '#fff', fontFamily: '"Archivo Black", sans-serif', fontSize: '13px', textDecoration: 'none', border: '2px solid #1B5E20', boxShadow: '3px 3px 0 #fff' }}>
+              <Link href="/sell" style={{ padding: '12px 24px', background: '#1B5E20', color: '#fff', fontFamily: '"Syne", sans-serif', fontSize: '13px', textDecoration: 'none', border: '2px solid #1B5E20', boxShadow: '3px 3px 0 #fff' }}>
                 + SELL ITEM
               </Link>
-              <Link href="/offer-service" style={{ padding: '12px 24px', background: '#5d3fd3', color: '#fff', fontFamily: '"Archivo Black", sans-serif', fontSize: '13px', textDecoration: 'none', border: '2px solid #5d3fd3', boxShadow: '3px 3px 0 #fff' }}>
+              <Link href="/offer-service" style={{ padding: '12px 24px', background: '#5d3fd3', color: '#fff', fontFamily: '"Syne", sans-serif', fontSize: '13px', textDecoration: 'none', border: '2px solid #5d3fd3', boxShadow: '3px 3px 0 #fff' }}>
                 + OFFER SERVICE
               </Link>
             </div>
@@ -87,7 +87,7 @@ export default function MyListingsPage() {
             { label: 'Sold', value: listings.filter(l => l.status === 'sold').length, color: '#f59e0b' },
           ].map(stat => (
             <div key={stat.label} style={{ border: '2px solid #111', background: '#fff', padding: '20px', boxShadow: '4px 4px 0 #111', textAlign: 'center' }}>
-              <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '32px', color: stat.color, lineHeight: 1 }}>{stat.value}</div>
+              <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '32px', color: stat.color, lineHeight: 1 }}>{stat.value}</div>
               <div style={{ fontSize: '12px', color: '#888', marginTop: '6px', fontWeight: 600 }}>{stat.label}</div>
             </div>
           ))}
@@ -96,7 +96,7 @@ export default function MyListingsPage() {
         {/* Performance analytics */}
         {listings.length > 0 && (
           <div style={{ marginBottom: '24px' }}>
-            <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '13px', letterSpacing: '1.5px', marginBottom: '14px', color: '#111', borderBottom: '3px solid #111', paddingBottom: '8px' }}>
+            <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '13px', letterSpacing: '1.5px', marginBottom: '14px', color: '#111', borderBottom: '3px solid #111', paddingBottom: '8px' }}>
               PERFORMANCE
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '16px' }}>
@@ -115,7 +115,7 @@ export default function MyListingsPage() {
                       <Link href={`/goods/${topPerformer.id}`} style={{ fontWeight: 700, fontSize: '12px', color: '#111', textDecoration: 'none', display: 'block', marginBottom: '6px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         {topPerformer.title}
                       </Link>
-                      <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '28px', color: '#5d3fd3', lineHeight: 1 }}>
+                      <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '28px', color: '#5d3fd3', lineHeight: 1 }}>
                         {topPerformer.views ?? 0}
                       </div>
                       <div style={{ fontSize: '10px', color: '#888', fontWeight: 700, letterSpacing: '0.5px' }}>VIEWS</div>
@@ -171,9 +171,9 @@ export default function MyListingsPage() {
         {listings.length === 0 ? (
           <div style={{ border: '2px solid #111', background: '#fff', boxShadow: '6px 6px 0 #111', padding: '60px', textAlign: 'center' }}>
             <div style={{ marginBottom: '20px', display: 'flex', justifyContent: 'center', color: '#ddd' }}><svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"><path d="M16.5 9.4l-9-5.19M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></div>
-            <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '24px', marginBottom: '12px' }}>No listings yet</div>
+            <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '24px', marginBottom: '12px' }}>No listings yet</div>
             <p style={{ color: '#888', marginBottom: '28px' }}>List your first item and start connecting with fellow students.</p>
-            <Link href="/sell" style={{ display: 'inline-block', padding: '14px 32px', background: '#1B5E20', color: '#fff', fontFamily: '"Archivo Black", sans-serif', fontSize: '14px', textDecoration: 'none', border: '2px solid #111', boxShadow: '4px 4px 0 #111' }}>
+            <Link href="/sell" style={{ display: 'inline-block', padding: '14px 32px', background: '#1B5E20', color: '#fff', fontFamily: '"Syne", sans-serif', fontSize: '14px', textDecoration: 'none', border: '2px solid #111', boxShadow: '4px 4px 0 #111' }}>
               LIST YOUR FIRST ITEM →
             </Link>
           </div>
@@ -185,7 +185,7 @@ export default function MyListingsPage() {
                 <thead>
                   <tr style={{ background: '#111', color: '#fff' }}>
                     {['ITEM', 'PRICE', 'CONDITION', 'VIEWS', 'STATUS', 'STOCK', 'ACTIONS'].map(h => (
-                      <th key={h} style={{ padding: '12px 14px', textAlign: 'left', fontFamily: '"Archivo Black", sans-serif', fontSize: '11px', letterSpacing: '1px', whiteSpace: 'nowrap' }}>{h}</th>
+                      <th key={h} style={{ padding: '12px 14px', textAlign: 'left', fontFamily: '"Syne", sans-serif', fontSize: '11px', letterSpacing: '1px', whiteSpace: 'nowrap' }}>{h}</th>
                     ))}
                   </tr>
                 </thead>
@@ -210,7 +210,7 @@ export default function MyListingsPage() {
                             </div>
                           </div>
                         </td>
-                        <td style={{ padding: '12px 14px', fontFamily: '"Archivo Black", sans-serif', fontSize: '14px', color: '#5d3fd3', whiteSpace: 'nowrap' }}>
+                        <td style={{ padding: '12px 14px', fontFamily: '"Syne", sans-serif', fontSize: '14px', color: '#5d3fd3', whiteSpace: 'nowrap' }}>
                           GHS {listing.price.toLocaleString()}
                         </td>
                         <td style={{ padding: '12px 14px' }}>
@@ -264,7 +264,7 @@ export default function MyListingsPage() {
                             <button
                               onClick={() => handleDelete(listing.id)}
                               disabled={deletingId === listing.id}
-                              style={{ fontSize: '12px', fontWeight: 700, color: '#dc2626', background: 'none', border: 'none', cursor: deletingId === listing.id ? 'not-allowed' : 'pointer', opacity: deletingId === listing.id ? 0.5 : 1, fontFamily: '"Space Grotesk", sans-serif', whiteSpace: 'nowrap' }}
+                              style={{ fontSize: '12px', fontWeight: 700, color: '#dc2626', background: 'none', border: 'none', cursor: deletingId === listing.id ? 'not-allowed' : 'pointer', opacity: deletingId === listing.id ? 0.5 : 1, fontFamily: '"Plus Jakarta Sans", sans-serif', whiteSpace: 'nowrap' }}
                             >
                               {deletingId === listing.id ? '...' : 'Delete'}
                             </button>

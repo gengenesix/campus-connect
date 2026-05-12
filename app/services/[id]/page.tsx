@@ -175,11 +175,11 @@ export default async function ServiceDetailPage({ params }: { params: Params }) 
 
           {/* RIGHT — Info */}
           <div>
-            <h1 style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '30px', lineHeight: 1.1, marginBottom: '16px', color: '#111', letterSpacing: '-0.5px' }}>
+            <h1 style={{ fontFamily: '"Syne", sans-serif', fontSize: '30px', lineHeight: 1.1, marginBottom: '16px', color: '#111', letterSpacing: '-0.5px' }}>
               {service.name}
             </h1>
 
-            <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '40px', color: '#1B5E20', marginBottom: '6px', lineHeight: 1 }}>
+            <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '40px', color: '#1B5E20', marginBottom: '6px', lineHeight: 1 }}>
               {service.rate ?? 'Contact for pricing'}
             </div>
             <div style={{ fontSize: '13px', color: '#888', marginBottom: '24px' }}>Pricing may vary by request</div>
@@ -252,7 +252,7 @@ export default async function ServiceDetailPage({ params }: { params: Params }) 
         {related.length > 0 && (
           <div style={{ marginTop: '60px', paddingTop: '40px', borderTop: '2px solid #111' }}>
             <div className="trending-header" style={{ marginBottom: '24px' }}>
-              <h3 style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '22px', textTransform: 'uppercase' }}>
+              <h3 style={{ fontFamily: '"Syne", sans-serif', fontSize: '22px', textTransform: 'uppercase' }}>
                 More {service.category} Services
               </h3>
             </div>

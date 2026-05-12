@@ -8,7 +8,7 @@ export default function SubscribeSuccessPage() {
         <div style={{ marginBottom: '20px', display: 'flex', justifyContent: 'center', color: '#1B5E20' }}>
           <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
         </div>
-        <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '32px', color: '#1B5E20', letterSpacing: '-1px', marginBottom: '12px' }}>
+        <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '32px', color: '#1B5E20', letterSpacing: '-1px', marginBottom: '12px' }}>
           YOU'RE IN!
         </div>
         <p style={{ color: '#555', fontSize: '15px', lineHeight: 1.7, marginBottom: '8px' }}>
@@ -20,13 +20,13 @@ export default function SubscribeSuccessPage() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
           <Link
             href="/sell"
-            style={{ display: 'block', padding: '16px', background: '#1B5E20', color: '#fff', fontFamily: '"Archivo Black", sans-serif', fontSize: '15px', textDecoration: 'none', border: '2px solid #111', boxShadow: '4px 4px 0 #111', letterSpacing: '0.5px' }}
+            style={{ display: 'block', padding: '16px', background: '#1B5E20', color: '#fff', fontFamily: '"Syne", sans-serif', fontSize: '15px', textDecoration: 'none', border: '2px solid #111', boxShadow: '4px 4px 0 #111', letterSpacing: '0.5px' }}
           >
             LIST YOUR FIRST ITEM →
           </Link>
           <Link
             href="/offer-service"
-            style={{ display: 'block', padding: '16px', background: '#fff', color: '#111', fontFamily: '"Archivo Black", sans-serif', fontSize: '15px', textDecoration: 'none', border: '2px solid #111', letterSpacing: '0.5px' }}
+            style={{ display: 'block', padding: '16px', background: '#fff', color: '#111', fontFamily: '"Syne", sans-serif', fontSize: '15px', textDecoration: 'none', border: '2px solid #111', letterSpacing: '0.5px' }}
           >
             OFFER A SERVICE →
           </Link>

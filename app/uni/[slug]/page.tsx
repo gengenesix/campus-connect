@@ -22,7 +22,7 @@ export default function UniHomePage() {
                 width: '64px', height: '64px', borderRadius: '50%',
                 background: uni.colors?.primary ?? '#1B5E20',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontFamily: '"Archivo Black", sans-serif', fontSize: '20px', color: '#fff',
+                fontFamily: '"Syne", sans-serif', fontSize: '20px', color: '#fff',
                 border: '3px solid rgba(255,255,255,0.2)', flexShrink: 0,
               }}
             >
@@ -32,9 +32,9 @@ export default function UniHomePage() {
               <div style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '2px', color: '#888', marginBottom: '6px' }}>
                 {uni.city.toUpperCase()} · {uni.region.toUpperCase()} REGION
               </div>
-              <h1 style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '40px', letterSpacing: '-1px', lineHeight: 1.05, marginBottom: '8px' }}>
+              <h1 style={{ fontFamily: '"Syne", sans-serif', fontSize: '40px', letterSpacing: '-1px', lineHeight: 1.05, marginBottom: '8px' }}>
                 {uni.shortName}<br />
-                <span style={{ fontSize: '18px', color: '#aaa', fontFamily: '"Space Grotesk", sans-serif', fontWeight: 400, letterSpacing: 0 }}>
+                <span style={{ fontSize: '18px', color: '#aaa', fontFamily: '"Plus Jakarta Sans", sans-serif', fontWeight: 400, letterSpacing: 0 }}>
                   {uni.name}
                 </span>
               </h1>
@@ -105,7 +105,7 @@ export default function UniHomePage() {
                 }}
               >
                 <div style={{ marginBottom: '14px' }}>{card.icon}</div>
-                <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '18px', marginBottom: '8px', color: '#111' }}>
+                <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '18px', marginBottom: '8px', color: '#111' }}>
                   {card.label}
                 </div>
                 <p style={{ fontSize: '13px', color: '#666', lineHeight: 1.6, margin: 0 }}>

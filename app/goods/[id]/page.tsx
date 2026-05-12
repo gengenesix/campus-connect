@@ -185,7 +185,7 @@ export default async function GoodDetailPage({ params }: { params: Params }) {
               <ImageGallery images={galleryImages} alt={product.title} height={460} />
               {!product.in_stock && (
                 <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.55)', display: 'flex', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none', zIndex: 5 }}>
-                  <span style={{ background: '#dc2626', color: '#fff', fontFamily: '"Archivo Black", sans-serif', fontSize: '16px', letterSpacing: '1px', padding: '10px 28px', border: '3px solid #fff' }}>OUT OF STOCK</span>
+                  <span style={{ background: '#dc2626', color: '#fff', fontFamily: '"Syne", sans-serif', fontSize: '16px', letterSpacing: '1px', padding: '10px 28px', border: '3px solid #fff' }}>OUT OF STOCK</span>
                 </div>
               )}
             </div>
@@ -216,11 +216,11 @@ export default async function GoodDetailPage({ params }: { params: Params }) {
 
           {/* RIGHT — Info */}
           <div>
-            <h1 style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '34px', lineHeight: 1.1, marginBottom: '16px', color: '#111', letterSpacing: '-0.5px' }}>
+            <h1 style={{ fontFamily: '"Syne", sans-serif', fontSize: '34px', lineHeight: 1.1, marginBottom: '16px', color: '#111', letterSpacing: '-0.5px' }}>
               {product.title}
             </h1>
 
-            <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '44px', color: '#5d3fd3', marginBottom: '20px', lineHeight: 1 }}>
+            <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '44px', color: '#5d3fd3', marginBottom: '20px', lineHeight: 1 }}>
               GHS {product.price.toLocaleString()}
             </div>
 
@@ -292,7 +292,7 @@ export default async function GoodDetailPage({ params }: { params: Params }) {
         {relatedItems.length > 0 && (
           <div style={{ marginTop: '60px', paddingTop: '40px', borderTop: '2px solid #111' }}>
             <div className="trending-header" style={{ marginBottom: '24px' }}>
-              <h3 style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '22px', textTransform: 'uppercase' }}>
+              <h3 style={{ fontFamily: '"Syne", sans-serif', fontSize: '22px', textTransform: 'uppercase' }}>
                 More {product.category}
               </h3>
               <Link href="/goods" style={{ color: '#111', fontWeight: 700, textDecoration: 'underline', fontSize: '14px' }}>See All</Link>

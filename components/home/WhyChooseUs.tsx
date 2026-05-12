@@ -55,7 +55,7 @@ export default function WhyChooseUs() {
           {FEATURES.map(item => (
             <div key={item.title} style={{ borderLeft: `3px solid ${item.accent}`, paddingLeft: '20px' }}>
               <span style={{ display: 'block', marginBottom: '12px' }}>{item.icon}</span>
-              <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '13px', marginBottom: '6px', color: '#fff', letterSpacing: '0.5px' }}>{item.title}</div>
+              <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '13px', marginBottom: '6px', color: '#fff', letterSpacing: '0.5px' }}>{item.title}</div>
               <div style={{ fontSize: '12px', color: '#555', lineHeight: 1.55 }}>{item.desc}</div>
             </div>
           ))}

@@ -185,7 +185,7 @@ export default function NotificationBell() {
             justifyContent: 'center',
             fontSize: '9px',
             fontWeight: 700,
-            fontFamily: '"Space Grotesk", sans-serif',
+            fontFamily: '"Plus Jakarta Sans", sans-serif',
             border: '1.5px solid #fff',
             lineHeight: 1,
           }}>
@@ -208,10 +208,10 @@ export default function NotificationBell() {
         }}>
           {/* Header */}
           <div style={{ padding: '12px 16px', borderBottom: '2px solid #111', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <span style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '13px', letterSpacing: '0.5px' }}>
+            <span style={{ fontFamily: '"Syne", sans-serif', fontSize: '13px', letterSpacing: '0.5px' }}>
               NOTIFICATIONS
               {unreadCount > 0 && (
-                <span style={{ marginLeft: '8px', background: '#ff3366', color: '#fff', fontSize: '9px', padding: '2px 6px', fontFamily: '"Space Grotesk", sans-serif' }}>
+                <span style={{ marginLeft: '8px', background: '#ff3366', color: '#fff', fontSize: '9px', padding: '2px 6px', fontFamily: '"Plus Jakarta Sans", sans-serif' }}>
                   {unreadCount} NEW
                 </span>
               )}
@@ -219,7 +219,7 @@ export default function NotificationBell() {
             {unreadCount > 0 && (
               <button
                 onClick={markAllRead}
-                style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '11px', fontWeight: 700, color: '#5d3fd3', fontFamily: '"Space Grotesk", sans-serif' }}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '11px', fontWeight: 700, color: '#5d3fd3', fontFamily: '"Plus Jakarta Sans", sans-serif' }}
               >
                 MARK ALL READ
               </button>
@@ -229,7 +229,7 @@ export default function NotificationBell() {
           {/* List */}
           <div style={{ maxHeight: '360px', overflowY: 'auto' }}>
             {loading && (
-              <div style={{ padding: '24px', textAlign: 'center', color: '#888', fontSize: '13px', fontFamily: '"Space Grotesk", sans-serif' }}>
+              <div style={{ padding: '24px', textAlign: 'center', color: '#888', fontSize: '13px', fontFamily: '"Plus Jakarta Sans", sans-serif' }}>
                 Loading...
               </div>
             )}
@@ -240,7 +240,7 @@ export default function NotificationBell() {
                     <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
                   </svg>
                 </div>
-                <div style={{ fontFamily: '"Space Grotesk", sans-serif', fontSize: '13px', color: '#888' }}>
+                <div style={{ fontFamily: '"Plus Jakarta Sans", sans-serif', fontSize: '13px', color: '#888' }}>
                   No notifications yet
                 </div>
               </div>
@@ -267,14 +267,14 @@ export default function NotificationBell() {
                   {TYPE_ICON[n.type] ?? <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#888" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>}
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontFamily: '"Space Grotesk", sans-serif', fontWeight: 700, fontSize: '13px', marginBottom: '2px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <div style={{ fontFamily: '"Plus Jakarta Sans", sans-serif', fontWeight: 700, fontSize: '13px', marginBottom: '2px', display: 'flex', alignItems: 'center', gap: '6px' }}>
                     {n.title}
                     {!n.read && <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#ff3366', flexShrink: 0, display: 'inline-block' }} />}
                   </div>
                   <div style={{ fontSize: '12px', color: '#666', lineHeight: '1.4', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {n.body}
                   </div>
-                  <div style={{ fontSize: '10px', color: '#aaa', marginTop: '4px', fontFamily: '"Space Grotesk", sans-serif' }}>
+                  <div style={{ fontSize: '10px', color: '#aaa', marginTop: '4px', fontFamily: '"Plus Jakarta Sans", sans-serif' }}>
                     {timeAgo(n.created_at)}
                   </div>
                 </div>
@@ -288,7 +288,7 @@ export default function NotificationBell() {
               <Link
                 href="/dashboard"
                 onClick={() => setOpen(false)}
-                style={{ fontFamily: '"Space Grotesk", sans-serif', fontSize: '12px', fontWeight: 700, color: '#5d3fd3', textDecoration: 'none', letterSpacing: '0.5px' }}
+                style={{ fontFamily: '"Plus Jakarta Sans", sans-serif', fontSize: '12px', fontWeight: 700, color: '#5d3fd3', textDecoration: 'none', letterSpacing: '0.5px' }}
               >
                 VIEW ALL IN DASHBOARD →
               </Link>
@@ -301,7 +301,7 @@ export default function NotificationBell() {
                   marginLeft: 'auto',
                   background: '#1B5E20', color: '#fff', border: 'none',
                   padding: '4px 10px',
-                  fontFamily: '"Space Grotesk", sans-serif', fontSize: '10px', fontWeight: 700,
+                  fontFamily: '"Plus Jakarta Sans", sans-serif', fontSize: '10px', fontWeight: 700,
                   cursor: pushLoading ? 'wait' : 'pointer', letterSpacing: '0.5px', whiteSpace: 'nowrap',
                 }}
                 title="Get push notifications for new messages and bookings"

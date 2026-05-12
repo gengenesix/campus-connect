@@ -513,14 +513,14 @@ function MessagesInner() {
   if (authLoading) {
     return (
       <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '18px', color: '#888' }}>Loading...</div>
+        <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '18px', color: '#888' }}>Loading...</div>
       </div>
     )
   }
 
   if (!user) return (
     <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <div style={{ fontFamily: '"Archivo Black", sans-serif', color: '#888' }}>Loading...</div>
+      <div style={{ fontFamily: '"Syne", sans-serif', color: '#888' }}>Loading...</div>
     </div>
   )
 
@@ -541,7 +541,7 @@ function MessagesInner() {
 
       <div style={{ background: '#111', color: '#fff', padding: '28px 20px' }}>
         <div className="container">
-          <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '32px', letterSpacing: '-1px' }}>MESSAGES</div>
+          <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '32px', letterSpacing: '-1px' }}>MESSAGES</div>
           <p style={{ color: '#666', marginTop: '4px', fontSize: '13px' }}>Real-time chat — buyers, sellers and service providers</p>
         </div>
       </div>
@@ -558,13 +558,13 @@ function MessagesInner() {
           >
             {/* Header */}
             <div style={{ padding: '12px 14px', borderBottom: '2px solid #111', background: '#f8f8f8', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '8px' }}>
-              <span style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '11px', letterSpacing: '1px', color: '#888' }}>CONVERSATIONS</span>
+              <span style={{ fontFamily: '"Syne", sans-serif', fontSize: '11px', letterSpacing: '1px', color: '#888' }}>CONVERSATIONS</span>
               <button
                 onClick={() => { setShowNewMsg(v => !v); setUserSearch(''); setSearchResults([]) }}
                 style={{
                   background: showNewMsg ? '#111' : '#1B5E20', color: '#fff',
                   border: 'none', padding: '5px 12px',
-                  fontFamily: '"Archivo Black", sans-serif', fontSize: '11px',
+                  fontFamily: '"Syne", sans-serif', fontSize: '11px',
                   cursor: 'pointer', letterSpacing: '0.5px', flexShrink: 0,
                 }}
               >
@@ -582,7 +582,7 @@ function MessagesInner() {
                     value={userSearch}
                     onChange={e => setUserSearch(e.target.value)}
                     placeholder="Search by name..."
-                    style={{ width: '100%', padding: '8px 10px', border: '2px solid #1B5E20', outline: 'none', fontFamily: '"Space Grotesk", sans-serif', fontSize: '13px', boxSizing: 'border-box', background: '#fff' }}
+                    style={{ width: '100%', padding: '8px 10px', border: '2px solid #1B5E20', outline: 'none', fontFamily: '"Plus Jakarta Sans", sans-serif', fontSize: '13px', boxSizing: 'border-box', background: '#fff' }}
                   />
                 </div>
                 {searching && <div style={{ padding: '6px 14px 10px', fontSize: '11px', color: '#888', fontWeight: 600 }}>Searching...</div>}
@@ -686,7 +686,7 @@ function MessagesInner() {
                   >←</button>
                   <Avatar url={displayAvatar} name={displayName} size={36} />
                   <div style={{ flex: 1 }}>
-                    <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '16px' }}>{displayName}</div>
+                    <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '16px' }}>{displayName}</div>
                     <div style={{ fontSize: '11px', color: '#888', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                       {displayRole || 'Student'}
                       {productTitle && ` · Re: ${decodeURIComponent(productTitle)}`}
@@ -759,7 +759,7 @@ function MessagesInner() {
                     onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage() } }}
                     placeholder="Type a message... (Enter to send)"
                     maxLength={2000}
-                    style={{ flex: 1, padding: '12px 16px', border: '2px solid #111', outline: 'none', fontFamily: '"Space Grotesk", sans-serif', fontSize: '14px' }}
+                    style={{ flex: 1, padding: '12px 16px', border: '2px solid #111', outline: 'none', fontFamily: '"Plus Jakarta Sans", sans-serif', fontSize: '14px' }}
                     onFocus={e  => (e.currentTarget.style.borderColor = '#1B5E20')}
                     onBlur={e   => (e.currentTarget.style.borderColor = '#111')}
                   />
@@ -770,7 +770,7 @@ function MessagesInner() {
                       padding: '12px 24px',
                       background: (!input.trim() || sending) ? '#888' : '#1B5E20',
                       color: '#fff', border: '2px solid #111',
-                      fontFamily: '"Archivo Black", sans-serif', fontSize: '13px',
+                      fontFamily: '"Syne", sans-serif', fontSize: '13px',
                       cursor: (!input.trim() || sending) ? 'not-allowed' : 'pointer',
                       letterSpacing: '0.5px',
                     }}
@@ -785,16 +785,16 @@ function MessagesInner() {
                 <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'center', color: '#ddd' }}>
                   <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
                 </div>
-                <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '22px', color: '#111', marginBottom: '10px' }}>START A CONVERSATION</div>
+                <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '22px', color: '#111', marginBottom: '10px' }}>START A CONVERSATION</div>
                 <p style={{ fontSize: '14px', maxWidth: '320px', lineHeight: 1.7, marginBottom: '24px' }}>
                   Pick someone from the left, or hit <strong style={{ color: '#1B5E20' }}>+ NEW</strong> to message any buyer, seller, or service provider on campus.
                 </p>
                 <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', justifyContent: 'center' }}>
-                  <button onClick={() => setShowNewMsg(true)} style={{ padding: '10px 20px', background: '#1B5E20', color: '#fff', fontFamily: '"Archivo Black", sans-serif', fontSize: '12px', border: '2px solid #111', cursor: 'pointer', boxShadow: '3px 3px 0 #111' }}>
+                  <button onClick={() => setShowNewMsg(true)} style={{ padding: '10px 20px', background: '#1B5E20', color: '#fff', fontFamily: '"Syne", sans-serif', fontSize: '12px', border: '2px solid #111', cursor: 'pointer', boxShadow: '3px 3px 0 #111' }}>
                     + NEW MESSAGE
                   </button>
                   <Link href="/goods"    style={{ padding: '10px 20px', border: '2px solid #111', fontWeight: 700, fontSize: '12px', textDecoration: 'none', color: '#111', boxShadow: '3px 3px 0 #888', display: 'inline-block' }}>BROWSE GOODS</Link>
-                  <Link href="/services" style={{ padding: '10px 20px', background: '#111', color: '#fff', fontFamily: '"Archivo Black", sans-serif', fontSize: '12px', textDecoration: 'none', border: '2px solid #111', boxShadow: '3px 3px 0 #888', display: 'inline-block' }}>BROWSE SERVICES</Link>
+                  <Link href="/services" style={{ padding: '10px 20px', background: '#111', color: '#fff', fontFamily: '"Syne", sans-serif', fontSize: '12px', textDecoration: 'none', border: '2px solid #111', boxShadow: '3px 3px 0 #888', display: 'inline-block' }}>BROWSE SERVICES</Link>
                 </div>
               </div>
             )}
@@ -809,7 +809,7 @@ export default function MessagesPage() {
   return (
     <Suspense fallback={
       <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '18px', color: '#888' }}>Loading...</div>
+        <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '18px', color: '#888' }}>Loading...</div>
       </div>
     }>
       <MessagesInner />

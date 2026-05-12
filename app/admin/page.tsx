@@ -257,7 +257,7 @@ export default function AdminDashboard() {
   if (loading) {
     return (
       <div style={{ background: '#111', minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '16px' }}>
-        <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '28px', color: '#fff', letterSpacing: '-0.5px' }}>ADMIN PANEL</div>
+        <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '28px', color: '#fff', letterSpacing: '-0.5px' }}>ADMIN PANEL</div>
         <div style={{ display: 'flex', gap: '8px' }}>
           {[0, 1, 2].map(i => (
             <div key={i} style={{ width: '8px', height: '8px', background: '#ff3366', borderRadius: '50%', animation: `bounce 0.9s ease-in-out ${i * 0.15}s infinite alternate` }} />
@@ -272,7 +272,7 @@ export default function AdminDashboard() {
   if (!user || !profile || profile.role !== 'admin') {
     return (
       <div style={{ background: '#111', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '20px', color: '#666' }}>Loading...</div>
+        <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '20px', color: '#666' }}>Loading...</div>
       </div>
     )
   }
@@ -322,7 +322,7 @@ export default function AdminDashboard() {
         <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px' }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '4px', flexWrap: 'wrap' }}>
-              <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '32px', letterSpacing: '-1px' }}>ADMIN PANEL</div>
+              <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '32px', letterSpacing: '-1px' }}>ADMIN PANEL</div>
               <span style={{ background: '#ff3366', color: '#fff', fontSize: '11px', fontWeight: 700, padding: '3px 10px', letterSpacing: '1px' }}>SUPER ADMIN</span>
               {pendingCount > 0 && (
                 <span style={{ background: '#f59e0b', color: '#000', fontSize: '11px', fontWeight: 900, padding: '3px 10px', letterSpacing: '1px' }}>
@@ -339,12 +339,12 @@ export default function AdminDashboard() {
             <button
               onClick={() => loadData()}
               disabled={loadingData}
-              style={{ padding: '10px 20px', border: '2px solid #555', color: loadingData ? '#555' : '#aaa', background: 'transparent', fontFamily: '"Archivo Black", sans-serif', fontSize: '12px', cursor: loadingData ? 'not-allowed' : 'pointer', opacity: loadingData ? 0.6 : 1 }}
+              style={{ padding: '10px 20px', border: '2px solid #555', color: loadingData ? '#555' : '#aaa', background: 'transparent', fontFamily: '"Syne", sans-serif', fontSize: '12px', cursor: loadingData ? 'not-allowed' : 'pointer', opacity: loadingData ? 0.6 : 1 }}
             >{loadingData ? '↻ LOADING...' : '↻ RELOAD'}</button>
-            <Link href="/dashboard" style={{ padding: '10px 20px', border: '2px solid #444', color: '#ccc', fontFamily: '"Archivo Black", sans-serif', fontSize: '12px', textDecoration: 'none' }}>← DASHBOARD</Link>
+            <Link href="/dashboard" style={{ padding: '10px 20px', border: '2px solid #444', color: '#ccc', fontFamily: '"Syne", sans-serif', fontSize: '12px', textDecoration: 'none' }}>← DASHBOARD</Link>
             <button
               onClick={async () => { await signOut(); router.replace('/') }}
-              style={{ padding: '10px 20px', border: '2px solid #dc2626', color: '#dc2626', background: 'transparent', fontFamily: '"Archivo Black", sans-serif', fontSize: '12px', cursor: 'pointer' }}
+              style={{ padding: '10px 20px', border: '2px solid #dc2626', color: '#dc2626', background: 'transparent', fontFamily: '"Syne", sans-serif', fontSize: '12px', cursor: 'pointer' }}
             >SIGN OUT</button>
           </div>
         </div>
@@ -373,7 +373,7 @@ export default function AdminDashboard() {
             { label: 'LIVE SERVICES',  value: services.filter(s => s.status === 'active').length, color: '#ff3366' },
           ].map(stat => (
             <div key={stat.label} style={{ border: '2px solid #111', background: '#fff', padding: '16px', boxShadow: '4px 4px 0 #111' }}>
-              <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '30px', color: stat.color, lineHeight: 1 }}>{stat.value}</div>
+              <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '30px', color: stat.color, lineHeight: 1 }}>{stat.value}</div>
               <div style={{ fontSize: '10px', fontWeight: 700, color: '#888', letterSpacing: '1px', marginTop: '6px' }}>{stat.label}</div>
             </div>
           ))}
@@ -387,7 +387,7 @@ export default function AdminDashboard() {
               background: activeTab === tab.key ? (tab.urgent ? '#f59e0b' : '#111') : '#fff',
               color: activeTab === tab.key ? '#fff' : tab.urgent ? '#92400e' : '#666',
               border: '2px solid #111', borderBottom: 'none',
-              fontFamily: '"Archivo Black", sans-serif', fontSize: '11px', letterSpacing: '0.8px',
+              fontFamily: '"Syne", sans-serif', fontSize: '11px', letterSpacing: '0.8px',
               cursor: 'pointer', marginBottom: '-2px', fontWeight: 700,
             }}>
               {tab.label}
@@ -398,9 +398,9 @@ export default function AdminDashboard() {
         {/* Error banner — shown regardless of loading state */}
         {loadError && (
           <div style={{ background: '#fee2e2', border: '2px solid #dc2626', borderLeft: '6px solid #dc2626', padding: '20px 24px', marginBottom: '24px' }}>
-            <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '14px', color: '#dc2626', marginBottom: '8px' }}>DATA LOAD ERROR</div>
+            <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '14px', color: '#dc2626', marginBottom: '8px' }}>DATA LOAD ERROR</div>
             <div style={{ fontSize: '13px', color: '#7f1d1d', marginBottom: '12px', fontFamily: 'monospace', wordBreak: 'break-all' }}>{loadError}</div>
-            <button onClick={() => loadData()} disabled={loadingData} style={{ padding: '8px 16px', background: '#dc2626', color: '#fff', border: 'none', fontFamily: '"Archivo Black", sans-serif', fontSize: '12px', cursor: loadingData ? 'not-allowed' : 'pointer', opacity: loadingData ? 0.6 : 1 }}>
+            <button onClick={() => loadData()} disabled={loadingData} style={{ padding: '8px 16px', background: '#dc2626', color: '#fff', border: 'none', fontFamily: '"Syne", sans-serif', fontSize: '12px', cursor: loadingData ? 'not-allowed' : 'pointer', opacity: loadingData ? 0.6 : 1 }}>
               {loadingData ? 'RETRYING...' : 'RETRY'}
             </button>
           </div>
@@ -415,14 +415,14 @@ export default function AdminDashboard() {
               <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'center', color: '#1B5E20' }}>
                 <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
               </div>
-              <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '24px', marginBottom: '10px' }}>ALL CLEAR</div>
+              <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '24px', marginBottom: '10px' }}>ALL CLEAR</div>
               <p style={{ color: '#888' }}>No listings or services awaiting approval.</p>
             </div>
           ) : (
             <>
               {pendingProducts.length > 0 && (
                 <div style={{ marginBottom: '36px' }}>
-                  <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '15px', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '10px', color: '#111' }}>
+                  <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '15px', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '10px', color: '#111' }}>
                     PENDING LISTINGS
                     <span style={{ background: '#f59e0b', color: '#000', fontSize: '11px', fontWeight: 800, padding: '2px 10px' }}>{pendingProducts.length}</span>
                   </div>
@@ -446,10 +446,10 @@ export default function AdminDashboard() {
                           </Link>
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', flexShrink: 0 }}>
-                          <button onClick={() => approveProduct(p.id)} disabled={actionId === p.id} style={{ padding: '10px 18px', background: '#1B5E20', color: '#fff', border: '2px solid #111', fontFamily: '"Archivo Black", sans-serif', fontSize: '12px', cursor: actionId === p.id ? 'not-allowed' : 'pointer', boxShadow: '3px 3px 0 #111', opacity: actionId === p.id ? 0.6 : 1 }}>
+                          <button onClick={() => approveProduct(p.id)} disabled={actionId === p.id} style={{ padding: '10px 18px', background: '#1B5E20', color: '#fff', border: '2px solid #111', fontFamily: '"Syne", sans-serif', fontSize: '12px', cursor: actionId === p.id ? 'not-allowed' : 'pointer', boxShadow: '3px 3px 0 #111', opacity: actionId === p.id ? 0.6 : 1 }}>
                             {actionId === p.id ? '...' : '✓ APPROVE'}
                           </button>
-                          <button onClick={() => rejectProduct(p.id)} disabled={actionId === p.id} style={{ padding: '10px 18px', background: '#fff', color: '#dc2626', border: '2px solid #dc2626', fontFamily: '"Archivo Black", sans-serif', fontSize: '12px', cursor: actionId === p.id ? 'not-allowed' : 'pointer', opacity: actionId === p.id ? 0.6 : 1 }}>
+                          <button onClick={() => rejectProduct(p.id)} disabled={actionId === p.id} style={{ padding: '10px 18px', background: '#fff', color: '#dc2626', border: '2px solid #dc2626', fontFamily: '"Syne", sans-serif', fontSize: '12px', cursor: actionId === p.id ? 'not-allowed' : 'pointer', opacity: actionId === p.id ? 0.6 : 1 }}>
                             ✕ REJECT
                           </button>
                         </div>
@@ -461,7 +461,7 @@ export default function AdminDashboard() {
 
               {pendingServices.length > 0 && (
                 <div>
-                  <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '15px', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '10px', color: '#111' }}>
+                  <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '15px', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '10px', color: '#111' }}>
                     PENDING SERVICES
                     <span style={{ background: '#f59e0b', color: '#000', fontSize: '11px', fontWeight: 800, padding: '2px 10px' }}>{pendingServices.length}</span>
                   </div>
@@ -482,10 +482,10 @@ export default function AdminDashboard() {
                           </div>
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', flexShrink: 0 }}>
-                          <button onClick={() => approveService(s.id)} disabled={actionId === s.id} style={{ padding: '10px 18px', background: '#1B5E20', color: '#fff', border: '2px solid #111', fontFamily: '"Archivo Black", sans-serif', fontSize: '12px', cursor: actionId === s.id ? 'not-allowed' : 'pointer', boxShadow: '3px 3px 0 #111', opacity: actionId === s.id ? 0.6 : 1 }}>
+                          <button onClick={() => approveService(s.id)} disabled={actionId === s.id} style={{ padding: '10px 18px', background: '#1B5E20', color: '#fff', border: '2px solid #111', fontFamily: '"Syne", sans-serif', fontSize: '12px', cursor: actionId === s.id ? 'not-allowed' : 'pointer', boxShadow: '3px 3px 0 #111', opacity: actionId === s.id ? 0.6 : 1 }}>
                             {actionId === s.id ? '...' : '✓ APPROVE'}
                           </button>
-                          <button onClick={() => rejectService(s.id)} disabled={actionId === s.id} style={{ padding: '10px 18px', background: '#fff', color: '#dc2626', border: '2px solid #dc2626', fontFamily: '"Archivo Black", sans-serif', fontSize: '12px', cursor: actionId === s.id ? 'not-allowed' : 'pointer', opacity: actionId === s.id ? 0.6 : 1 }}>
+                          <button onClick={() => rejectService(s.id)} disabled={actionId === s.id} style={{ padding: '10px 18px', background: '#fff', color: '#dc2626', border: '2px solid #dc2626', fontFamily: '"Syne", sans-serif', fontSize: '12px', cursor: actionId === s.id ? 'not-allowed' : 'pointer', opacity: actionId === s.id ? 0.6 : 1 }}>
                             ✕ REJECT
                           </button>
                         </div>
@@ -507,7 +507,7 @@ export default function AdminDashboard() {
                 placeholder="Search by name, email, department..."
                 value={search}
                 onChange={e => setSearch(e.target.value)}
-                style={{ flex: 1, padding: '10px 14px', border: '2px solid #111', fontFamily: '"Space Grotesk", sans-serif', fontSize: '14px', outline: 'none' }}
+                style={{ flex: 1, padding: '10px 14px', border: '2px solid #111', fontFamily: '"Plus Jakarta Sans", sans-serif', fontSize: '14px', outline: 'none' }}
               />
               <span style={{ fontWeight: 700, fontSize: '13px', color: '#888', whiteSpace: 'nowrap' }}>{filteredUsers.length} user{filteredUsers.length !== 1 ? 's' : ''}</span>
             </div>
@@ -548,7 +548,7 @@ export default function AdminDashboard() {
                         padding: '7px 14px',
                         background: u.is_verified ? '#fff' : '#1d9bf0', color: u.is_verified ? '#dc2626' : '#fff',
                         border: u.is_verified ? '2px solid #dc2626' : '2px solid #1d9bf0',
-                        fontFamily: '"Archivo Black", sans-serif', fontSize: '10px',
+                        fontFamily: '"Syne", sans-serif', fontSize: '10px',
                         cursor: (actionId === u.id || u.role === 'admin' || u.is_banned) ? 'not-allowed' : 'pointer',
                         whiteSpace: 'nowrap', opacity: (u.role === 'admin' || u.is_banned) ? 0.4 : 1,
                       }}
@@ -563,7 +563,7 @@ export default function AdminDashboard() {
                           padding: '7px 14px',
                           background: u.is_banned ? '#e8f5e9' : '#fee2e2', color: u.is_banned ? '#1B5E20' : '#dc2626',
                           border: u.is_banned ? '2px solid #1B5E20' : '2px solid #dc2626',
-                          fontFamily: '"Archivo Black", sans-serif', fontSize: '10px',
+                          fontFamily: '"Syne", sans-serif', fontSize: '10px',
                           cursor: actionId === u.id ? 'not-allowed' : 'pointer', whiteSpace: 'nowrap',
                         }}
                       >
@@ -581,7 +581,7 @@ export default function AdminDashboard() {
         {/* ── LISTINGS TAB ── */}
         {!loadingData && activeTab === 'listings' && (
           <>
-            <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '18px', marginBottom: '16px' }}>
+            <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '18px', marginBottom: '16px' }}>
               LIVE LISTINGS ({products.filter(p => p.status !== 'pending').length})
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -601,7 +601,7 @@ export default function AdminDashboard() {
                   <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexShrink: 0 }}>
                     <StatusBadge status={p.status} />
                     <Link href={`/goods/${p.id}`} style={{ fontSize: '12px', color: '#5d3fd3', fontWeight: 700, textDecoration: 'none' }}>VIEW →</Link>
-                    <button onClick={() => removeProduct(p.id)} disabled={actionId === p.id} style={{ fontSize: '12px', color: '#dc2626', fontWeight: 700, background: 'none', border: 'none', cursor: actionId === p.id ? 'not-allowed' : 'pointer', fontFamily: '"Space Grotesk", sans-serif', opacity: actionId === p.id ? 0.5 : 1 }}>
+                    <button onClick={() => removeProduct(p.id)} disabled={actionId === p.id} style={{ fontSize: '12px', color: '#dc2626', fontWeight: 700, background: 'none', border: 'none', cursor: actionId === p.id ? 'not-allowed' : 'pointer', fontFamily: '"Plus Jakarta Sans", sans-serif', opacity: actionId === p.id ? 0.5 : 1 }}>
                       {actionId === p.id ? '...' : 'REMOVE'}
                     </button>
                   </div>
@@ -615,7 +615,7 @@ export default function AdminDashboard() {
         {/* ── SERVICES TAB ── */}
         {!loadingData && activeTab === 'services' && (
           <>
-            <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '18px', marginBottom: '16px' }}>
+            <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '18px', marginBottom: '16px' }}>
               LIVE SERVICES ({services.filter(s => s.status !== 'pending').length})
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -628,7 +628,7 @@ export default function AdminDashboard() {
                   </div>
                   <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexShrink: 0 }}>
                     <StatusBadge status={s.status} />
-                    <button onClick={() => removeService(s.id)} disabled={actionId === s.id} style={{ fontSize: '12px', color: '#dc2626', fontWeight: 700, background: 'none', border: 'none', cursor: actionId === s.id ? 'not-allowed' : 'pointer', fontFamily: '"Space Grotesk", sans-serif', opacity: actionId === s.id ? 0.5 : 1 }}>
+                    <button onClick={() => removeService(s.id)} disabled={actionId === s.id} style={{ fontSize: '12px', color: '#dc2626', fontWeight: 700, background: 'none', border: 'none', cursor: actionId === s.id ? 'not-allowed' : 'pointer', fontFamily: '"Plus Jakarta Sans", sans-serif', opacity: actionId === s.id ? 0.5 : 1 }}>
                       {actionId === s.id ? '...' : 'REMOVE'}
                     </button>
                   </div>
@@ -643,7 +643,7 @@ export default function AdminDashboard() {
         {!loadingData && activeTab === 'reports' && (
           <>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '12px' }}>
-              <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '18px' }}>
+              <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '18px' }}>
                 PENDING REPORTS ({reports.length})
               </div>
               <button
@@ -662,7 +662,7 @@ export default function AdminDashboard() {
                 <div style={{ marginBottom: '12px', display: 'flex', justifyContent: 'center', color: '#1B5E20' }}>
                   <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
                 </div>
-                <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '22px', marginBottom: '8px' }}>ALL CLEAR</div>
+                <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '22px', marginBottom: '8px' }}>ALL CLEAR</div>
                 <p style={{ color: '#888', fontSize: '14px' }}>No pending reports.</p>
               </div>
             ) : (

@@ -67,11 +67,11 @@ function LoginForm() {
           {/* Header */}
           <div style={{ background: '#111', padding: '28px 32px' }}>
             <Link href="/" style={{ textDecoration: 'none' }}>
-              <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '20px', color: '#fff', marginBottom: '8px', opacity: 0.8 }}>
+              <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '20px', color: '#fff', marginBottom: '8px', opacity: 0.8 }}>
                 CAMPUS<span style={{ color: '#a78bfa' }}>.</span>CONNECT
               </div>
             </Link>
-            <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '30px', color: '#fff', letterSpacing: '-0.5px' }}>
+            <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '30px', color: '#fff', letterSpacing: '-0.5px' }}>
               SIGN IN
             </div>
             <div style={{ color: '#666', fontSize: '13px', marginTop: '6px' }}>

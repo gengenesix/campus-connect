@@ -122,7 +122,7 @@ export default function ReviewsSection({ productId, serviceId, revieweeId }: Pro
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px', marginBottom: '24px' }}>
         <div>
-          <h3 style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '22px', textTransform: 'uppercase', marginBottom: '4px' }}>
+          <h3 style={{ fontFamily: '"Syne", sans-serif', fontSize: '22px', textTransform: 'uppercase', marginBottom: '4px' }}>
             Reviews
           </h3>
           {avgRating && (
@@ -139,7 +139,7 @@ export default function ReviewsSection({ productId, serviceId, revieweeId }: Pro
         {canReview && !formOpen && (
           <button
             onClick={() => setFormOpen(true)}
-            style={{ padding: '10px 20px', background: '#111', color: '#fff', fontFamily: '"Archivo Black", sans-serif', fontSize: '12px', border: '2px solid #111', cursor: 'pointer', letterSpacing: '0.5px', boxShadow: '3px 3px 0 #1B5E20' }}
+            style={{ padding: '10px 20px', background: '#111', color: '#fff', fontFamily: '"Syne", sans-serif', fontSize: '12px', border: '2px solid #111', cursor: 'pointer', letterSpacing: '0.5px', boxShadow: '3px 3px 0 #1B5E20' }}
           >
             + WRITE A REVIEW
           </button>
@@ -159,7 +159,7 @@ export default function ReviewsSection({ productId, serviceId, revieweeId }: Pro
             placeholder="Share your experience... (optional)"
             rows={3}
             maxLength={500}
-            style={{ display: 'block', width: '100%', marginTop: '16px', padding: '12px', border: '2px solid #ddd', fontFamily: '"Space Grotesk", sans-serif', fontSize: '14px', resize: 'vertical', outline: 'none', boxSizing: 'border-box' }}
+            style={{ display: 'block', width: '100%', marginTop: '16px', padding: '12px', border: '2px solid #ddd', fontFamily: '"Plus Jakarta Sans", sans-serif', fontSize: '14px', resize: 'vertical', outline: 'none', boxSizing: 'border-box' }}
             onFocus={e => e.currentTarget.style.borderColor = '#111'}
             onBlur={e => e.currentTarget.style.borderColor = '#ddd'}
           />
@@ -175,14 +175,14 @@ export default function ReviewsSection({ productId, serviceId, revieweeId }: Pro
             <button
               type="submit"
               disabled={submitting}
-              style={{ padding: '12px 24px', background: submitting ? '#888' : '#1B5E20', color: '#fff', fontFamily: '"Archivo Black", sans-serif', fontSize: '13px', border: '2px solid #111', cursor: submitting ? 'not-allowed' : 'pointer', letterSpacing: '0.5px', boxShadow: '3px 3px 0 #111' }}
+              style={{ padding: '12px 24px', background: submitting ? '#888' : '#1B5E20', color: '#fff', fontFamily: '"Syne", sans-serif', fontSize: '13px', border: '2px solid #111', cursor: submitting ? 'not-allowed' : 'pointer', letterSpacing: '0.5px', boxShadow: '3px 3px 0 #111' }}
             >
               {submitting ? 'SUBMITTING...' : 'SUBMIT REVIEW'}
             </button>
             <button
               type="button"
               onClick={() => { setFormOpen(false); setMsg(null) }}
-              style={{ padding: '12px 18px', background: '#fff', color: '#666', fontWeight: 700, border: '2px solid #ddd', cursor: 'pointer', fontFamily: '"Space Grotesk", sans-serif', fontSize: '13px' }}
+              style={{ padding: '12px 18px', background: '#fff', color: '#666', fontWeight: 700, border: '2px solid #ddd', cursor: 'pointer', fontFamily: '"Plus Jakarta Sans", sans-serif', fontSize: '13px' }}
             >
               Cancel
             </button>

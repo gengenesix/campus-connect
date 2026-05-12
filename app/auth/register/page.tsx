@@ -136,7 +136,7 @@ export default function RegisterPage() {
               <polyline points="20 6 9 17 4 12" />
             </svg>
           </div>
-          <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '28px', marginBottom: '12px', color: '#1B5E20' }}>
+          <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '28px', marginBottom: '12px', color: '#1B5E20' }}>
             CHECK YOUR EMAIL
           </div>
           <p style={{ color: '#666', lineHeight: 1.7, marginBottom: '24px' }}>
@@ -145,7 +145,7 @@ export default function RegisterPage() {
           <Link href="/auth/login" style={{
             display: 'block', textAlign: 'center', padding: '14px 32px',
             background: '#1B5E20', color: '#fff',
-            fontFamily: '"Archivo Black", sans-serif', fontSize: '15px',
+            fontFamily: '"Syne", sans-serif', fontSize: '15px',
             textDecoration: 'none', border: '2px solid #111',
             boxShadow: '4px 4px 0 #111',
           }}>
@@ -166,11 +166,11 @@ export default function RegisterPage() {
           {/* Header */}
           <div style={{ background: '#1B5E20', padding: '28px 32px' }}>
             <Link href="/" style={{ textDecoration: 'none' }}>
-              <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '20px', color: '#fff', marginBottom: '8px', opacity: 0.8 }}>
+              <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '20px', color: '#fff', marginBottom: '8px', opacity: 0.8 }}>
                 CAMPUS<span style={{ color: '#86efac' }}>.</span>CONNECT
               </div>
             </Link>
-            <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '28px', color: '#fff', letterSpacing: '-0.5px' }}>
+            <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '28px', color: '#fff', letterSpacing: '-0.5px' }}>
               JOIN FREE
             </div>
             <div style={{ color: 'rgba(255,255,255,0.6)', fontSize: '13px', marginTop: '6px' }}>
@@ -293,7 +293,7 @@ export default function RegisterPage() {
                           borderColor: form.role === r.val ? '#1B5E20' : '#ddd',
                           background: form.role === r.val ? '#e8f5e9' : '#fff',
                           cursor: 'pointer', textAlign: 'center',
-                          fontFamily: '"Space Grotesk", sans-serif',
+                          fontFamily: '"Plus Jakarta Sans", sans-serif',
                           transition: 'all 0.15s',
                         }}
                       >
@@ -323,7 +323,7 @@ export default function RegisterPage() {
                     <select
                       value={form.department}
                       onChange={e => update('department', e.target.value)}
-                      style={{ width: '100%', padding: '13px 16px', border: '2px solid #111', fontFamily: '"Space Grotesk", sans-serif', fontSize: '14px', background: '#fff', boxSizing: 'border-box', outline: 'none' }}
+                      style={{ width: '100%', padding: '13px 16px', border: '2px solid #111', fontFamily: '"Plus Jakarta Sans", sans-serif', fontSize: '14px', background: '#fff', boxSizing: 'border-box', outline: 'none' }}
                     >
                       <option value="">Select your programme</option>
                       {FACULTIES.map(f => (
@@ -351,7 +351,7 @@ export default function RegisterPage() {
                   <select
                     value={form.class_year}
                     onChange={e => update('class_year', e.target.value)}
-                    style={{ width: '100%', padding: '13px 16px', border: '2px solid #ddd', fontFamily: '"Space Grotesk", sans-serif', fontSize: '14px', background: '#fff', boxSizing: 'border-box', outline: 'none' }}
+                    style={{ width: '100%', padding: '13px 16px', border: '2px solid #ddd', fontFamily: '"Plus Jakarta Sans", sans-serif', fontSize: '14px', background: '#fff', boxSizing: 'border-box', outline: 'none' }}
                   >
                     <option value="">Select year (optional)</option>
                     {CLASS_YEARS.map(y => <option key={y} value={y}>{y}</option>)}
@@ -367,7 +367,7 @@ export default function RegisterPage() {
                     <select
                       value={form.hostel}
                       onChange={e => update('hostel', e.target.value)}
-                      style={{ width: '100%', padding: '13px 16px', border: '2px solid #ddd', fontFamily: '"Space Grotesk", sans-serif', fontSize: '14px', background: '#fff', boxSizing: 'border-box', outline: 'none' }}
+                      style={{ width: '100%', padding: '13px 16px', border: '2px solid #ddd', fontFamily: '"Plus Jakarta Sans", sans-serif', fontSize: '14px', background: '#fff', boxSizing: 'border-box', outline: 'none' }}
                     >
                       <option value="">Select hostel (optional)</option>
                       <optgroup label="Main Halls of Residence">

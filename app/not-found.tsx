@@ -21,7 +21,7 @@ export default function NotFound() {
     >
       <div
         style={{
-          fontFamily: '"Archivo Black", sans-serif',
+          fontFamily: '"Syne", sans-serif',
           fontSize: 'clamp(80px, 20vw, 160px)',
           lineHeight: 1,
           color: '#111',
@@ -33,7 +33,7 @@ export default function NotFound() {
       </div>
       <div
         style={{
-          fontFamily: '"Archivo Black", sans-serif',
+          fontFamily: '"Syne", sans-serif',
           fontSize: '22px',
           marginBottom: '12px',
           letterSpacing: '-0.5px',
@@ -41,7 +41,7 @@ export default function NotFound() {
       >
         PAGE NOT FOUND
       </div>
-      <p style={{ color: '#888', maxWidth: '380px', lineHeight: 1.7, marginBottom: '36px', fontFamily: '"Space Grotesk", sans-serif' }}>
+      <p style={{ color: '#888', maxWidth: '380px', lineHeight: 1.7, marginBottom: '36px', fontFamily: '"Plus Jakarta Sans", sans-serif' }}>
         The listing, page, or resource you were looking for doesn't exist or has been removed.
       </p>
       <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', justifyContent: 'center' }}>
@@ -51,7 +51,7 @@ export default function NotFound() {
             padding: '14px 32px',
             background: '#111',
             color: '#fff',
-            fontFamily: '"Archivo Black", sans-serif',
+            fontFamily: '"Syne", sans-serif',
             fontSize: '14px',
             textDecoration: 'none',
             border: '2px solid #111',
@@ -67,7 +67,7 @@ export default function NotFound() {
             padding: '14px 32px',
             background: '#1B5E20',
             color: '#fff',
-            fontFamily: '"Archivo Black", sans-serif',
+            fontFamily: '"Syne", sans-serif',
             fontSize: '14px',
             textDecoration: 'none',
             border: '2px solid #111',
@@ -83,7 +83,7 @@ export default function NotFound() {
             padding: '14px 32px',
             background: '#fff',
             color: '#111',
-            fontFamily: '"Archivo Black", sans-serif',
+            fontFamily: '"Syne", sans-serif',
             fontSize: '14px',
             textDecoration: 'none',
             border: '2px solid #111',

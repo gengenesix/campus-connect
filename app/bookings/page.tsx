@@ -82,7 +82,7 @@ export default function BookingsPage() {
   if (loading) {
     return (
       <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ fontFamily: '"Archivo Black", sans-serif', color: '#888' }}>Loading...</div>
+        <div style={{ fontFamily: '"Syne", sans-serif', color: '#888' }}>Loading...</div>
       </div>
     )
   }
@@ -99,7 +99,7 @@ export default function BookingsPage() {
         <div className="container">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
             <div>
-              <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '36px', letterSpacing: '-1px' }}>
+              <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '36px', letterSpacing: '-1px' }}>
                 BOOKINGS
               </div>
               <p style={{ color: '#666', marginTop: '4px', fontSize: '14px' }}>
@@ -113,7 +113,7 @@ export default function BookingsPage() {
               style={{
                 display: 'inline-block', padding: '12px 28px',
                 background: '#1B5E20', color: '#fff',
-                fontFamily: '"Archivo Black", sans-serif', fontSize: '13px',
+                fontFamily: '"Syne", sans-serif', fontSize: '13px',
                 textDecoration: 'none', border: '2px solid #86efac',
                 boxShadow: '3px 3px 0 #86efac',
               }}
@@ -134,7 +134,7 @@ export default function BookingsPage() {
               onClick={() => setTab(t)}
               style={{
                 flex: 1, padding: '14px 20px', border: 'none', cursor: 'pointer',
-                fontFamily: '"Archivo Black", sans-serif', fontSize: '13px', letterSpacing: '0.5px',
+                fontFamily: '"Syne", sans-serif', fontSize: '13px', letterSpacing: '0.5px',
                 background: tab === t ? '#111' : '#fff',
                 color: tab === t ? '#fff' : '#888',
                 borderRight: t === 'client' ? '2px solid #111' : 'none',
@@ -163,7 +163,7 @@ export default function BookingsPage() {
             <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'center', color: '#ddd' }}>
               <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
             </div>
-            <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '18px', marginBottom: '8px', color: '#111' }}>
+            <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '18px', marginBottom: '8px', color: '#111' }}>
               {tab === 'client' ? 'No bookings yet' : 'No service requests yet'}
             </div>
             <div style={{ color: '#888', fontSize: '14px', marginBottom: '24px' }}>
@@ -176,7 +176,7 @@ export default function BookingsPage() {
               style={{
                 display: 'inline-block', padding: '12px 28px',
                 background: '#1B5E20', color: '#fff',
-                fontFamily: '"Archivo Black", sans-serif', fontSize: '13px',
+                fontFamily: '"Syne", sans-serif', fontSize: '13px',
                 textDecoration: 'none', border: '2px solid #111', boxShadow: '3px 3px 0 #111',
               }}
             >
@@ -217,7 +217,7 @@ export default function BookingsPage() {
                       <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap', marginBottom: '4px' }}>
                         <Link
                           href={`/services/${booking.service?.id}`}
-                          style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '16px', color: '#111', textDecoration: 'none' }}
+                          style={{ fontFamily: '"Syne", sans-serif', fontSize: '16px', color: '#111', textDecoration: 'none' }}
                         >
                           {booking.service?.name ?? 'Service'}
                         </Link>
@@ -275,7 +275,7 @@ export default function BookingsPage() {
                           disabled={!!actionLoading}
                           style={{
                             padding: '8px 20px', background: isLoading('confirmed') ? '#888' : '#1B5E20', color: '#fff',
-                            fontFamily: '"Archivo Black", sans-serif', fontSize: '12px', letterSpacing: '0.5px',
+                            fontFamily: '"Syne", sans-serif', fontSize: '12px', letterSpacing: '0.5px',
                             border: '2px solid #111', boxShadow: '2px 2px 0 #111', cursor: actionLoading ? 'not-allowed' : 'pointer',
                           }}
                         >
@@ -301,7 +301,7 @@ export default function BookingsPage() {
                         disabled={!!actionLoading}
                         style={{
                           padding: '8px 20px', background: isLoading('completed') ? '#888' : '#5d3fd3', color: '#fff',
-                          fontFamily: '"Archivo Black", sans-serif', fontSize: '12px', letterSpacing: '0.5px',
+                          fontFamily: '"Syne", sans-serif', fontSize: '12px', letterSpacing: '0.5px',
                           border: '2px solid #111', boxShadow: '2px 2px 0 #111', cursor: actionLoading ? 'not-allowed' : 'pointer',
                         }}
                       >

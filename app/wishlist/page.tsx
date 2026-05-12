@@ -61,7 +61,7 @@ export default function WishlistPage() {
   if (authLoading) {
     return (
       <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ fontFamily: '"Archivo Black", sans-serif', color: '#888' }}>Loading...</div>
+        <div style={{ fontFamily: '"Syne", sans-serif', color: '#888' }}>Loading...</div>
       </div>
     )
   }
@@ -71,7 +71,7 @@ export default function WishlistPage() {
       {/* Header */}
       <div style={{ background: '#111', color: '#fff', padding: '36px 20px' }}>
         <div className="container">
-          <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '36px', letterSpacing: '-1px' }}>
+          <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '36px', letterSpacing: '-1px' }}>
             MY WISHLIST
           </div>
           <p style={{ color: '#888', marginTop: '6px', fontSize: '14px' }}>
@@ -94,7 +94,7 @@ export default function WishlistPage() {
               onClick={() => setTab(t.key)}
               style={{
                 padding: '10px 20px',
-                fontFamily: '"Archivo Black", sans-serif',
+                fontFamily: '"Syne", sans-serif',
                 fontSize: '12px',
                 letterSpacing: '0.5px',
                 border: '2px solid #111',
@@ -111,7 +111,7 @@ export default function WishlistPage() {
         </div>
 
         {loading ? (
-          <div style={{ textAlign: 'center', padding: '60px 20px', color: '#888', fontFamily: '"Space Grotesk", sans-serif' }}>
+          <div style={{ textAlign: 'center', padding: '60px 20px', color: '#888', fontFamily: '"Plus Jakarta Sans", sans-serif' }}>
             Loading your saved items...
           </div>
         ) : visible.length === 0 ? (
@@ -119,7 +119,7 @@ export default function WishlistPage() {
             <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'center', color: '#ccc' }}>
               <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
             </div>
-            <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '20px', marginBottom: '8px', color: '#111' }}>
+            <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '20px', marginBottom: '8px', color: '#111' }}>
               NOTHING SAVED YET
             </div>
             <p style={{ color: '#888', fontSize: '14px', marginBottom: '24px' }}>
@@ -127,7 +127,7 @@ export default function WishlistPage() {
             </p>
             <Link
               href={tab === 'services' ? '/services' : '/goods'}
-              style={{ display: 'inline-block', padding: '14px 32px', background: '#111', color: '#fff', fontFamily: '"Archivo Black", sans-serif', fontSize: '14px', textDecoration: 'none', border: '2px solid #111', boxShadow: '4px 4px 0 #a78bfa' }}
+              style={{ display: 'inline-block', padding: '14px 32px', background: '#111', color: '#fff', fontFamily: '"Syne", sans-serif', fontSize: '14px', textDecoration: 'none', border: '2px solid #111', boxShadow: '4px 4px 0 #a78bfa' }}
             >
               BROWSE {tab === 'services' ? 'SERVICES' : 'GOODS'} →
             </Link>
@@ -156,13 +156,13 @@ function ProductCard({ item }: { item: SavedItem }) {
           <Image src={imgSrc} alt={p.title} fill style={{ objectFit: 'cover' }} sizes="(max-width: 640px) 100vw, 33vw" onError={() => setImgSrc('/placeholder.jpg')} />
           {p.status !== 'active' && (
             <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <span style={{ background: '#888', color: '#fff', fontFamily: '"Archivo Black", sans-serif', fontSize: '11px', padding: '6px 14px', letterSpacing: '0.5px' }}>UNAVAILABLE</span>
+              <span style={{ background: '#888', color: '#fff', fontFamily: '"Syne", sans-serif', fontSize: '11px', padding: '6px 14px', letterSpacing: '0.5px' }}>UNAVAILABLE</span>
             </div>
           )}
         </div>
         <div style={{ padding: '14px 16px' }}>
           <div style={{ fontWeight: 700, fontSize: '14px', lineHeight: 1.35, marginBottom: '8px', color: '#111', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as const }}>{p.title}</div>
-          <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '20px', color: '#5d3fd3', marginBottom: '4px' }}>GHS {p.price.toLocaleString()}</div>
+          <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '20px', color: '#5d3fd3', marginBottom: '4px' }}>GHS {p.price.toLocaleString()}</div>
           <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
             <span style={{ fontSize: '11px', fontWeight: 700, padding: '2px 8px', background: '#f0f0f0', color: '#555', border: '1px solid #eee' }}>{p.condition.toUpperCase()}</span>
             <span style={{ fontSize: '11px', color: '#888' }}>{p.seller?.name ?? 'Student'}</span>
@@ -188,7 +188,7 @@ function ServiceCard({ item }: { item: SavedItem }) {
         </div>
         <div style={{ padding: '14px 16px' }}>
           <div style={{ fontWeight: 700, fontSize: '14px', lineHeight: 1.35, marginBottom: '8px', color: '#111', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as const }}>{s.name}</div>
-          <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '18px', color: '#1B5E20', marginBottom: '4px' }}>{s.rate ?? 'Contact for pricing'}</div>
+          <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '18px', color: '#1B5E20', marginBottom: '4px' }}>{s.rate ?? 'Contact for pricing'}</div>
           <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
             <span style={{ fontSize: '11px', fontWeight: 700, padding: '2px 8px', background: '#e8f5e9', color: '#1B5E20', border: '1px solid #86efac' }}>{s.category.toUpperCase()}</span>
             <span style={{ fontSize: '11px', color: '#888' }}>{s.provider?.name ?? 'Provider'}</span>

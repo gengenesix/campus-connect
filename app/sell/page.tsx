@@ -213,20 +213,20 @@ export default function SellPage() {
   if (authLoading) {
     return (
       <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ fontFamily: '"Archivo Black", sans-serif', color: '#888' }}>Loading...</div>
+        <div style={{ fontFamily: '"Syne", sans-serif', color: '#888' }}>Loading...</div>
       </div>
     )
   }
 
   if (!user) return (
     <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <div style={{ fontFamily: '"Archivo Black", sans-serif', color: '#888' }}>Loading...</div>
+      <div style={{ fontFamily: '"Syne", sans-serif', color: '#888' }}>Loading...</div>
     </div>
   )
 
   if (subStatus === 'loading') return (
     <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <div style={{ fontFamily: '"Archivo Black", sans-serif', color: '#888' }}>Loading...</div>
+      <div style={{ fontFamily: '"Syne", sans-serif', color: '#888' }}>Loading...</div>
     </div>
   )
 
@@ -234,7 +234,7 @@ export default function SellPage() {
     <>
       <div style={{ background: '#111', color: '#fff', padding: '36px 20px' }}>
         <div className="container">
-          <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '36px', letterSpacing: '-1px' }}>LIST YOUR ITEM</div>
+          <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '36px', letterSpacing: '-1px' }}>LIST YOUR ITEM</div>
         </div>
       </div>
       <SectionWrapper className="bg-[#f8f8f8]">
@@ -242,7 +242,7 @@ export default function SellPage() {
           <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'center', color: '#1B5E20' }}>
             <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
           </div>
-          <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '26px', letterSpacing: '-0.5px', marginBottom: '14px' }}>
+          <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '26px', letterSpacing: '-0.5px', marginBottom: '14px' }}>
             SELLER SUBSCRIPTION REQUIRED
           </div>
           <p style={{ color: '#555', fontSize: '14px', lineHeight: 1.7, marginBottom: '24px' }}>
@@ -255,7 +255,7 @@ export default function SellPage() {
             </div>
           ))}
           <div style={{ marginTop: '28px' }}>
-            <Link href="/subscribe" style={{ display: 'block', padding: '18px', background: '#1B5E20', color: '#fff', fontFamily: '"Archivo Black", sans-serif', fontSize: '15px', textDecoration: 'none', border: '2px solid #111', boxShadow: '6px 6px 0 #111', textAlign: 'center', letterSpacing: '0.5px' }}>
+            <Link href="/subscribe" style={{ display: 'block', padding: '18px', background: '#1B5E20', color: '#fff', fontFamily: '"Syne", sans-serif', fontSize: '15px', textDecoration: 'none', border: '2px solid #111', boxShadow: '6px 6px 0 #111', textAlign: 'center', letterSpacing: '0.5px' }}>
               SUBSCRIBE — GHS 20/MONTH →
             </Link>
             <p style={{ marginTop: '12px', fontSize: '12px', color: '#999', textAlign: 'center' }}>
@@ -272,7 +272,7 @@ export default function SellPage() {
       <div style={{ minHeight: '70vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 20px', background: '#f8f8f8' }}>
         <div style={{ width: '100%', maxWidth: '480px', border: '3px solid #f59e0b', background: '#fff', boxShadow: '8px 8px 0 #f59e0b', padding: '40px', textAlign: 'center' }}>
           <div style={{ fontSize: '56px', marginBottom: '16px' }}>⏳</div>
-          <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '28px', color: '#92400e', marginBottom: '12px' }}>
+          <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '28px', color: '#92400e', marginBottom: '12px' }}>
             UNDER REVIEW
           </div>
           <p style={{ color: '#666', lineHeight: 1.7, marginBottom: '8px' }}>
@@ -283,14 +283,14 @@ export default function SellPage() {
           </p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
             {newId && (
-              <Link href={`/goods/${newId}`} style={{ display: 'block', padding: '14px', background: '#f59e0b', color: '#fff', fontFamily: '"Archivo Black", sans-serif', fontSize: '14px', textDecoration: 'none', border: '2px solid #111', boxShadow: '4px 4px 0 #111' }}>
+              <Link href={`/goods/${newId}`} style={{ display: 'block', padding: '14px', background: '#f59e0b', color: '#fff', fontFamily: '"Syne", sans-serif', fontSize: '14px', textDecoration: 'none', border: '2px solid #111', boxShadow: '4px 4px 0 #111' }}>
                 VIEW MY LISTING →
               </Link>
             )}
             <Link
               href="/sell"
               onClick={() => { setSuccess(false); setForm({ name: '', category: '', condition: '', price: '', description: '', phone: '', inStock: true }); setImageFile(null); setImagePreview(null); setAdditionalFiles([]); setAdditionalPreviews([]) }}
-              style={{ display: 'block', padding: '14px', background: '#fff', color: '#111', fontFamily: '"Archivo Black", sans-serif', fontSize: '14px', textDecoration: 'none', border: '2px solid #111' }}
+              style={{ display: 'block', padding: '14px', background: '#fff', color: '#111', fontFamily: '"Syne", sans-serif', fontSize: '14px', textDecoration: 'none', border: '2px solid #111' }}
             >
               LIST ANOTHER ITEM
             </Link>
@@ -308,7 +308,7 @@ export default function SellPage() {
       {/* Header */}
       <div style={{ background: '#111', color: '#fff', padding: '36px 20px' }}>
         <div className="container">
-          <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '36px', letterSpacing: '-1px' }}>LIST YOUR ITEM</div>
+          <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '36px', letterSpacing: '-1px' }}>LIST YOUR ITEM</div>
           <p style={{ color: '#888', marginTop: '6px', fontSize: '14px' }}>100% free. No commission. Admin-reviewed before going live.</p>
         </div>
       </div>
@@ -357,14 +357,14 @@ export default function SellPage() {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
               <FormField label="CATEGORY *">
                 <select value={form.category} onChange={e => update('category', e.target.value)} required
-                  style={{ width: '100%', padding: '13px 16px', border: '2px solid #111', fontFamily: '"Space Grotesk", sans-serif', fontSize: '14px', background: '#fff', boxSizing: 'border-box', outline: 'none' }}>
+                  style={{ width: '100%', padding: '13px 16px', border: '2px solid #111', fontFamily: '"Plus Jakarta Sans", sans-serif', fontSize: '14px', background: '#fff', boxSizing: 'border-box', outline: 'none' }}>
                   <option value="">Select category</option>
                   {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
                 </select>
               </FormField>
               <FormField label="CONDITION *">
                 <select value={form.condition} onChange={e => update('condition', e.target.value)} required
-                  style={{ width: '100%', padding: '13px 16px', border: '2px solid #111', fontFamily: '"Space Grotesk", sans-serif', fontSize: '14px', background: '#fff', boxSizing: 'border-box', outline: 'none' }}>
+                  style={{ width: '100%', padding: '13px 16px', border: '2px solid #111', fontFamily: '"Plus Jakarta Sans", sans-serif', fontSize: '14px', background: '#fff', boxSizing: 'border-box', outline: 'none' }}>
                   <option value="">Select condition</option>
                   {CONDITIONS.map(c => <option key={c} value={c}>{c}</option>)}
                 </select>
@@ -402,7 +402,7 @@ export default function SellPage() {
                     onClick={() => update('inStock', val)}
                     style={{
                       flex: 1, padding: '12px 16px', cursor: 'pointer',
-                      fontFamily: '"Archivo Black", sans-serif', fontSize: '12px', letterSpacing: '0.5px',
+                      fontFamily: '"Syne", sans-serif', fontSize: '12px', letterSpacing: '0.5px',
                       border: '2px solid #111',
                       background: form.inStock === val ? (val ? '#1B5E20' : '#dc2626') : '#fff',
                       color: form.inStock === val ? '#fff' : '#888',

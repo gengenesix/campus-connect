@@ -59,7 +59,7 @@ function SubscribePageInner() {
           <div style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '2px', color: '#888', marginBottom: '12px' }}>
             CAMPUS CONNECT · SELLER PLAN
           </div>
-          <h1 style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: 'clamp(36px, 7vw, 64px)', letterSpacing: '-2px', lineHeight: 1, marginBottom: '16px' }}>
+          <h1 style={{ fontFamily: '"Syne", sans-serif', fontSize: 'clamp(36px, 7vw, 64px)', letterSpacing: '-2px', lineHeight: 1, marginBottom: '16px' }}>
             BECOME A<br />CAMPUS SELLER
           </h1>
           <p style={{ color: '#aaa', fontSize: '16px', maxWidth: '480px', lineHeight: 1.6 }}>
@@ -81,11 +81,11 @@ function SubscribePageInner() {
           {/* Pricing card */}
           <div style={{ border: '3px solid #111', background: '#fff', boxShadow: '8px 8px 0 #1B5E20' }}>
             <div style={{ background: '#1B5E20', color: '#fff', padding: '24px 28px', borderBottom: '3px solid #111' }}>
-              <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '14px', letterSpacing: '1.5px', marginBottom: '8px' }}>
+              <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '14px', letterSpacing: '1.5px', marginBottom: '8px' }}>
                 SELLER PLAN
               </div>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
-                <span style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '52px', lineHeight: 1 }}>₵20</span>
+                <span style={{ fontFamily: '"Syne", sans-serif', fontSize: '52px', lineHeight: 1 }}>₵20</span>
                 <span style={{ fontSize: '14px', color: 'rgba(255,255,255,0.7)' }}>/month</span>
               </div>
               <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.6)', marginTop: '6px' }}>
@@ -114,7 +114,7 @@ function SubscribePageInner() {
                     width: '100%', padding: '18px',
                     background: (paying || loading) ? '#888' : '#111',
                     color: '#fff',
-                    fontFamily: '"Archivo Black", sans-serif', fontSize: '15px',
+                    fontFamily: '"Syne", sans-serif', fontSize: '15px',
                     border: '2px solid #111',
                     cursor: (paying || loading) ? 'not-allowed' : 'pointer',
                     boxShadow: (paying || loading) ? 'none' : '5px 5px 0 #1B5E20',
@@ -133,7 +133,7 @@ function SubscribePageInner() {
           {/* Why we charge */}
           <div>
             <div style={{ border: '2px solid #111', background: '#fff', padding: '24px', boxShadow: '4px 4px 0 #111', marginBottom: '20px' }}>
-              <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '16px', marginBottom: '12px' }}>
+              <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '16px', marginBottom: '12px' }}>
                 WHY GHS 20?
               </div>
               <p style={{ fontSize: '14px', color: '#555', lineHeight: 1.7, margin: 0 }}>
@@ -142,7 +142,7 @@ function SubscribePageInner() {
             </div>
 
             <div style={{ border: '2px solid #111', background: '#fff', padding: '24px', boxShadow: '4px 4px 0 #111', marginBottom: '20px' }}>
-              <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '16px', marginBottom: '12px' }}>
+              <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '16px', marginBottom: '12px' }}>
                 BUYERS STAY FREE
               </div>
               <p style={{ fontSize: '14px', color: '#555', lineHeight: 1.7, margin: 0 }}>
@@ -151,7 +151,7 @@ function SubscribePageInner() {
             </div>
 
             <div style={{ border: '2px solid #f59e0b', background: '#fffbeb', padding: '20px 24px' }}>
-              <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '13px', color: '#92400e', marginBottom: '8px' }}>
+              <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '13px', color: '#92400e', marginBottom: '8px' }}>
                 ALREADY A SELLER?
               </div>
               <p style={{ fontSize: '13px', color: '#78350f', margin: '0 0 12px', lineHeight: 1.5 }}>

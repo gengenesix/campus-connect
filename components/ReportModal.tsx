@@ -62,7 +62,7 @@ export default function ReportModal({ productId, serviceId, reportedUserId, item
   if (!user) return (
     <button
       onClick={() => router.push('/auth/login')}
-      style={{ background: 'none', border: 'none', color: '#bbb', fontSize: '12px', cursor: 'pointer', fontFamily: '"Space Grotesk", sans-serif', padding: '4px 0' }}
+      style={{ background: 'none', border: 'none', color: '#bbb', fontSize: '12px', cursor: 'pointer', fontFamily: '"Plus Jakarta Sans", sans-serif', padding: '4px 0' }}
     >
       {reportBtnContent}
     </button>
@@ -72,7 +72,7 @@ export default function ReportModal({ productId, serviceId, reportedUserId, item
     <>
       <button
         onClick={() => setOpen(true)}
-        style={{ background: 'none', border: 'none', color: '#bbb', fontSize: '12px', cursor: 'pointer', fontFamily: '"Space Grotesk", sans-serif', padding: '4px 0', transition: 'color 0.15s' }}
+        style={{ background: 'none', border: 'none', color: '#bbb', fontSize: '12px', cursor: 'pointer', fontFamily: '"Plus Jakarta Sans", sans-serif', padding: '4px 0', transition: 'color 0.15s' }}
         onMouseEnter={e => (e.currentTarget.style.color = '#ff3366')}
         onMouseLeave={e => (e.currentTarget.style.color = '#bbb')}
       >
@@ -86,7 +86,7 @@ export default function ReportModal({ productId, serviceId, reportedUserId, item
         >
           <div style={{ background: '#fff', border: '3px solid #111', boxShadow: '8px 8px 0 #111', maxWidth: '440px', width: '100%' }}>
             <div style={{ background: '#ff3366', color: '#fff', padding: '14px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '14px', letterSpacing: '0.5px' }}>REPORT</span>
+              <span style={{ fontFamily: '"Syne", sans-serif', fontSize: '14px', letterSpacing: '0.5px' }}>REPORT</span>
               <button onClick={() => { setOpen(false); setDone(false); setReason(''); setDetails(''); setError(null) }} style={{ background: 'none', border: 'none', color: '#fff', fontSize: '20px', cursor: 'pointer', padding: '0 4px', lineHeight: 1 }}>×</button>
             </div>
 
@@ -94,11 +94,11 @@ export default function ReportModal({ productId, serviceId, reportedUserId, item
               {done ? (
                 <div style={{ textAlign: 'center', padding: '20px 0' }}>
                   <div style={{ fontSize: '40px', marginBottom: '12px' }}>✓</div>
-                  <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '18px', marginBottom: '8px', color: '#1B5E20' }}>REPORT SUBMITTED</div>
+                  <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '18px', marginBottom: '8px', color: '#1B5E20' }}>REPORT SUBMITTED</div>
                   <p style={{ color: '#666', fontSize: '13px', lineHeight: 1.6 }}>Thank you. Our team will review this and take action if needed.</p>
                   <button
                     onClick={() => { setOpen(false); setDone(false) }}
-                    style={{ marginTop: '20px', padding: '10px 24px', background: '#111', color: '#fff', fontFamily: '"Archivo Black", sans-serif', fontSize: '13px', border: '2px solid #111', cursor: 'pointer' }}
+                    style={{ marginTop: '20px', padding: '10px 24px', background: '#111', color: '#fff', fontFamily: '"Syne", sans-serif', fontSize: '13px', border: '2px solid #111', cursor: 'pointer' }}
                   >
                     CLOSE
                   </button>
@@ -151,7 +151,7 @@ export default function ReportModal({ productId, serviceId, reportedUserId, item
                     disabled={loading || !reason}
                     style={{
                       width: '100%', padding: '13px', background: (!reason || loading) ? '#888' : '#ff3366',
-                      color: '#fff', fontFamily: '"Archivo Black", sans-serif', fontSize: '13px',
+                      color: '#fff', fontFamily: '"Syne", sans-serif', fontSize: '13px',
                       border: '2px solid #111', cursor: (!reason || loading) ? 'not-allowed' : 'pointer',
                       boxShadow: (!reason || loading) ? 'none' : '3px 3px 0 #111', letterSpacing: '0.5px',
                     }}

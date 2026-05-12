@@ -127,10 +127,10 @@ export default function GoodsPageClient({
       {/* Page Header */}
       <div style={{ background: '#111', color: '#fff', padding: '36px 20px' }}>
         <div className="container">
-          <h1 style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: 'clamp(32px, 6vw, 48px)', marginBottom: '6px', letterSpacing: '-1px' }}>
+          <h1 style={{ fontFamily: '"Syne", sans-serif', fontSize: 'clamp(32px, 6vw, 48px)', marginBottom: '6px', letterSpacing: '-1px' }}>
             BROWSE GOODS
           </h1>
-          <p style={{ color: '#666', fontSize: '15px', fontFamily: '"Space Grotesk", sans-serif' }}>
+          <p style={{ color: '#666', fontSize: '15px', fontFamily: '"Plus Jakarta Sans", sans-serif' }}>
             {campusOnly && userUniversityId ? 'Showing items from your campus · ' : ''}
             New listings daily from Ghana campus students
           </p>
@@ -145,7 +145,7 @@ export default function GoodsPageClient({
             placeholder="Search goods..."
             value={search}
             onChange={e => setSearch(e.target.value)}
-            style={{ flex: 1, minWidth: '160px', padding: '10px 14px', border: '2px solid #111', fontFamily: '"Space Grotesk", sans-serif', fontSize: '14px', fontWeight: 600, outline: 'none' }}
+            style={{ flex: 1, minWidth: '160px', padding: '10px 14px', border: '2px solid #111', fontFamily: '"Plus Jakarta Sans", sans-serif', fontSize: '14px', fontWeight: 600, outline: 'none' }}
           />
           {/* MY CAMPUS toggle — only if logged in with a university */}
           {userUniversityId && (
@@ -153,7 +153,7 @@ export default function GoodsPageClient({
               onClick={() => setCampusOnly(v => !v)}
               style={{
                 padding: '10px 16px', border: '2px solid #111',
-                fontFamily: '"Archivo Black", sans-serif', fontSize: '11px',
+                fontFamily: '"Syne", sans-serif', fontSize: '11px',
                 letterSpacing: '0.5px', cursor: 'pointer', transition: 'all 0.15s',
                 whiteSpace: 'nowrap',
                 background: campusOnly ? '#1B5E20' : '#fff',
@@ -163,22 +163,22 @@ export default function GoodsPageClient({
               {campusOnly ? '● MY CAMPUS' : '○ MY CAMPUS'}
             </button>
           )}
-          <select value={condition} onChange={e => setCondition(e.target.value)} style={{ padding: '10px 12px', border: '2px solid #111', fontFamily: '"Space Grotesk", sans-serif', fontWeight: 600, cursor: 'pointer', background: '#fff', fontSize: '13px' }}>
+          <select value={condition} onChange={e => setCondition(e.target.value)} style={{ padding: '10px 12px', border: '2px solid #111', fontFamily: '"Plus Jakarta Sans", sans-serif', fontWeight: 600, cursor: 'pointer', background: '#fff', fontSize: '13px' }}>
             <option value="">All Conditions</option>
             {CONDITIONS.map(c => <option key={c} value={c}>{c}</option>)}
           </select>
-          <select value={category} onChange={e => setCategory(e.target.value)} style={{ padding: '10px 12px', border: '2px solid #111', fontFamily: '"Space Grotesk", sans-serif', fontWeight: 600, cursor: 'pointer', background: '#fff', fontSize: '13px' }}>
+          <select value={category} onChange={e => setCategory(e.target.value)} style={{ padding: '10px 12px', border: '2px solid #111', fontFamily: '"Plus Jakarta Sans", sans-serif', fontWeight: 600, cursor: 'pointer', background: '#fff', fontSize: '13px' }}>
             <option value="">All Categories</option>
             {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
           </select>
-          <select value={sortBy} onChange={e => setSortBy(e.target.value)} style={{ padding: '10px 12px', border: '2px solid #111', fontFamily: '"Space Grotesk", sans-serif', fontWeight: 600, cursor: 'pointer', background: '#fff', fontSize: '13px' }}>
+          <select value={sortBy} onChange={e => setSortBy(e.target.value)} style={{ padding: '10px 12px', border: '2px solid #111', fontFamily: '"Plus Jakarta Sans", sans-serif', fontWeight: 600, cursor: 'pointer', background: '#fff', fontSize: '13px' }}>
             <option value="newest">Newest First</option>
             <option value="price-low">Price: Low → High</option>
             <option value="price-high">Price: High → Low</option>
             <option value="popular">Most Viewed</option>
           </select>
           {hasFilters && (
-            <button onClick={clearFilters} style={{ padding: '10px 16px', background: '#111', color: '#fff', border: '2px solid #111', fontWeight: 700, cursor: 'pointer', fontFamily: '"Space Grotesk", sans-serif', fontSize: '12px', letterSpacing: '0.5px' }}>
+            <button onClick={clearFilters} style={{ padding: '10px 16px', background: '#111', color: '#fff', border: '2px solid #111', fontWeight: 700, cursor: 'pointer', fontFamily: '"Plus Jakarta Sans", sans-serif', fontSize: '12px', letterSpacing: '0.5px' }}>
               CLEAR ✕
             </button>
           )}
@@ -194,7 +194,7 @@ export default function GoodsPageClient({
               onClick={() => setCategory(cat === 'All' ? '' : cat)}
               style={{
                 padding: '7px 16px', whiteSpace: 'nowrap', border: '2px solid #111',
-                fontFamily: '"Space Grotesk", sans-serif', fontWeight: 700, fontSize: '11px',
+                fontFamily: '"Plus Jakarta Sans", sans-serif', fontWeight: 700, fontSize: '11px',
                 cursor: 'pointer', letterSpacing: '0.5px', transition: 'all 0.15s',
                 background: (cat === 'All' && !category) || category === cat ? '#111' : '#fff',
                 color: (cat === 'All' && !category) || category === cat ? '#fff' : '#111',
@@ -210,7 +210,7 @@ export default function GoodsPageClient({
       <SectionWrapper className="bg-[#f8f8f8]">
         {products.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '80px 20px' }}>
-            <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: 'clamp(22px, 5vw, 28px)', marginBottom: '10px' }}>
+            <div style={{ fontFamily: '"Syne", sans-serif', fontSize: 'clamp(22px, 5vw, 28px)', marginBottom: '10px' }}>
               {campusOnly ? 'NO CAMPUS LISTINGS YET' : hasFilters ? 'NO RESULTS FOUND' : 'NO LISTINGS YET'}
             </div>
             <p style={{ color: '#666', marginBottom: '24px', fontSize: '15px' }}>
@@ -227,7 +227,7 @@ export default function GoodsPageClient({
           </div>
         ) : (
           <>
-            <p style={{ marginBottom: '20px', fontWeight: 700, color: '#888', fontSize: '12px', letterSpacing: '1px', fontFamily: '"Space Grotesk", sans-serif' }}>
+            <p style={{ marginBottom: '20px', fontWeight: 700, color: '#888', fontSize: '12px', letterSpacing: '1px', fontFamily: '"Plus Jakarta Sans", sans-serif' }}>
               SHOWING <strong style={{ color: '#111' }}>{products.length}</strong> ITEM{products.length !== 1 ? 'S' : ''}
               {campusOnly && <span style={{ color: '#1B5E20' }}> · MY CAMPUS</span>}
               {hasFilters && !campusOnly && <span style={{ color: '#5d3fd3' }}> · FILTERED</span>}
@@ -252,7 +252,7 @@ export default function GoodsPageClient({
                   disabled={loadingMore}
                   style={{
                     padding: '14px 48px', background: loadingMore ? '#888' : '#111', color: '#fff',
-                    fontFamily: '"Archivo Black", sans-serif', fontSize: '14px', border: '2px solid #111',
+                    fontFamily: '"Syne", sans-serif', fontSize: '14px', border: '2px solid #111',
                     boxShadow: loadingMore ? 'none' : '4px 4px 0 #5d3fd3',
                     cursor: loadingMore ? 'not-allowed' : 'pointer', transition: 'all 0.15s',
                   }}

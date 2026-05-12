@@ -87,7 +87,7 @@ export default function PWAInstallBanner() {
 
       {/* Text */}
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '13px', color: '#fff', letterSpacing: '0.3px' }}>
+        <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '13px', color: '#fff', letterSpacing: '0.3px' }}>
           Add to Home Screen
         </div>
         <div style={{ fontSize: '12px', color: '#888', marginTop: '2px' }}>
@@ -102,7 +102,7 @@ export default function PWAInstallBanner() {
           padding: '9px 16px',
           background: '#1B5E20',
           color: '#fff',
-          fontFamily: '"Archivo Black", sans-serif',
+          fontFamily: '"Syne", sans-serif',
           fontSize: '12px',
           letterSpacing: '0.5px',
           border: '2px solid #1B5E20',

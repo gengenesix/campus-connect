@@ -197,20 +197,20 @@ export default function OfferServicePage() {
   if (authLoading) {
     return (
       <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ fontFamily: '"Archivo Black", sans-serif', color: '#888' }}>Loading...</div>
+        <div style={{ fontFamily: '"Syne", sans-serif', color: '#888' }}>Loading...</div>
       </div>
     )
   }
 
   if (!user) return (
     <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <div style={{ fontFamily: '"Archivo Black", sans-serif', color: '#888' }}>Loading...</div>
+      <div style={{ fontFamily: '"Syne", sans-serif', color: '#888' }}>Loading...</div>
     </div>
   )
 
   if (subStatus === 'loading') return (
     <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <div style={{ fontFamily: '"Archivo Black", sans-serif', color: '#888' }}>Loading...</div>
+      <div style={{ fontFamily: '"Syne", sans-serif', color: '#888' }}>Loading...</div>
     </div>
   )
 
@@ -218,7 +218,7 @@ export default function OfferServicePage() {
     <>
       <div style={{ background: '#1B5E20', color: '#fff', padding: '36px 20px' }}>
         <div className="container">
-          <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '36px', letterSpacing: '-1px' }}>OFFER A SERVICE</div>
+          <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '36px', letterSpacing: '-1px' }}>OFFER A SERVICE</div>
         </div>
       </div>
       <SectionWrapper className="bg-[#f8f8f8]">
@@ -226,7 +226,7 @@ export default function OfferServicePage() {
           <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'center', color: '#1B5E20' }}>
             <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
           </div>
-          <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '26px', letterSpacing: '-0.5px', marginBottom: '14px' }}>
+          <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '26px', letterSpacing: '-0.5px', marginBottom: '14px' }}>
             SELLER SUBSCRIPTION REQUIRED
           </div>
           <p style={{ color: '#555', fontSize: '14px', lineHeight: 1.7, marginBottom: '24px' }}>
@@ -239,7 +239,7 @@ export default function OfferServicePage() {
             </div>
           ))}
           <div style={{ marginTop: '28px' }}>
-            <Link href="/subscribe" style={{ display: 'block', padding: '18px', background: '#1B5E20', color: '#fff', fontFamily: '"Archivo Black", sans-serif', fontSize: '15px', textDecoration: 'none', border: '2px solid #111', boxShadow: '6px 6px 0 #111', textAlign: 'center', letterSpacing: '0.5px' }}>
+            <Link href="/subscribe" style={{ display: 'block', padding: '18px', background: '#1B5E20', color: '#fff', fontFamily: '"Syne", sans-serif', fontSize: '15px', textDecoration: 'none', border: '2px solid #111', boxShadow: '6px 6px 0 #111', textAlign: 'center', letterSpacing: '0.5px' }}>
               SUBSCRIBE — GHS 20/MONTH →
             </Link>
             <p style={{ marginTop: '12px', fontSize: '12px', color: '#999', textAlign: 'center' }}>
@@ -258,7 +258,7 @@ export default function OfferServicePage() {
           <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'center', color: '#1B5E20' }}>
             <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
           </div>
-          <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '28px', color: '#1B5E20', marginBottom: '12px' }}>
+          <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '28px', color: '#1B5E20', marginBottom: '12px' }}>
             SERVICE LISTED!
           </div>
           <p style={{ color: '#666', lineHeight: 1.7, marginBottom: '28px' }}>
@@ -266,7 +266,7 @@ export default function OfferServicePage() {
           </p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
             {newId && (
-              <Link href={`/services/${newId}`} style={{ display: 'block', padding: '14px', background: '#1B5E20', color: '#fff', fontFamily: '"Archivo Black", sans-serif', fontSize: '14px', textDecoration: 'none', border: '2px solid #111', boxShadow: '4px 4px 0 #111' }}>
+              <Link href={`/services/${newId}`} style={{ display: 'block', padding: '14px', background: '#1B5E20', color: '#fff', fontFamily: '"Syne", sans-serif', fontSize: '14px', textDecoration: 'none', border: '2px solid #111', boxShadow: '4px 4px 0 #111' }}>
                 VIEW MY SERVICE →
               </Link>
             )}
@@ -284,7 +284,7 @@ export default function OfferServicePage() {
       {/* Header */}
       <div style={{ background: '#1B5E20', color: '#fff', padding: '36px 20px' }}>
         <div className="container">
-          <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '36px', letterSpacing: '-1px' }}>
+          <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '36px', letterSpacing: '-1px' }}>
             OFFER A SERVICE
           </div>
           <p style={{ color: 'rgba(255,255,255,0.6)', marginTop: '6px', fontSize: '14px' }}>
@@ -355,7 +355,7 @@ export default function OfferServicePage() {
                       background: form.category === cat ? '#e8f5e9' : '#fff',
                       cursor: 'pointer', fontSize: '12px', fontWeight: 700,
                       color: form.category === cat ? '#1B5E20' : '#666',
-                      fontFamily: '"Space Grotesk", sans-serif',
+                      fontFamily: '"Plus Jakarta Sans", sans-serif',
                       transition: '0.15s',
                     }}
                   >

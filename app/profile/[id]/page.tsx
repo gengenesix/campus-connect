@@ -23,7 +23,7 @@ export default function PublicProfilePage() {
   if (loading) {
     return (
       <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '18px', color: '#888' }}>Loading...</div>
+        <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '18px', color: '#888' }}>Loading...</div>
       </div>
     )
   }
@@ -31,9 +31,9 @@ export default function PublicProfilePage() {
   if (notFound || !profile) {
     return (
       <div style={{ minHeight: '60vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '16px', padding: '40px 20px' }}>
-        <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '48px' }}>404</div>
+        <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '48px' }}>404</div>
         <div style={{ fontSize: '16px', color: '#666' }}>This profile doesn&apos;t exist or has been removed.</div>
-        <Link href="/" style={{ padding: '12px 28px', background: '#111', color: '#fff', fontFamily: '"Archivo Black", sans-serif', fontSize: '13px', textDecoration: 'none', border: '2px solid #111' }}>
+        <Link href="/" style={{ padding: '12px 28px', background: '#111', color: '#fff', fontFamily: '"Syne", sans-serif', fontSize: '13px', textDecoration: 'none', border: '2px solid #111' }}>
           ← HOME
         </Link>
       </div>
@@ -45,7 +45,7 @@ export default function PublicProfilePage() {
     router.replace('/profile')
     return (
       <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ fontFamily: '"Archivo Black", sans-serif', color: '#888' }}>Redirecting...</div>
+        <div style={{ fontFamily: '"Syne", sans-serif', color: '#888' }}>Redirecting...</div>
       </div>
     )
   }
@@ -92,7 +92,7 @@ export default function PublicProfilePage() {
                     width: '88px', height: '88px', borderRadius: '50%',
                     background: '#1B5E20', color: '#fff', border: '4px solid #fff',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontFamily: '"Archivo Black", sans-serif', fontSize: '28px',
+                    fontFamily: '"Syne", sans-serif', fontSize: '28px',
                   }}>
                     {initials}
                   </div>
@@ -113,7 +113,7 @@ export default function PublicProfilePage() {
                   onClick={() => router.push(`/messages?with=${profile.id}`)}
                   style={{
                     padding: '12px 24px', background: '#111', color: '#fff',
-                    fontFamily: '"Archivo Black", sans-serif', fontSize: '13px',
+                    fontFamily: '"Syne", sans-serif', fontSize: '13px',
                     border: '2px solid #111', cursor: 'pointer', letterSpacing: '0.5px',
                     boxShadow: '3px 3px 0 #1B5E20', transition: 'all 0.2s',
                   }}
@@ -131,7 +131,7 @@ export default function PublicProfilePage() {
                   href={`/auth/login?redirect=/messages?with=${profile.id}`}
                   style={{
                     padding: '12px 24px', background: '#888', color: '#fff',
-                    fontFamily: '"Archivo Black", sans-serif', fontSize: '13px',
+                    fontFamily: '"Syne", sans-serif', fontSize: '13px',
                     border: '2px solid #111', textDecoration: 'none', display: 'inline-block',
                   }}
                 >
@@ -145,7 +145,7 @@ export default function PublicProfilePage() {
 
             {/* Name + role */}
             <div style={{ marginBottom: '16px' }}>
-              <h1 style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '26px', marginBottom: '6px', color: '#111' }}>
+              <h1 style={{ fontFamily: '"Syne", sans-serif', fontSize: '26px', marginBottom: '6px', color: '#111' }}>
                 {profile.name ?? 'Campus Student'}
               </h1>
               <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
@@ -204,7 +204,7 @@ export default function PublicProfilePage() {
         {/* Listings */}
         {listings.length > 0 && (
           <div>
-            <h2 style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '20px', textTransform: 'uppercase', marginBottom: '20px', paddingBottom: '12px', borderBottom: '2px solid #111' }}>
+            <h2 style={{ fontFamily: '"Syne", sans-serif', fontSize: '20px', textTransform: 'uppercase', marginBottom: '20px', paddingBottom: '12px', borderBottom: '2px solid #111' }}>
               {profile.name?.split(' ')[0] ?? 'Their'}&apos;s Listings
             </h2>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '20px' }}>
@@ -240,7 +240,7 @@ export default function PublicProfilePage() {
                       <div style={{ fontSize: '13px', fontWeight: 700, color: '#111', marginBottom: '4px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         {item.title ?? item.name}
                       </div>
-                      <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '15px', color: '#1B5E20' }}>
+                      <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '15px', color: '#1B5E20' }}>
                         {item.price != null ? `GH₵ ${item.price.toLocaleString()}` : (item.rate ?? 'Contact for price')}
                       </div>
                     </div>
@@ -263,7 +263,7 @@ export default function PublicProfilePage() {
         <div style={{ marginTop: '32px' }}>
           <button
             onClick={() => router.back()}
-            style={{ padding: '12px 24px', background: 'none', border: '2px solid #111', fontFamily: '"Space Grotesk", sans-serif', fontWeight: 700, fontSize: '13px', cursor: 'pointer' }}
+            style={{ padding: '12px 24px', background: 'none', border: '2px solid #111', fontFamily: '"Plus Jakarta Sans", sans-serif', fontWeight: 700, fontSize: '13px', cursor: 'pointer' }}
           >
             ← GO BACK
           </button>

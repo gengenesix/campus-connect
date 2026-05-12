@@ -22,7 +22,7 @@ export default function PrivacyPage() {
       <SectionWrapper className="bg-[#f8f8f8]" innerClassName="max-w-[860px] mx-auto px-4">
         {/* Title */}
         <div style={{ marginBottom: '48px' }}>
-          <h1 style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '52px', lineHeight: '1.1', color: '#111', marginBottom: '16px' }}>
+          <h1 style={{ fontFamily: '"Syne", sans-serif', fontSize: '52px', lineHeight: '1.1', color: '#111', marginBottom: '16px' }}>
             PRIVACY<br /><span style={{ color: '#1B5E20' }}>POLICY</span>
           </h1>
           <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
@@ -160,11 +160,11 @@ For account-related issues (banned account, listing removal): support@campusconn
         ].map((section) => (
           <div key={section.num} style={{ marginBottom: '40px' }}>
             <div style={{ display: 'flex', gap: '20px', alignItems: 'flex-start' }}>
-              <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '36px', color: '#eee', lineHeight: 1, flexShrink: 0, width: '52px' }}>
+              <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '36px', color: '#eee', lineHeight: 1, flexShrink: 0, width: '52px' }}>
                 {section.num}
               </div>
               <div style={{ flex: 1 }}>
-                <h2 style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '20px', color: '#111', marginBottom: '16px', paddingBottom: '8px', borderBottom: '2px solid #111', textTransform: 'uppercase' }}>
+                <h2 style={{ fontFamily: '"Syne", sans-serif', fontSize: '20px', color: '#111', marginBottom: '16px', paddingBottom: '8px', borderBottom: '2px solid #111', textTransform: 'uppercase' }}>
                   {section.title}
                 </h2>
                 {section.content.split('\n\n').map((para, i) => (

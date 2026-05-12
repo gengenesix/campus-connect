@@ -343,14 +343,14 @@ export default function ProfilePage() {
   if (loading) {
     return (
       <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ fontFamily: '"Archivo Black", sans-serif', color: '#888' }}>Loading...</div>
+        <div style={{ fontFamily: '"Syne", sans-serif', color: '#888' }}>Loading...</div>
       </div>
     )
   }
 
   if (!user) return (
     <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <div style={{ fontFamily: '"Archivo Black", sans-serif', color: '#888' }}>Loading...</div>
+      <div style={{ fontFamily: '"Syne", sans-serif', color: '#888' }}>Loading...</div>
     </div>
   )
 
@@ -367,7 +367,7 @@ export default function ProfilePage() {
       <div style={{ background: '#111', color: '#fff', padding: '36px 20px' }}>
         <div className="container">
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
-            <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '36px', letterSpacing: '-1px' }}>
+            <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '36px', letterSpacing: '-1px' }}>
               MY PROFILE
             </div>
             {profile?.is_verified && (
@@ -417,7 +417,7 @@ export default function ProfilePage() {
               {!editing && (
                 <button
                   onClick={() => setEditing(true)}
-                  style={{ padding: '8px 16px', background: '#111', color: '#fff', fontFamily: '"Archivo Black", sans-serif', fontSize: '11px', border: 'none', cursor: 'pointer', letterSpacing: '0.5px', flexShrink: 0 }}
+                  style={{ padding: '8px 16px', background: '#111', color: '#fff', fontFamily: '"Syne", sans-serif', fontSize: '11px', border: 'none', cursor: 'pointer', letterSpacing: '0.5px', flexShrink: 0 }}
                 >
                   COMPLETE NOW →
                 </button>
@@ -460,7 +460,7 @@ export default function ProfilePage() {
                     style={{ width: '110px', height: '110px', borderRadius: '50%', objectFit: 'cover', border: '3px solid #111', display: 'block' }}
                   />
                 ) : (
-                  <div style={{ width: '110px', height: '110px', borderRadius: '50%', background: '#1B5E20', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: '"Archivo Black", sans-serif', fontSize: '34px', border: '3px solid #111', margin: '0 auto' }}>
+                  <div style={{ width: '110px', height: '110px', borderRadius: '50%', background: '#1B5E20', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: '"Syne", sans-serif', fontSize: '34px', border: '3px solid #111', margin: '0 auto' }}>
                     {initials}
                   </div>
                 )}
@@ -510,7 +510,7 @@ export default function ProfilePage() {
               )}
 
               <div style={{ position: 'relative', display: 'inline-block' }}>
-                <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '20px', marginBottom: '2px' }}>
+                <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '20px', marginBottom: '2px' }}>
                   {profile?.name ?? 'Your Name'}
                 </div>
                 {profile?.is_verified && (
@@ -536,13 +536,13 @@ export default function ProfilePage() {
               {/* Stats */}
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '20px' }}>
                 <div style={{ border: '2px solid #eee', padding: '12px 8px', textAlign: 'center' }}>
-                  <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '22px', color: '#1B5E20' }}>
+                  <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '22px', color: '#1B5E20' }}>
                     {(profile?.total_reviews ?? 0) > 0 ? (profile?.rating?.toFixed(1) ?? '—') : '—'}
                   </div>
                   <div style={{ fontSize: '11px', color: '#888', marginTop: '2px' }}>Rating</div>
                 </div>
                 <div style={{ border: '2px solid #eee', padding: '12px 8px', textAlign: 'center' }}>
-                  <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '22px', color: '#1B5E20' }}>
+                  <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '22px', color: '#1B5E20' }}>
                     {profile?.total_reviews ?? 0}
                   </div>
                   <div style={{ fontSize: '11px', color: '#888', marginTop: '2px' }}>
@@ -557,15 +557,15 @@ export default function ProfilePage() {
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                <Link href="/my-listings" style={{ display: 'block', padding: '10px', background: '#111', color: '#fff', fontFamily: '"Archivo Black", sans-serif', fontSize: '12px', textDecoration: 'none', letterSpacing: '0.5px' }}>
+                <Link href="/my-listings" style={{ display: 'block', padding: '10px', background: '#111', color: '#fff', fontFamily: '"Syne", sans-serif', fontSize: '12px', textDecoration: 'none', letterSpacing: '0.5px' }}>
                   MY LISTINGS →
                 </Link>
-                <Link href="/dashboard" style={{ display: 'block', padding: '10px', background: '#fff', color: '#111', fontFamily: '"Archivo Black", sans-serif', fontSize: '12px', textDecoration: 'none', border: '2px solid #111', letterSpacing: '0.5px' }}>
+                <Link href="/dashboard" style={{ display: 'block', padding: '10px', background: '#fff', color: '#111', fontFamily: '"Syne", sans-serif', fontSize: '12px', textDecoration: 'none', border: '2px solid #111', letterSpacing: '0.5px' }}>
                   DASHBOARD
                 </Link>
                 <button
                   onClick={async () => { await signOut(); router.push('/') }}
-                  style={{ padding: '10px', background: 'none', color: '#dc2626', fontWeight: 700, fontSize: '12px', border: '1px solid #fca5a5', cursor: 'pointer', fontFamily: '"Space Grotesk", sans-serif' }}
+                  style={{ padding: '10px', background: 'none', color: '#dc2626', fontWeight: 700, fontSize: '12px', border: '1px solid #fca5a5', cursor: 'pointer', fontFamily: '"Plus Jakarta Sans", sans-serif' }}
                 >
                   Sign Out
                 </button>
@@ -577,11 +577,11 @@ export default function ProfilePage() {
           <div>
             <div style={{ border: '2px solid #111', background: '#fff', boxShadow: '6px 6px 0 #111' }}>
               <div style={{ background: '#f0f0f0', padding: '16px 24px', borderBottom: '2px solid #111', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '14px', letterSpacing: '0.5px' }}>PROFILE INFORMATION</span>
+                <span style={{ fontFamily: '"Syne", sans-serif', fontSize: '14px', letterSpacing: '0.5px' }}>PROFILE INFORMATION</span>
                 {!editing && (
                   <button
                     onClick={() => setEditing(true)}
-                    style={{ padding: '8px 20px', background: '#5d3fd3', color: '#fff', fontFamily: '"Archivo Black", sans-serif', fontSize: '12px', border: '2px solid #111', cursor: 'pointer', letterSpacing: '0.5px' }}
+                    style={{ padding: '8px 20px', background: '#5d3fd3', color: '#fff', fontFamily: '"Syne", sans-serif', fontSize: '12px', border: '2px solid #111', cursor: 'pointer', letterSpacing: '0.5px' }}
                   >
                     EDIT
                   </button>
@@ -599,7 +599,7 @@ export default function ProfilePage() {
                         value={form.name}
                         onChange={e => setForm(p => ({ ...p, name: e.target.value }))}
                         placeholder="Kwame Asante"
-                        style={{ width: '100%', padding: '12px 16px', border: '2px solid #111', fontFamily: '"Space Grotesk", sans-serif', fontSize: '14px', outline: 'none', boxSizing: 'border-box' }}
+                        style={{ width: '100%', padding: '12px 16px', border: '2px solid #111', fontFamily: '"Plus Jakarta Sans", sans-serif', fontSize: '14px', outline: 'none', boxSizing: 'border-box' }}
                       />
                     </div>
 
@@ -616,7 +616,7 @@ export default function ProfilePage() {
                           onChange={e => setForm(p => ({ ...p, phone: e.target.value.replace(/\D/g, '') }))}
                           placeholder="241234567"
                           maxLength={9}
-                          style={{ width: '100%', padding: '12px 16px 12px 58px', border: '2px solid #111', fontFamily: '"Space Grotesk", sans-serif', fontSize: '14px', outline: 'none', boxSizing: 'border-box' }}
+                          style={{ width: '100%', padding: '12px 16px 12px 58px', border: '2px solid #111', fontFamily: '"Plus Jakarta Sans", sans-serif', fontSize: '14px', outline: 'none', boxSizing: 'border-box' }}
                         />
                       </div>
                       <p style={{ marginTop: '4px', fontSize: '11px', color: '#888' }}>Enter the 9 digits after +233</p>
@@ -641,7 +641,7 @@ export default function ProfilePage() {
                         <select
                           value={form.department}
                           onChange={e => setForm(p => ({ ...p, department: e.target.value }))}
-                          style={{ width: '100%', padding: '12px 16px', border: '2px solid #111', fontFamily: '"Space Grotesk", sans-serif', fontSize: '14px', background: '#fff', boxSizing: 'border-box' }}
+                          style={{ width: '100%', padding: '12px 16px', border: '2px solid #111', fontFamily: '"Plus Jakarta Sans", sans-serif', fontSize: '14px', background: '#fff', boxSizing: 'border-box' }}
                         >
                           <option value="">Select your programme</option>
                           {FACULTIES.map(f => (
@@ -656,7 +656,7 @@ export default function ProfilePage() {
                           value={form.department}
                           onChange={e => setForm(p => ({ ...p, department: e.target.value }))}
                           placeholder="e.g. BSc Computer Science"
-                          style={{ width: '100%', padding: '12px 16px', border: '2px solid #111', fontFamily: '"Space Grotesk", sans-serif', fontSize: '14px', outline: 'none', boxSizing: 'border-box' }}
+                          style={{ width: '100%', padding: '12px 16px', border: '2px solid #111', fontFamily: '"Plus Jakarta Sans", sans-serif', fontSize: '14px', outline: 'none', boxSizing: 'border-box' }}
                         />
                       )}
                     </div>
@@ -667,7 +667,7 @@ export default function ProfilePage() {
                       <select
                         value={form.class_year}
                         onChange={e => setForm(p => ({ ...p, class_year: e.target.value }))}
-                        style={{ width: '100%', padding: '12px 16px', border: '2px solid #111', fontFamily: '"Space Grotesk", sans-serif', fontSize: '14px', background: '#fff', boxSizing: 'border-box' }}
+                        style={{ width: '100%', padding: '12px 16px', border: '2px solid #111', fontFamily: '"Plus Jakarta Sans", sans-serif', fontSize: '14px', background: '#fff', boxSizing: 'border-box' }}
                       >
                         <option value="">Select year</option>
                         {CLASS_YEARS.map(y => <option key={y} value={y}>{y}</option>)}
@@ -687,7 +687,7 @@ export default function ProfilePage() {
                           <select
                             value={form.hostel}
                             onChange={e => setForm(p => ({ ...p, hostel: e.target.value }))}
-                            style={{ width: '100%', padding: '12px 16px', border: '2px solid #111', fontFamily: '"Space Grotesk", sans-serif', fontSize: '14px', background: '#fff', boxSizing: 'border-box' }}
+                            style={{ width: '100%', padding: '12px 16px', border: '2px solid #111', fontFamily: '"Plus Jakarta Sans", sans-serif', fontSize: '14px', background: '#fff', boxSizing: 'border-box' }}
                           >
                             <option value="">Select hostel</option>
                             {form.hostel && !hostels.all.includes(form.hostel) && (
@@ -710,7 +710,7 @@ export default function ProfilePage() {
                           value={form.hostel}
                           onChange={e => setForm(p => ({ ...p, hostel: e.target.value }))}
                           placeholder={selectedUni ? `Hostel or area near ${selectedUni.shortName}` : 'Hostel or residential area'}
-                          style={{ width: '100%', padding: '12px 16px', border: '2px solid #111', fontFamily: '"Space Grotesk", sans-serif', fontSize: '14px', outline: 'none', boxSizing: 'border-box' }}
+                          style={{ width: '100%', padding: '12px 16px', border: '2px solid #111', fontFamily: '"Plus Jakarta Sans", sans-serif', fontSize: '14px', outline: 'none', boxSizing: 'border-box' }}
                         />
                       )}
                     </div>
@@ -723,7 +723,7 @@ export default function ProfilePage() {
                         onChange={e => setForm(p => ({ ...p, bio: e.target.value }))}
                         placeholder="Tell other students about yourself..."
                         rows={4}
-                        style={{ width: '100%', padding: '12px 16px', border: '2px solid #111', fontFamily: '"Space Grotesk", sans-serif', fontSize: '14px', outline: 'none', boxSizing: 'border-box', resize: 'vertical' }}
+                        style={{ width: '100%', padding: '12px 16px', border: '2px solid #111', fontFamily: '"Plus Jakarta Sans", sans-serif', fontSize: '14px', outline: 'none', boxSizing: 'border-box', resize: 'vertical' }}
                       />
                     </div>
 
@@ -734,7 +734,7 @@ export default function ProfilePage() {
                         <select
                           value={form.role ?? profile?.role ?? 'buyer'}
                           onChange={e => setForm(p => ({ ...p, role: e.target.value }))}
-                          style={{ width: '100%', padding: '12px 16px', border: '2px solid #111', fontFamily: '"Space Grotesk", sans-serif', fontSize: '14px', background: '#fff', boxSizing: 'border-box' }}
+                          style={{ width: '100%', padding: '12px 16px', border: '2px solid #111', fontFamily: '"Plus Jakarta Sans", sans-serif', fontSize: '14px', background: '#fff', boxSizing: 'border-box' }}
                         >
                           <option value="buyer">Buyer — Browse and buy items</option>
                           <option value="seller">Seller — List and sell goods</option>
@@ -750,14 +750,14 @@ export default function ProfilePage() {
                       <button
                         type="submit"
                         disabled={saving}
-                        style={{ flex: 1, padding: '14px', background: saving ? '#888' : '#1B5E20', color: '#fff', fontFamily: '"Archivo Black", sans-serif', fontSize: '14px', border: '2px solid #111', cursor: saving ? 'not-allowed' : 'pointer', boxShadow: '3px 3px 0 #111' }}
+                        style={{ flex: 1, padding: '14px', background: saving ? '#888' : '#1B5E20', color: '#fff', fontFamily: '"Syne", sans-serif', fontSize: '14px', border: '2px solid #111', cursor: saving ? 'not-allowed' : 'pointer', boxShadow: '3px 3px 0 #111' }}
                       >
                         {saving ? 'SAVING...' : 'SAVE CHANGES →'}
                       </button>
                       <button
                         type="button"
                         onClick={() => { setEditing(false); setSaveMsg('') }}
-                        style={{ padding: '14px 24px', background: '#fff', color: '#666', fontWeight: 600, border: '2px solid #ddd', cursor: 'pointer', fontFamily: '"Space Grotesk", sans-serif' }}
+                        style={{ padding: '14px 24px', background: '#fff', color: '#666', fontWeight: 600, border: '2px solid #ddd', cursor: 'pointer', fontFamily: '"Plus Jakarta Sans", sans-serif' }}
                       >
                         Cancel
                       </button>
@@ -795,7 +795,7 @@ export default function ProfilePage() {
             {/* University Email Verification */}
             <div style={{ marginTop: '24px', border: '2px solid #111', background: '#fff', boxShadow: '4px 4px 0 #111' }}>
               <div style={{ background: '#f0f0f0', padding: '14px 24px', borderBottom: '2px solid #111', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <span style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '14px', letterSpacing: '0.5px' }}>
+                <span style={{ fontFamily: '"Syne", sans-serif', fontSize: '14px', letterSpacing: '0.5px' }}>
                   UNIVERSITY EMAIL VERIFICATION
                 </span>
                 {emailStep === 'verified' && (
@@ -829,12 +829,12 @@ export default function ProfilePage() {
                           value={uniEmail}
                           onChange={e => setUniEmail(e.target.value)}
                           placeholder="yourname@st.umat.edu.gh"
-                          style={{ flex: 1, minWidth: '220px', padding: '10px 14px', border: '2px solid #111', fontFamily: '"Space Grotesk", sans-serif', fontSize: '14px', outline: 'none', boxSizing: 'border-box' }}
+                          style={{ flex: 1, minWidth: '220px', padding: '10px 14px', border: '2px solid #111', fontFamily: '"Plus Jakarta Sans", sans-serif', fontSize: '14px', outline: 'none', boxSizing: 'border-box' }}
                         />
                         <button
                           onClick={handleSendOtp}
                           disabled={emailLoading}
-                          style={{ padding: '10px 20px', background: emailLoading ? '#888' : '#1B5E20', color: '#fff', fontFamily: '"Archivo Black", sans-serif', fontSize: '12px', border: '2px solid #111', cursor: emailLoading ? 'not-allowed' : 'pointer', letterSpacing: '0.5px', whiteSpace: 'nowrap' }}
+                          style={{ padding: '10px 20px', background: emailLoading ? '#888' : '#1B5E20', color: '#fff', fontFamily: '"Syne", sans-serif', fontSize: '12px', border: '2px solid #111', cursor: emailLoading ? 'not-allowed' : 'pointer', letterSpacing: '0.5px', whiteSpace: 'nowrap' }}
                         >
                           {emailLoading ? 'SENDING...' : 'SEND CODE →'}
                         </button>
@@ -852,18 +852,18 @@ export default function ProfilePage() {
                             onChange={e => setOtpCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
                             placeholder="000000"
                             maxLength={6}
-                            style={{ width: '150px', padding: '10px 14px', border: '2px solid #111', fontFamily: '"Archivo Black", sans-serif', fontSize: '22px', letterSpacing: '8px', outline: 'none', textAlign: 'center' }}
+                            style={{ width: '150px', padding: '10px 14px', border: '2px solid #111', fontFamily: '"Syne", sans-serif', fontSize: '22px', letterSpacing: '8px', outline: 'none', textAlign: 'center' }}
                           />
                           <button
                             onClick={handleConfirmOtp}
                             disabled={emailLoading}
-                            style={{ padding: '10px 20px', background: emailLoading ? '#888' : '#5d3fd3', color: '#fff', fontFamily: '"Archivo Black", sans-serif', fontSize: '12px', border: '2px solid #111', cursor: emailLoading ? 'not-allowed' : 'pointer', letterSpacing: '0.5px' }}
+                            style={{ padding: '10px 20px', background: emailLoading ? '#888' : '#5d3fd3', color: '#fff', fontFamily: '"Syne", sans-serif', fontSize: '12px', border: '2px solid #111', cursor: emailLoading ? 'not-allowed' : 'pointer', letterSpacing: '0.5px' }}
                           >
                             {emailLoading ? 'VERIFYING...' : 'VERIFY →'}
                           </button>
                           <button
                             onClick={() => { setEmailStep('idle'); setOtpCode(''); setEmailMsg('') }}
-                            style={{ padding: '10px 14px', background: '#fff', color: '#666', fontWeight: 600, border: '2px solid #ddd', cursor: 'pointer', fontFamily: '"Space Grotesk", sans-serif', fontSize: '12px' }}
+                            style={{ padding: '10px 14px', background: '#fff', color: '#666', fontWeight: 600, border: '2px solid #ddd', cursor: 'pointer', fontFamily: '"Plus Jakarta Sans", sans-serif', fontSize: '12px' }}
                           >
                             Change email
                           </button>
@@ -888,7 +888,7 @@ export default function ProfilePage() {
             {/* Account Quick Links */}
             <div style={{ marginTop: '24px', border: '2px solid #111', background: '#fff', boxShadow: '4px 4px 0 #111' }}>
               <div style={{ background: '#f0f0f0', padding: '14px 24px', borderBottom: '2px solid #111' }}>
-                <span style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '14px', letterSpacing: '0.5px' }}>ACCOUNT</span>
+                <span style={{ fontFamily: '"Syne", sans-serif', fontSize: '14px', letterSpacing: '0.5px' }}>ACCOUNT</span>
               </div>
               <div style={{ padding: '20px 24px', display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
                 <Link href="/messages" style={{ padding: '10px 20px', border: '2px solid #111', fontWeight: 700, fontSize: '13px', textDecoration: 'none', color: '#111', boxShadow: '3px 3px 0 #111', display: 'inline-flex', alignItems: 'center', gap: '7px' }}>
@@ -899,7 +899,7 @@ export default function ProfilePage() {
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
                   My Listings
                 </Link>
-                <Link href="/sell" style={{ padding: '10px 20px', background: '#1B5E20', color: '#fff', border: '2px solid #111', fontFamily: '"Archivo Black", sans-serif', fontSize: '13px', textDecoration: 'none', boxShadow: '3px 3px 0 #111' }}>
+                <Link href="/sell" style={{ padding: '10px 20px', background: '#1B5E20', color: '#fff', border: '2px solid #111', fontFamily: '"Syne", sans-serif', fontSize: '13px', textDecoration: 'none', boxShadow: '3px 3px 0 #111' }}>
                   + SELL AN ITEM
                 </Link>
               </div>
@@ -908,7 +908,7 @@ export default function ProfilePage() {
             {/* Danger Zone */}
             <div style={{ marginTop: '40px', border: '2px solid #dc2626', background: '#fff' }}>
               <div style={{ background: '#dc2626', padding: '14px 24px' }}>
-                <span style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '14px', letterSpacing: '0.5px', color: '#fff' }}>DANGER ZONE</span>
+                <span style={{ fontFamily: '"Syne", sans-serif', fontSize: '14px', letterSpacing: '0.5px', color: '#fff' }}>DANGER ZONE</span>
               </div>
               <div style={{ padding: '24px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
@@ -920,7 +920,7 @@ export default function ProfilePage() {
                   </div>
                   <button
                     onClick={() => setShowDeleteModal(true)}
-                    style={{ padding: '10px 20px', background: '#fff', color: '#dc2626', border: '2px solid #dc2626', fontFamily: '"Archivo Black", sans-serif', fontSize: '12px', letterSpacing: '0.5px', cursor: 'pointer', whiteSpace: 'nowrap' }}
+                    style={{ padding: '10px 20px', background: '#fff', color: '#dc2626', border: '2px solid #dc2626', fontFamily: '"Syne", sans-serif', fontSize: '12px', letterSpacing: '0.5px', cursor: 'pointer', whiteSpace: 'nowrap' }}
                     onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#dc2626'; (e.currentTarget as HTMLElement).style.color = '#fff' }}
                     onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#fff'; (e.currentTarget as HTMLElement).style.color = '#dc2626' }}
                   >
@@ -941,7 +941,7 @@ export default function ProfilePage() {
         onClick={e => { if (e.target === e.currentTarget && !deleting) setShowDeleteModal(false) }}
       >
         <div style={{ background: '#fff', border: '3px solid #dc2626', boxShadow: '8px 8px 0 #dc2626', maxWidth: '440px', width: '100%' }}>
-          <div style={{ background: '#dc2626', color: '#fff', padding: '16px 24px', fontFamily: '"Archivo Black", sans-serif', fontSize: '15px', letterSpacing: '0.5px' }}>
+          <div style={{ background: '#dc2626', color: '#fff', padding: '16px 24px', fontFamily: '"Syne", sans-serif', fontSize: '15px', letterSpacing: '0.5px' }}>
             CONFIRM ACCOUNT DELETION
           </div>
           <div style={{ padding: '28px 24px' }}>
@@ -957,7 +957,7 @@ export default function ProfilePage() {
               onChange={e => setDeleteConfirm(e.target.value)}
               placeholder="Type DELETE to confirm"
               disabled={deleting}
-              style={{ width: '100%', padding: '12px 14px', border: '2px solid #dc2626', fontFamily: '"Archivo Black", sans-serif', fontSize: '16px', letterSpacing: '2px', outline: 'none', boxSizing: 'border-box', textTransform: 'uppercase', marginBottom: '16px' }}
+              style={{ width: '100%', padding: '12px 14px', border: '2px solid #dc2626', fontFamily: '"Syne", sans-serif', fontSize: '16px', letterSpacing: '2px', outline: 'none', boxSizing: 'border-box', textTransform: 'uppercase', marginBottom: '16px' }}
             />
             {deleteError && (
               <div style={{ padding: '10px 14px', background: '#fee2e2', color: '#dc2626', fontSize: '13px', fontWeight: 600, marginBottom: '16px', border: '1px solid #dc2626' }}>
@@ -968,14 +968,14 @@ export default function ProfilePage() {
               <button
                 onClick={handleDeleteAccount}
                 disabled={deleteConfirm !== 'DELETE' || deleting}
-                style={{ flex: 1, padding: '14px 20px', background: deleteConfirm === 'DELETE' && !deleting ? '#dc2626' : '#ccc', color: '#fff', fontFamily: '"Archivo Black", sans-serif', fontSize: '13px', letterSpacing: '0.5px', border: '2px solid #111', cursor: deleteConfirm === 'DELETE' && !deleting ? 'pointer' : 'not-allowed' }}
+                style={{ flex: 1, padding: '14px 20px', background: deleteConfirm === 'DELETE' && !deleting ? '#dc2626' : '#ccc', color: '#fff', fontFamily: '"Syne", sans-serif', fontSize: '13px', letterSpacing: '0.5px', border: '2px solid #111', cursor: deleteConfirm === 'DELETE' && !deleting ? 'pointer' : 'not-allowed' }}
               >
                 {deleting ? 'DELETING...' : 'YES, DELETE MY ACCOUNT'}
               </button>
               <button
                 onClick={() => { setShowDeleteModal(false); setDeleteConfirm(''); setDeleteError(null) }}
                 disabled={deleting}
-                style={{ padding: '14px 20px', background: '#fff', color: '#111', fontWeight: 700, border: '2px solid #111', cursor: 'pointer', fontFamily: '"Space Grotesk", sans-serif', fontSize: '13px' }}
+                style={{ padding: '14px 20px', background: '#fff', color: '#111', fontWeight: 700, border: '2px solid #111', cursor: 'pointer', fontFamily: '"Plus Jakarta Sans", sans-serif', fontSize: '13px' }}
               >
                 Cancel
               </button>

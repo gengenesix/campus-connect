@@ -11,6 +11,13 @@ const TICKER_ITEMS = [
   'TECH REPAIR', 'PHOTOGRAPHY', 'DESIGN',
 ]
 
+const STATS = [
+  { num: '43',   label: 'Universities' },
+  { num: '0%',   label: 'Commission' },
+  { num: 'Free', label: 'Forever' },
+  { num: 'P2P',  label: 'Direct Deals' },
+]
+
 export default function HeroSection() {
   const [searchQuery, setSearchQuery] = useState('')
   const router = useRouter()
@@ -25,22 +32,11 @@ export default function HeroSection() {
 
   return (
     <>
-      <style>{`
-        @keyframes ticker {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(-50%); }
-        }
-        @keyframes fadeUp {
-          from { opacity: 0; transform: translateY(20px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-      `}</style>
-
       {/* HERO */}
       <section className="hero-section">
-        <div className="hero-content" style={{ animation: 'fadeUp 0.55s ease both' }}>
+        <div className="hero-content">
           <div className="season-badge">
-            GHANA'S CAMPUS MARKETPLACE · 43 UNIVERSITIES
+            Ghana's Campus Marketplace · 43 Universities
           </div>
           <h1 className="hero-headline">
             BUY, SELL
@@ -48,12 +44,19 @@ export default function HeroSection() {
             &amp; <span className="hero-headline-highlight">CONNECT</span>
           </h1>
           <p className="hero-subtext">
-            The free peer-to-peer marketplace for students across all Ghanaian universities. Buy goods, book campus services, connect with fellow students. Zero commission. Zero fees.
+            The free peer-to-peer marketplace for students across all Ghanaian universities.
+            Buy goods, book campus services, connect with fellow students.
+            Zero commission. Zero fees.
           </p>
           <div className="cta-buttons">
-            <a href="#universities" className="btn-primary hover-lift" style={{ textDecoration: 'none' }}>FIND YOUR UNI →</a>
-            <Link href="/goods" className="btn-secondary hover-lift">BROWSE GOODS</Link>
+            <a href="#universities" className="btn-primary hover-lift" style={{ textDecoration: 'none' }}>
+              Find Your Uni →
+            </a>
+            <Link href="/goods" className="btn-secondary hover-lift">
+              Browse Goods
+            </Link>
           </div>
+
           <form onSubmit={handleHeroSearch} className="hero-search-form">
             <input
               type="text"
@@ -62,13 +65,24 @@ export default function HeroSection() {
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
             />
-            <button type="submit" className="hero-search-btn">SEARCH</button>
+            <button type="submit" className="hero-search-btn">Search</button>
           </form>
+
+          {/* Stats strip — inline, warm background, no dark bar */}
+          <div className="hero-stats-strip">
+            {STATS.map(s => (
+              <div key={s.label}>
+                <div className="hero-stat-num">{s.num}</div>
+                <div className="hero-stat-label">{s.label}</div>
+              </div>
+            ))}
+          </div>
+
           <div className="social-proof">
             <div className="avatar-stack">
-              <img src="/images/hero/avatar1.jpg" alt="Student" />
-              <img src="/images/hero/avatar2.jpg" alt="Student" />
-              <img src="/images/hero/avatar3.jpg" alt="Student" />
+              <img src="/images/hero/avatar1.jpg" alt="Student" onError={e => { (e.currentTarget as HTMLImageElement).src = '/placeholder-user.jpg' }} />
+              <img src="/images/hero/avatar2.jpg" alt="Student" onError={e => { (e.currentTarget as HTMLImageElement).src = '/placeholder-user.jpg' }} />
+              <img src="/images/hero/avatar3.jpg" alt="Student" onError={e => { (e.currentTarget as HTMLImageElement).src = '/placeholder-user.jpg' }} />
             </div>
             <div>
               <div className="social-proof-title">Ghana Campus Community</div>
@@ -77,68 +91,62 @@ export default function HeroSection() {
           </div>
         </div>
 
-        {/* RIGHT — original overlapping collage */}
+        {/* RIGHT — overlapping collage */}
         <div className="hero-visuals">
           <div className="abstract-shape">
-            <svg width="520" height="520" viewBox="0 0 520 520" fill="none">
-              <circle cx="260" cy="260" r="250" fill="#1B5E20" opacity="0.07" />
-              <circle cx="260" cy="260" r="195" fill="#1B5E20" opacity="0.05" />
+            <svg width="500" height="500" viewBox="0 0 500 500" fill="none">
+              <circle cx="250" cy="250" r="240" fill="#1B5E20" opacity="0.06" />
+              <circle cx="250" cy="250" r="185" fill="#1B5E20" opacity="0.04" />
             </svg>
           </div>
           <div className="decorative-star">
-            <svg width="72" height="72" viewBox="0 0 72 72" fill="none">
-              <path d="M36 2 L43 26 L68 26 L48 41 L55 65 L36 51 L17 65 L24 41 L4 26 L29 26 Z" fill="#1B5E20" opacity="0.85" />
+            <svg width="64" height="64" viewBox="0 0 72 72" fill="none">
+              <path d="M36 2 L43 26 L68 26 L48 41 L55 65 L36 51 L17 65 L24 41 L4 26 L29 26 Z" fill="#1B5E20" opacity="0.75" />
             </svg>
           </div>
           <div className="main-image-container">
-            <img src="/images/hero/main.jpg" alt="Campus marketplace" onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/placeholder.jpg' }} />
+            <img src="/images/hero/main.jpg" alt="Campus marketplace" onError={e => { (e.currentTarget as HTMLImageElement).src = '/placeholder.jpg' }} />
             <div style={{
-              position: 'absolute', top: '20px', left: '-14px',
+              position: 'absolute', top: '18px', left: '-12px',
               background: '#ff3366', color: '#fff',
-              fontFamily: '"Archivo Black", sans-serif', fontSize: '11px',
-              letterSpacing: '2px', padding: '7px 16px',
-              border: '2px solid #111', boxShadow: '3px 3px 0 #111',
+              fontFamily: '"Plus Jakarta Sans", sans-serif', fontWeight: 800, fontSize: '10px',
+              letterSpacing: '1.5px', padding: '6px 14px',
+              border: '2px solid #1A1A1A', boxShadow: '3px 3px 0 #1A1A1A',
+              borderRadius: '4px',
             }}>
               LIVE
             </div>
           </div>
           <div className="secondary-image">
-            <img src="/images/hero/secondary.jpg" alt="Student services" onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/placeholder.jpg' }} />
+            <img src="/images/hero/secondary.jpg" alt="Student services" onError={e => { (e.currentTarget as HTMLImageElement).src = '/placeholder.jpg' }} />
           </div>
           <div className="sticker-graphic">
-            <div className="hot-badge" style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '10px', letterSpacing: '0.5px' }}>
+            <div className="hot-badge" style={{ fontFamily: '"Plus Jakarta Sans", sans-serif', fontWeight: 800, fontSize: '10px', letterSpacing: '0.3px' }}>
               FREE
             </div>
-            <img src="/images/hero/sticker.jpg" alt="Campus student" onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/placeholder.jpg' }} />
+            <img src="/images/hero/sticker.jpg" alt="Campus student" onError={e => { (e.currentTarget as HTMLImageElement).src = '/placeholder.jpg' }} />
           </div>
         </div>
       </section>
 
-      {/* TICKER */}
-      <div style={{ background: '#111', borderTop: '2px solid #333', borderBottom: '2px solid #333', padding: '11px 0', overflow: 'hidden' }}>
-        <div style={{ display: 'flex', animation: 'ticker 30s linear infinite', width: 'max-content' }}>
+      {/* TICKER — softer, keeping #ccff00 signature */}
+      <div style={{
+        background: '#1A1A1A',
+        borderTop: '1px solid #2a2a2a',
+        borderBottom: '1px solid #2a2a2a',
+        padding: '10px 0', overflow: 'hidden',
+      }}>
+        <div style={{ display: 'flex', animation: 'ticker 32s linear infinite', width: 'max-content' }}>
           {tickerSet.map((item, i) => (
-            <span key={i} style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '12px', color: '#fff', whiteSpace: 'nowrap', padding: '0 20px' }}>
+            <span key={i} style={{
+              fontFamily: '"Plus Jakarta Sans", sans-serif',
+              fontWeight: 700, fontSize: '11px',
+              color: '#fff', whiteSpace: 'nowrap', padding: '0 18px',
+              letterSpacing: '0.8px',
+            }}>
               {item}
-              <span style={{ color: '#1B5E20', marginLeft: '20px', fontWeight: 900 }}>·</span>
+              <span style={{ color: '#ccff00', marginLeft: '18px', fontWeight: 900 }}>·</span>
             </span>
-          ))}
-        </div>
-      </div>
-
-      {/* STATS */}
-      <div style={{ background: '#111', color: '#fff', padding: '32px 20px', borderBottom: '2px solid #1a1a1a' }}>
-        <div className="container" style={{ display: 'flex', justifyContent: 'space-around', flexWrap: 'wrap', gap: '24px', textAlign: 'center' }}>
-          {[
-            { num: '43', label: 'UNIVERSITIES' },
-            { num: '0%', label: 'COMMISSION' },
-            { num: '100%', label: 'FREE FOREVER' },
-            { num: 'P2P', label: 'DIRECT DEALS' },
-          ].map(s => (
-            <div key={s.label}>
-              <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: 'clamp(28px, 5vw, 42px)', color: '#a78bfa', lineHeight: 1 }}>{s.num}</div>
-              <div style={{ fontSize: '11px', letterSpacing: '2px', color: '#555', marginTop: '6px', fontWeight: 700 }}>{s.label}</div>
-            </div>
           ))}
         </div>
       </div>

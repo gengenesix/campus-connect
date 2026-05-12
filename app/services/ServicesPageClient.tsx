@@ -109,7 +109,7 @@ export default function ServicesPageClient({
       {/* Header */}
       <div style={{ background: '#111', color: '#fff', padding: '36px 20px' }}>
         <div className="container">
-          <h1 style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '48px', marginBottom: '6px', letterSpacing: '-1px' }}>
+          <h1 style={{ fontFamily: '"Syne", sans-serif', fontSize: '48px', marginBottom: '6px', letterSpacing: '-1px' }}>
             CAMPUS SERVICES
           </h1>
           <p style={{ color: '#666', fontSize: '15px' }}>
@@ -127,7 +127,7 @@ export default function ServicesPageClient({
               onClick={() => setCategory(cat === 'All' ? '' : cat)}
               style={{
                 padding: '8px 20px', whiteSpace: 'nowrap', border: '2px solid #111',
-                fontFamily: '"Archivo Black", sans-serif', fontSize: '12px',
+                fontFamily: '"Syne", sans-serif', fontSize: '12px',
                 cursor: 'pointer', letterSpacing: '0.5px',
                 background: (cat === 'All' && !category) || category === cat ? '#1B5E20' : '#fff',
                 color: (cat === 'All' && !category) || category === cat ? '#fff' : '#111',
@@ -148,14 +148,14 @@ export default function ServicesPageClient({
             placeholder="Search services or providers..."
             value={search}
             onChange={e => setSearch(e.target.value)}
-            style={{ flex: 1, minWidth: '200px', maxWidth: '480px', padding: '10px 16px', border: '2px solid #111', fontFamily: '"Space Grotesk", sans-serif', fontSize: '14px', fontWeight: 600, outline: 'none' }}
+            style={{ flex: 1, minWidth: '200px', maxWidth: '480px', padding: '10px 16px', border: '2px solid #111', fontFamily: '"Plus Jakarta Sans", sans-serif', fontSize: '14px', fontWeight: 600, outline: 'none' }}
           />
           {userUniversityId && (
             <button
               onClick={() => setCampusOnly(v => !v)}
               style={{
                 padding: '10px 16px', border: '2px solid #111', cursor: 'pointer',
-                fontFamily: '"Archivo Black", sans-serif', fontSize: '12px', letterSpacing: '0.5px',
+                fontFamily: '"Syne", sans-serif', fontSize: '12px', letterSpacing: '0.5px',
                 background: campusOnly ? '#1B5E20' : '#fff',
                 color: campusOnly ? '#fff' : '#111',
                 boxShadow: campusOnly ? '2px 2px 0 #111' : 'none',
@@ -166,7 +166,7 @@ export default function ServicesPageClient({
             </button>
           )}
           {hasFilters && (
-            <button onClick={clearFilters} style={{ padding: '10px 18px', background: '#ff3366', color: '#fff', border: '2px solid #111', fontWeight: 700, cursor: 'pointer', fontFamily: '"Space Grotesk", sans-serif', fontSize: '13px' }}>
+            <button onClick={clearFilters} style={{ padding: '10px 18px', background: '#ff3366', color: '#fff', border: '2px solid #111', fontWeight: 700, cursor: 'pointer', fontFamily: '"Plus Jakarta Sans", sans-serif', fontSize: '13px' }}>
               ✕ CLEAR
             </button>
           )}
@@ -191,7 +191,7 @@ export default function ServicesPageClient({
                 </svg>
               )}
             </div>
-            <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '28px', marginBottom: '10px' }}>
+            <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '28px', marginBottom: '10px' }}>
               {campusOnly ? 'NO CAMPUS SERVICES YET' : hasFilters ? 'NO SERVICES FOUND' : 'NO SERVICES YET'}
             </div>
             <p style={{ color: '#666', marginBottom: '24px' }}>
@@ -203,7 +203,7 @@ export default function ServicesPageClient({
               {campusOnly && (
                 <button
                   onClick={() => setCampusOnly(false)}
-                  style={{ padding: '12px 24px', background: '#fff', color: '#111', border: '2px solid #111', fontFamily: '"Archivo Black", sans-serif', fontSize: '13px', cursor: 'pointer', boxShadow: '3px 3px 0 #111' }}
+                  style={{ padding: '12px 24px', background: '#fff', color: '#111', border: '2px solid #111', fontFamily: '"Syne", sans-serif', fontSize: '13px', cursor: 'pointer', boxShadow: '3px 3px 0 #111' }}
                 >
                   ALL UNIVERSITIES
                 </button>
@@ -223,7 +223,7 @@ export default function ServicesPageClient({
               Showing <strong style={{ color: '#111' }}>{services.length}</strong> service{services.length !== 1 ? 's' : ''}
               {category && ` in ${category}`}
               {campusOnly && (
-                <span style={{ padding: '2px 8px', background: '#1B5E20', color: '#fff', fontSize: '11px', fontFamily: '"Archivo Black", sans-serif', letterSpacing: '0.5px' }}>
+                <span style={{ padding: '2px 8px', background: '#1B5E20', color: '#fff', fontSize: '11px', fontFamily: '"Syne", sans-serif', letterSpacing: '0.5px' }}>
                   MY CAMPUS
                 </span>
               )}
@@ -257,7 +257,7 @@ export default function ServicesPageClient({
                     padding: '14px 48px',
                     background: loadingMore ? '#888' : '#1B5E20',
                     color: '#fff',
-                    fontFamily: '"Archivo Black", sans-serif',
+                    fontFamily: '"Syne", sans-serif',
                     fontSize: '14px',
                     border: '2px solid #111',
                     boxShadow: loadingMore ? 'none' : '4px 4px 0 #111',
@@ -276,7 +276,7 @@ export default function ServicesPageClient({
 
       {/* Offer CTA */}
       <SectionWrapper className="bg-[#1B5E20] text-white text-center">
-        <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '28px', marginBottom: '12px' }}>
+        <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '28px', marginBottom: '12px' }}>
           OFFER YOUR SERVICES
         </div>
         <p style={{ color: 'rgba(255,255,255,0.8)', marginBottom: '24px', maxWidth: '440px', margin: '0 auto 24px' }}>
@@ -284,7 +284,7 @@ export default function ServicesPageClient({
         </p>
         <a
           href="/offer-service"
-          style={{ display: 'inline-block', padding: '16px 40px', background: '#fff', color: '#1B5E20', fontFamily: '"Archivo Black", sans-serif', fontSize: '15px', textDecoration: 'none', border: '2px solid #fff', boxShadow: '4px 4px 0 rgba(0,0,0,0.3)' }}
+          style={{ display: 'inline-block', padding: '16px 40px', background: '#fff', color: '#1B5E20', fontFamily: '"Syne", sans-serif', fontSize: '15px', textDecoration: 'none', border: '2px solid #fff', boxShadow: '4px 4px 0 rgba(0,0,0,0.3)' }}
         >
           + LIST YOUR SERVICE
         </a>

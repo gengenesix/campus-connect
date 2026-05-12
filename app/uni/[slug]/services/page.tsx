@@ -128,7 +128,7 @@ export default function UniServicesPage() {
               {uni.shortName}
             </Link> · SERVICES
           </div>
-          <h1 style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '44px', letterSpacing: '-1px', marginBottom: '4px' }}>
+          <h1 style={{ fontFamily: '"Syne", sans-serif', fontSize: '44px', letterSpacing: '-1px', marginBottom: '4px' }}>
             {uni.shortName} SERVICES
           </h1>
           <p style={{ color: '#666', fontSize: '14px' }}>
@@ -146,7 +146,7 @@ export default function UniServicesPage() {
               onClick={() => setCategory(cat === 'All' ? '' : cat)}
               style={{
                 padding: '8px 20px', whiteSpace: 'nowrap', border: '2px solid #111',
-                fontFamily: '"Archivo Black", sans-serif', fontSize: '12px',
+                fontFamily: '"Syne", sans-serif', fontSize: '12px',
                 cursor: 'pointer', letterSpacing: '0.5px',
                 background: (cat === 'All' && !category) || category === cat ? '#1B5E20' : '#fff',
                 color: (cat === 'All' && !category) || category === cat ? '#fff' : '#111',
@@ -160,7 +160,7 @@ export default function UniServicesPage() {
               onClick={() => setAllUnis(v => !v)}
               style={{
                 padding: '8px 16px', border: '2px solid #111',
-                fontFamily: '"Archivo Black", sans-serif', fontSize: '11px',
+                fontFamily: '"Syne", sans-serif', fontSize: '11px',
                 cursor: 'pointer', letterSpacing: '0.5px', whiteSpace: 'nowrap',
                 background: allUnis ? '#5d3fd3' : '#fff',
                 color: allUnis ? '#fff' : '#111',
@@ -185,10 +185,10 @@ export default function UniServicesPage() {
             placeholder="Search services..."
             value={search}
             onChange={e => setSearch(e.target.value)}
-            style={{ flex: 1, maxWidth: '480px', padding: '10px 16px', border: '2px solid #111', fontFamily: '"Space Grotesk", sans-serif', fontSize: '14px', fontWeight: 600, outline: 'none' }}
+            style={{ flex: 1, maxWidth: '480px', padding: '10px 16px', border: '2px solid #111', fontFamily: '"Plus Jakarta Sans", sans-serif', fontSize: '14px', fontWeight: 600, outline: 'none' }}
           />
           {hasFilters && (
-            <button onClick={() => { setCategory(''); setSearch(''); setDebouncedSearch('') }} style={{ padding: '10px 18px', background: '#ff3366', color: '#fff', border: '2px solid #111', fontWeight: 700, cursor: 'pointer', fontFamily: '"Space Grotesk", sans-serif', fontSize: '13px' }}>
+            <button onClick={() => { setCategory(''); setSearch(''); setDebouncedSearch('') }} style={{ padding: '10px 18px', background: '#ff3366', color: '#fff', border: '2px solid #111', fontWeight: 700, cursor: 'pointer', fontFamily: '"Plus Jakarta Sans", sans-serif', fontSize: '13px' }}>
               ✕ CLEAR
             </button>
           )}
@@ -215,7 +215,7 @@ export default function UniServicesPage() {
             <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'center', color: '#ccc' }}>
               <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
             </div>
-            <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '28px', marginBottom: '10px' }}>
+            <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '28px', marginBottom: '10px' }}>
               {hasFilters ? 'NO SERVICES FOUND' : allUnis ? 'NO SERVICES YET' : `NO SERVICES AT ${uni.shortName.toUpperCase()} YET`}
             </div>
             <p style={{ color: '#666', marginBottom: '24px' }}>
@@ -256,7 +256,7 @@ export default function UniServicesPage() {
                 <button
                   onClick={loadMore}
                   disabled={loadingMore}
-                  style={{ padding: '14px 48px', background: loadingMore ? '#888' : '#1B5E20', color: '#fff', fontFamily: '"Archivo Black", sans-serif', fontSize: '14px', border: '2px solid #111', boxShadow: loadingMore ? 'none' : '4px 4px 0 #111', cursor: loadingMore ? 'not-allowed' : 'pointer' }}
+                  style={{ padding: '14px 48px', background: loadingMore ? '#888' : '#1B5E20', color: '#fff', fontFamily: '"Syne", sans-serif', fontSize: '14px', border: '2px solid #111', boxShadow: loadingMore ? 'none' : '4px 4px 0 #111', cursor: loadingMore ? 'not-allowed' : 'pointer' }}
                 >
                   {loadingMore ? 'LOADING...' : 'LOAD MORE'}
                 </button>

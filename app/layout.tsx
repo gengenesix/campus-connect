@@ -55,7 +55,7 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
-          href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&family=Archivo+Black&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Archivo+Black&display=swap"
           rel="stylesheet"
         />
         {/* Preconnect to Supabase for faster first DB query */}
@@ -77,11 +77,11 @@ export default function RootLayout({
             closeButton
             toastOptions={{
               style: {
-                fontFamily: '"Space Grotesk", sans-serif',
+                fontFamily: '"Plus Jakarta Sans", sans-serif',
                 fontWeight: 600,
-                border: '2px solid #111',
-                borderRadius: '0',
-                boxShadow: '4px 4px 0 #111',
+                border: '1px solid #E8E5E0',
+                borderRadius: '10px',
+                boxShadow: '0 4px 16px rgba(0,0,0,0.10)',
               },
             }}
           />
