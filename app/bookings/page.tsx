@@ -95,30 +95,31 @@ export default function BookingsPage() {
   return (
     <>
       {/* Header */}
-      <div style={{ background: '#111', color: '#fff', padding: '36px 20px' }}>
+      <div style={{ background: '#FAFAF8', borderBottom: '1px solid #E8E5E0', padding: '32px 20px' }}>
         <div className="container">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
             <div>
-              <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '36px', letterSpacing: '-1px' }}>
-                BOOKINGS
+              <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '28px', letterSpacing: '-0.5px', color: '#1A1A1A' }}>
+                Bookings
               </div>
-              <p style={{ color: '#666', marginTop: '4px', fontSize: '14px' }}>
+              <p style={{ color: '#9A9590', marginTop: '6px', fontSize: '14px', fontFamily: '"Plus Jakarta Sans", sans-serif', display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
                 Manage your service bookings
-                {pending > 0 && <span style={{ marginLeft: '12px', background: '#ff3366', color: '#fff', padding: '2px 8px', fontSize: '11px', fontWeight: 700 }}>{pending} PENDING</span>}
-                {confirmed > 0 && <span style={{ marginLeft: '8px', background: '#1B5E20', color: '#fff', padding: '2px 8px', fontSize: '11px', fontWeight: 700 }}>{confirmed} CONFIRMED</span>}
+                {pending > 0 && <span style={{ background: '#FFE4EC', color: '#ff3366', padding: '2px 10px', fontSize: '11px', fontWeight: 700, borderRadius: '999px', fontFamily: '"Plus Jakarta Sans", sans-serif' }}>{pending} pending</span>}
+                {confirmed > 0 && <span style={{ background: '#E8F5E9', color: '#1B5E20', padding: '2px 10px', fontSize: '11px', fontWeight: 700, borderRadius: '999px', fontFamily: '"Plus Jakarta Sans", sans-serif' }}>{confirmed} confirmed</span>}
               </p>
             </div>
             <Link
               href="/services"
               style={{
-                display: 'inline-block', padding: '12px 28px',
-                background: '#1B5E20', color: '#fff',
-                fontFamily: '"Syne", sans-serif', fontSize: '13px',
-                textDecoration: 'none', border: '2px solid #86efac',
-                boxShadow: '3px 3px 0 #86efac',
+                display: 'inline-flex', alignItems: 'center', gap: '6px',
+                padding: '11px 20px', background: '#1B5E20', color: '#fff',
+                fontFamily: '"Plus Jakarta Sans", sans-serif', fontSize: '13px', fontWeight: 700,
+                textDecoration: 'none', borderRadius: '10px',
+                boxShadow: '0 2px 8px rgba(27,94,32,0.25)',
               }}
             >
-              + BOOK A SERVICE
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Book a Service
             </Link>
           </div>
         </div>
@@ -127,17 +128,17 @@ export default function BookingsPage() {
       <SectionWrapper className="bg-[#f8f8f8]">
 
         {/* Tabs */}
-        <div style={{ display: 'flex', border: '2px solid #111', marginBottom: '28px', background: '#fff', boxShadow: '4px 4px 0 #111' }}>
+        <div style={{ display: 'flex', border: '1px solid #E8E5E0', marginBottom: '28px', background: '#fff', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
           {(['client', 'provider'] as const).map(t => (
             <button
               key={t}
               onClick={() => setTab(t)}
               style={{
-                flex: 1, padding: '14px 20px', border: 'none', cursor: 'pointer',
-                fontFamily: '"Syne", sans-serif', fontSize: '13px', letterSpacing: '0.5px',
-                background: tab === t ? '#111' : '#fff',
-                color: tab === t ? '#fff' : '#888',
-                borderRight: t === 'client' ? '2px solid #111' : 'none',
+                flex: 1, padding: '13px 20px', border: 'none', cursor: 'pointer',
+                fontFamily: '"Plus Jakarta Sans", sans-serif', fontSize: '13px', fontWeight: 700,
+                background: tab === t ? '#1B5E20' : '#fff',
+                color: tab === t ? '#fff' : '#9A9590',
+                borderRight: t === 'client' ? '1px solid #E8E5E0' : 'none',
                 transition: 'all 0.15s',
               }}
             >
@@ -193,8 +194,9 @@ export default function BookingsPage() {
                 <div
                   key={booking.id}
                   style={{
-                    background: '#fff', border: '2px solid #111',
-                    boxShadow: '4px 4px 0 #111', overflow: 'hidden',
+                    background: '#fff', border: '1px solid #E8E5E0',
+                    borderRadius: '14px', overflow: 'hidden',
+                    boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
                   }}
                 >
                   {/* Booking header */}

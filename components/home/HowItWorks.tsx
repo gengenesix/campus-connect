@@ -55,21 +55,21 @@ export default function HowItWorks() {
         }
       `}</style>
 
-      <SectionWrapper className="border-t-2 border-[#111]">
+      <SectionWrapper className="border-t border-[#E8E5E0]">
         <div className="text-center mb-12">
-          <div style={{ fontFamily: '"Plus Jakarta Sans", sans-serif', fontSize: '11px', fontWeight: 700, letterSpacing: '3px', color: '#5d3fd3', marginBottom: '12px' }}>SIMPLE PROCESS</div>
-          <div style={{ fontFamily: '"Syne", sans-serif', fontSize: 'clamp(28px, 5vw, 40px)', marginBottom: '8px' }}>HOW IT WORKS</div>
-          <p style={{ color: '#666', fontSize: '16px', margin: 0 }}>Three simple steps to buy, sell, or book on campus</p>
+          <div style={{ fontFamily: '"Plus Jakarta Sans", sans-serif', fontSize: '11px', fontWeight: 700, letterSpacing: '3px', color: '#9A9590', marginBottom: '10px' }}>SIMPLE PROCESS</div>
+          <div style={{ fontFamily: '"Syne", sans-serif', fontSize: 'clamp(24px, 4vw, 36px)', marginBottom: '8px', color: '#1A1A1A', letterSpacing: '-0.5px' }}>How It Works</div>
+          <p style={{ color: '#6B6660', fontSize: '15px', margin: 0, fontFamily: '"Plus Jakarta Sans", sans-serif' }}>Three simple steps to buy, sell, or book on campus</p>
         </div>
 
         <div className="how-scroll">
           <div className="how-inner">
             {STEPS.map(item => (
-              <div key={item.step} className="how-card" style={{ border: '2px solid #111', borderTop: `4px solid ${item.accent}`, padding: '32px 28px', boxShadow: '4px 4px 0 #111', background: '#fff' }}>
-                <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '52px', color: '#f0f0f0', lineHeight: 1, marginBottom: '4px' }}>{item.step}</div>
-                <div style={{ marginBottom: '16px' }}>{item.icon}</div>
-                <h3 style={{ fontFamily: '"Syne", sans-serif', fontSize: '20px', marginBottom: '10px', color: '#111' }}>{item.title}</h3>
-                <p style={{ color: '#666', fontSize: '14px', lineHeight: 1.65, margin: 0 }}>{item.desc}</p>
+              <div key={item.step} className="how-card" style={{ border: '1px solid #E8E5E0', borderTop: `3px solid ${item.accent}`, padding: '28px 24px', boxShadow: '0 1px 3px rgba(0,0,0,0.06)', background: '#fff', borderRadius: '0 0 14px 14px' }}>
+                <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '44px', color: '#F3F2EF', lineHeight: 1, marginBottom: '4px' }}>{item.step}</div>
+                <div style={{ marginBottom: '14px' }}>{item.icon}</div>
+                <h3 style={{ fontFamily: '"Syne", sans-serif', fontSize: '18px', marginBottom: '8px', color: '#1A1A1A' }}>{item.title}</h3>
+                <p style={{ color: '#6B6660', fontSize: '14px', lineHeight: 1.65, margin: 0, fontFamily: '"Plus Jakarta Sans", sans-serif' }}>{item.desc}</p>
               </div>
             ))}
           </div>

@@ -54,15 +54,15 @@ function SubscribePageInner() {
   return (
     <>
       {/* Header */}
-      <div style={{ background: '#111', color: '#fff', padding: '48px 20px' }}>
+      <div style={{ background: '#FAFAF8', borderBottom: '1px solid #E8E5E0', padding: '48px 20px' }}>
         <div className="container" style={{ maxWidth: '800px' }}>
-          <div style={{ fontSize: '12px', fontWeight: 700, letterSpacing: '2px', color: '#888', marginBottom: '12px' }}>
+          <div style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '2px', color: '#9A9590', marginBottom: '12px', fontFamily: '"Plus Jakarta Sans", sans-serif' }}>
             CAMPUS CONNECT · SELLER PLAN
           </div>
-          <h1 style={{ fontFamily: '"Syne", sans-serif', fontSize: 'clamp(36px, 7vw, 64px)', letterSpacing: '-2px', lineHeight: 1, marginBottom: '16px' }}>
-            BECOME A<br />CAMPUS SELLER
+          <h1 style={{ fontFamily: '"Syne", sans-serif', fontSize: 'clamp(32px, 6vw, 56px)', letterSpacing: '-1.5px', lineHeight: 1.05, marginBottom: '14px', color: '#1A1A1A' }}>
+            Become a<br />Campus Seller
           </h1>
-          <p style={{ color: '#aaa', fontSize: '16px', maxWidth: '480px', lineHeight: 1.6 }}>
+          <p style={{ color: '#6B6660', fontSize: '16px', maxWidth: '480px', lineHeight: 1.6, fontFamily: '"Plus Jakarta Sans", sans-serif' }}>
             GHS 20/month. Unlimited listings. Buyers always browse free.
           </p>
         </div>

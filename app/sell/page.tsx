@@ -232,35 +232,42 @@ export default function SellPage() {
 
   if (subStatus === 'none') return (
     <>
-      <div style={{ background: '#111', color: '#fff', padding: '36px 20px' }}>
+      <div style={{ background: '#FAFAF8', borderBottom: '1px solid #E8E5E0', padding: '32px 20px' }}>
         <div className="container">
-          <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '36px', letterSpacing: '-1px' }}>LIST YOUR ITEM</div>
+          <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '28px', letterSpacing: '-0.5px', color: '#1A1A1A' }}>List Your Item</div>
         </div>
       </div>
       <SectionWrapper className="bg-[#f8f8f8]">
-        <div style={{ maxWidth: '520px', border: '3px solid #1B5E20', background: '#fff', boxShadow: '8px 8px 0 #1B5E20', padding: '40px' }}>
-          <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'center', color: '#1B5E20' }}>
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-          </div>
-          <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '26px', letterSpacing: '-0.5px', marginBottom: '14px' }}>
-            SELLER SUBSCRIPTION REQUIRED
-          </div>
-          <p style={{ color: '#555', fontSize: '14px', lineHeight: 1.7, marginBottom: '24px' }}>
-            Campus Connect is free for buyers. To list goods and services, sellers pay a small <strong>GHS 20/month</strong> platform fee — this keeps Campus Connect running and free for buyers across all 43 Ghana universities.
-          </p>
-          {['Unlimited goods listings', 'Unlimited service listings', 'Admin-reviewed for quality', 'Keep the platform alive for 300k+ students'].map(f => (
-            <div key={f} style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
-              <span style={{ color: '#1B5E20', fontWeight: 900, fontSize: '16px' }}>✓</span>
-              <span style={{ fontSize: '14px', fontWeight: 600 }}>{f}</span>
+        <div style={{ maxWidth: '520px', border: '1px solid #E8E5E0', background: '#fff', borderRadius: '16px', overflow: 'hidden', boxShadow: '0 2px 12px rgba(0,0,0,0.08)' }}>
+          <div style={{ background: '#E8F5E9', padding: '28px 32px', borderBottom: '1px solid #c8e6c9', display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: '#1B5E20', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
             </div>
-          ))}
-          <div style={{ marginTop: '28px' }}>
-            <Link href="/subscribe" style={{ display: 'block', padding: '18px', background: '#1B5E20', color: '#fff', fontFamily: '"Syne", sans-serif', fontSize: '15px', textDecoration: 'none', border: '2px solid #111', boxShadow: '6px 6px 0 #111', textAlign: 'center', letterSpacing: '0.5px' }}>
-              SUBSCRIBE — GHS 20/MONTH →
-            </Link>
-            <p style={{ marginTop: '12px', fontSize: '12px', color: '#999', textAlign: 'center' }}>
-              Pay via MTN MoMo · Vodafone Cash · AirtelTigo · Card
+            <div>
+              <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '18px', color: '#1A1A1A' }}>Seller Subscription Required</div>
+              <div style={{ fontSize: '13px', color: '#2E7D32', fontFamily: '"Plus Jakarta Sans", sans-serif', marginTop: '2px' }}>GHS 20/month · Cancel anytime</div>
+            </div>
+          </div>
+          <div style={{ padding: '28px 32px' }}>
+            <p style={{ color: '#6B6660', fontSize: '14px', lineHeight: 1.7, marginBottom: '20px', fontFamily: '"Plus Jakarta Sans", sans-serif' }}>
+              Campus Connect is free for buyers. To list goods and services, sellers pay a small <strong style={{ color: '#1A1A1A' }}>GHS 20/month</strong> platform fee — keeping the platform running across all 43 Ghana universities.
             </p>
+            {['Unlimited goods listings', 'Unlimited service listings', 'Admin-reviewed for quality', 'Keep the platform alive for 300k+ students'].map(f => (
+              <div key={f} style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
+                <div style={{ width: '20px', height: '20px', borderRadius: '50%', background: '#E8F5E9', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#1B5E20" strokeWidth="3" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+                </div>
+                <span style={{ fontSize: '14px', fontWeight: 600, fontFamily: '"Plus Jakarta Sans", sans-serif', color: '#1A1A1A' }}>{f}</span>
+              </div>
+            ))}
+            <div style={{ marginTop: '24px' }}>
+              <Link href="/subscribe" style={{ display: 'block', padding: '16px', background: '#1B5E20', color: '#fff', fontFamily: '"Plus Jakarta Sans", sans-serif', fontWeight: 700, fontSize: '15px', textDecoration: 'none', borderRadius: '10px', textAlign: 'center', boxShadow: '0 2px 8px rgba(27,94,32,0.3)' }}>
+                Subscribe — GHS 20/month →
+              </Link>
+              <p style={{ marginTop: '12px', fontSize: '12px', color: '#9A9590', textAlign: 'center', fontFamily: '"Plus Jakarta Sans", sans-serif' }}>
+                Pay via MTN MoMo · Vodafone Cash · AirtelTigo · Card
+              </p>
+            </div>
           </div>
         </div>
       </SectionWrapper>
@@ -269,32 +276,34 @@ export default function SellPage() {
 
   if (success) {
     return (
-      <div style={{ minHeight: '70vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 20px', background: '#f8f8f8' }}>
-        <div style={{ width: '100%', maxWidth: '480px', border: '3px solid #f59e0b', background: '#fff', boxShadow: '8px 8px 0 #f59e0b', padding: '40px', textAlign: 'center' }}>
-          <div style={{ fontSize: '56px', marginBottom: '16px' }}>⏳</div>
-          <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '28px', color: '#92400e', marginBottom: '12px' }}>
-            UNDER REVIEW
+      <div style={{ minHeight: '70vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 20px', background: '#FAFAF8' }}>
+        <div style={{ width: '100%', maxWidth: '480px', background: '#fff', border: '1px solid #E8E5E0', borderRadius: '20px', padding: '40px', textAlign: 'center', boxShadow: '0 4px 24px rgba(0,0,0,0.08)' }}>
+          <div style={{ width: '64px', height: '64px', borderRadius: '16px', background: '#FEF3C7', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', color: '#f59e0b' }}>
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
           </div>
-          <p style={{ color: '#666', lineHeight: 1.7, marginBottom: '8px' }}>
-            Your listing has been submitted and is <strong>awaiting admin approval</strong>.
+          <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '24px', color: '#1A1A1A', marginBottom: '10px' }}>
+            Under Review
+          </div>
+          <p style={{ color: '#6B6660', lineHeight: 1.7, marginBottom: '8px', fontFamily: '"Plus Jakarta Sans", sans-serif', fontSize: '14px' }}>
+            Your listing has been submitted and is <strong style={{ color: '#1A1A1A' }}>awaiting admin approval</strong>.
           </p>
-          <p style={{ color: '#888', fontSize: '13px', lineHeight: 1.6, marginBottom: '28px' }}>
-            Once approved, your item will become visible to all campus students. You'll be able to see your listing in My Listings in the meantime.
+          <p style={{ color: '#9A9590', fontSize: '13px', lineHeight: 1.6, marginBottom: '28px', fontFamily: '"Plus Jakarta Sans", sans-serif' }}>
+            Once approved, your item will become visible to all campus students. You'll be able to see it in My Listings in the meantime.
           </p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
             {newId && (
-              <Link href={`/goods/${newId}`} style={{ display: 'block', padding: '14px', background: '#f59e0b', color: '#fff', fontFamily: '"Syne", sans-serif', fontSize: '14px', textDecoration: 'none', border: '2px solid #111', boxShadow: '4px 4px 0 #111' }}>
-                VIEW MY LISTING →
+              <Link href={`/goods/${newId}`} style={{ display: 'block', padding: '14px', background: '#1B5E20', color: '#fff', fontFamily: '"Plus Jakarta Sans", sans-serif', fontWeight: 700, fontSize: '14px', textDecoration: 'none', borderRadius: '10px' }}>
+                View My Listing →
               </Link>
             )}
             <Link
               href="/sell"
               onClick={() => { setSuccess(false); setForm({ name: '', category: '', condition: '', price: '', description: '', phone: '', inStock: true }); setImageFile(null); setImagePreview(null); setAdditionalFiles([]); setAdditionalPreviews([]) }}
-              style={{ display: 'block', padding: '14px', background: '#fff', color: '#111', fontFamily: '"Syne", sans-serif', fontSize: '14px', textDecoration: 'none', border: '2px solid #111' }}
+              style={{ display: 'block', padding: '14px', background: '#F3F2EF', color: '#1A1A1A', fontFamily: '"Plus Jakarta Sans", sans-serif', fontWeight: 700, fontSize: '14px', textDecoration: 'none', borderRadius: '10px' }}
             >
-              LIST ANOTHER ITEM
+              List Another Item
             </Link>
-            <Link href="/my-listings" style={{ display: 'block', padding: '12px', color: '#666', fontWeight: 600, textDecoration: 'none', fontSize: '14px' }}>
+            <Link href="/my-listings" style={{ display: 'block', padding: '10px', color: '#9A9590', fontWeight: 600, textDecoration: 'none', fontSize: '13px', fontFamily: '"Plus Jakarta Sans", sans-serif' }}>
               Go to My Listings
             </Link>
           </div>
@@ -306,10 +315,10 @@ export default function SellPage() {
   return (
     <>
       {/* Header */}
-      <div style={{ background: '#111', color: '#fff', padding: '36px 20px' }}>
+      <div style={{ background: '#FAFAF8', borderBottom: '1px solid #E8E5E0', padding: '32px 20px' }}>
         <div className="container">
-          <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '36px', letterSpacing: '-1px' }}>LIST YOUR ITEM</div>
-          <p style={{ color: '#888', marginTop: '6px', fontSize: '14px' }}>100% free. No commission. Admin-reviewed before going live.</p>
+          <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '28px', letterSpacing: '-0.5px', color: '#1A1A1A' }}>List Your Item</div>
+          <p style={{ color: '#9A9590', marginTop: '6px', fontSize: '14px', fontFamily: '"Plus Jakarta Sans", sans-serif' }}>100% free. No commission. Admin-reviewed before going live.</p>
         </div>
       </div>
 

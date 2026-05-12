@@ -131,7 +131,7 @@ export default function MobileNav() {
             width: '50px', height: '50px', borderRadius: '16px',
             background: '#1B5E20',
             boxShadow: '0 4px 14px rgba(27,94,32,0.35)',
-            marginTop: '-18px', textDecoration: 'none',
+            marginTop: '-18px', textDecoration: 'none', outline: 'none',
             transition: 'transform 0.15s cubic-bezier(0.4,0,0.2,1), box-shadow 0.15s',
           }}
           onMouseDown={e => {

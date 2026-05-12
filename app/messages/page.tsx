@@ -539,33 +539,33 @@ function MessagesInner() {
         }
       `}</style>
 
-      <div style={{ background: '#111', color: '#fff', padding: '28px 20px' }}>
+      <div style={{ background: '#FAFAF8', borderBottom: '1px solid #E8E5E0', padding: '28px 20px' }}>
         <div className="container">
-          <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '32px', letterSpacing: '-1px' }}>MESSAGES</div>
-          <p style={{ color: '#666', marginTop: '4px', fontSize: '13px' }}>Real-time chat — buyers, sellers and service providers</p>
+          <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '28px', letterSpacing: '-0.5px', color: '#1A1A1A' }}>Messages</div>
+          <p style={{ color: '#9A9590', marginTop: '4px', fontSize: '13px', fontFamily: '"Plus Jakarta Sans", sans-serif' }}>Real-time chat with buyers, sellers and service providers</p>
         </div>
       </div>
 
       <SectionWrapper className="bg-[#f8f8f8]">
         <div
           className="msg-grid"
-          style={{ border: '2px solid #111', boxShadow: '6px 6px 0 #111', background: '#fff', minHeight: '600px' }}
+          style={{ border: '1px solid #E8E5E0', borderRadius: '16px', overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.06)', background: '#fff', minHeight: '600px' }}
         >
           {/* ── Sidebar ── */}
           <aside
             className={`msg-sidebar${mobileView === 'chat' ? ' msg-sidebar-hidden' : ''}`}
-            style={{ borderRight: '2px solid #111', overflowY: 'auto', maxHeight: '700px' }}
+            style={{ borderRight: '1px solid #E8E5E0', overflowY: 'auto', maxHeight: '700px' }}
           >
             {/* Header */}
-            <div style={{ padding: '12px 14px', borderBottom: '2px solid #111', background: '#f8f8f8', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '8px' }}>
+            <div style={{ padding: '12px 14px', borderBottom: '1px solid #E8E5E0', background: '#FAFAF8', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '8px' }}>
               <span style={{ fontFamily: '"Syne", sans-serif', fontSize: '11px', letterSpacing: '1px', color: '#888' }}>CONVERSATIONS</span>
               <button
                 onClick={() => { setShowNewMsg(v => !v); setUserSearch(''); setSearchResults([]) }}
                 style={{
-                  background: showNewMsg ? '#111' : '#1B5E20', color: '#fff',
-                  border: 'none', padding: '5px 12px',
-                  fontFamily: '"Syne", sans-serif', fontSize: '11px',
-                  cursor: 'pointer', letterSpacing: '0.5px', flexShrink: 0,
+                  background: showNewMsg ? '#6B6660' : '#1B5E20', color: '#fff',
+                  border: 'none', padding: '6px 12px', borderRadius: '6px',
+                  fontFamily: '"Plus Jakarta Sans", sans-serif', fontSize: '11px', fontWeight: 700,
+                  cursor: 'pointer', letterSpacing: '0.3px', flexShrink: 0,
                 }}
               >
                 {showNewMsg ? '✕ CANCEL' : '+ NEW'}
@@ -678,7 +678,7 @@ function MessagesInner() {
             {activePartner ? (
               <>
                 {/* Chat header */}
-                <div style={{ padding: '14px 20px', borderBottom: '2px solid #111', background: '#f8f8f8', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div style={{ padding: '14px 20px', borderBottom: '1px solid #E8E5E0', background: '#FAFAF8', display: 'flex', alignItems: 'center', gap: '12px' }}>
                   <button
                     onClick={() => setMobileView('list')}
                     className="msg-back"
@@ -694,7 +694,7 @@ function MessagesInner() {
                   </div>
                   <Link
                     href={`/profile/${activePartner}`}
-                    style={{ fontSize: '11px', color: '#5d3fd3', fontWeight: 700, textDecoration: 'none', padding: '4px 8px', border: '1px solid #5d3fd3', flexShrink: 0 }}
+                    style={{ fontSize: '11px', color: '#1B5E20', fontWeight: 700, textDecoration: 'none', padding: '5px 10px', border: '1px solid #86efac', borderRadius: '6px', flexShrink: 0, fontFamily: '"Plus Jakarta Sans", sans-serif' }}
                     title="View profile"
                   >
                     PROFILE
@@ -751,7 +751,7 @@ function MessagesInner() {
                 </div>
 
                 {/* Input */}
-                <div style={{ padding: '14px 16px', borderTop: '2px solid #111', display: 'flex', gap: '10px', background: '#fff' }}>
+                <div style={{ padding: '14px 16px', borderTop: '1px solid #E8E5E0', display: 'flex', gap: '10px', background: '#fff' }}>
                   <input
                     type="text"
                     value={input}
@@ -759,20 +759,20 @@ function MessagesInner() {
                     onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage() } }}
                     placeholder="Type a message... (Enter to send)"
                     maxLength={2000}
-                    style={{ flex: 1, padding: '12px 16px', border: '2px solid #111', outline: 'none', fontFamily: '"Plus Jakarta Sans", sans-serif', fontSize: '14px' }}
+                    style={{ flex: 1, padding: '12px 16px', border: '1.5px solid #E8E5E0', borderRadius: '10px', outline: 'none', fontFamily: '"Plus Jakarta Sans", sans-serif', fontSize: '14px', transition: 'border-color 0.2s' }}
                     onFocus={e  => (e.currentTarget.style.borderColor = '#1B5E20')}
-                    onBlur={e   => (e.currentTarget.style.borderColor = '#111')}
+                    onBlur={e   => (e.currentTarget.style.borderColor = '#E8E5E0')}
                   />
                   <button
                     onClick={sendMessage}
                     disabled={!input.trim() || sending}
                     style={{
-                      padding: '12px 24px',
-                      background: (!input.trim() || sending) ? '#888' : '#1B5E20',
-                      color: '#fff', border: '2px solid #111',
-                      fontFamily: '"Syne", sans-serif', fontSize: '13px',
+                      padding: '12px 24px', borderRadius: '10px',
+                      background: (!input.trim() || sending) ? '#D1CEC8' : '#1B5E20',
+                      color: '#fff', border: 'none',
+                      fontFamily: '"Plus Jakarta Sans", sans-serif', fontSize: '13px', fontWeight: 700,
                       cursor: (!input.trim() || sending) ? 'not-allowed' : 'pointer',
-                      letterSpacing: '0.5px',
+                      transition: 'background 0.2s',
                     }}
                   >
                     {sending ? '...' : 'SEND →'}

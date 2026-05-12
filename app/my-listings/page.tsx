@@ -56,19 +56,19 @@ export default function MyListingsPage() {
       )}
 
       {/* Header */}
-      <div style={{ background: '#111', color: '#fff', padding: '36px 20px' }}>
+      <div style={{ background: '#FAFAF8', borderBottom: '1px solid #E8E5E0', padding: '32px 20px' }}>
         <div className="container">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
             <div>
-              <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '36px', letterSpacing: '-1px' }}>MY LISTINGS</div>
-              <p style={{ color: '#888', marginTop: '4px', fontSize: '14px' }}>Manage your items and track performance</p>
+              <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '28px', letterSpacing: '-0.5px', color: '#1A1A1A' }}>My Listings</div>
+              <p style={{ color: '#9A9590', marginTop: '6px', fontSize: '14px', fontFamily: '"Plus Jakarta Sans", sans-serif' }}>Manage your items and track performance</p>
             </div>
             <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-              <Link href="/sell" style={{ padding: '12px 24px', background: '#1B5E20', color: '#fff', fontFamily: '"Syne", sans-serif', fontSize: '13px', textDecoration: 'none', border: '2px solid #1B5E20', boxShadow: '3px 3px 0 #fff' }}>
-                + SELL ITEM
+              <Link href="/sell" style={{ padding: '10px 20px', background: '#1B5E20', color: '#fff', fontFamily: '"Plus Jakarta Sans", sans-serif', fontWeight: 700, fontSize: '13px', textDecoration: 'none', borderRadius: '10px', boxShadow: '0 2px 8px rgba(27,94,32,0.25)' }}>
+                + Sell Item
               </Link>
-              <Link href="/offer-service" style={{ padding: '12px 24px', background: '#5d3fd3', color: '#fff', fontFamily: '"Syne", sans-serif', fontSize: '13px', textDecoration: 'none', border: '2px solid #5d3fd3', boxShadow: '3px 3px 0 #fff' }}>
-                + OFFER SERVICE
+              <Link href="/offer-service" style={{ padding: '10px 20px', background: '#F3F2EF', color: '#1A1A1A', fontFamily: '"Plus Jakarta Sans", sans-serif', fontWeight: 700, fontSize: '13px', textDecoration: 'none', borderRadius: '10px', border: '1px solid #E8E5E0' }}>
+                + Offer Service
               </Link>
             </div>
           </div>
@@ -86,9 +86,9 @@ export default function MyListingsPage() {
             { label: 'Total Views', value: totalViews, color: '#5d3fd3' },
             { label: 'Sold', value: listings.filter(l => l.status === 'sold').length, color: '#f59e0b' },
           ].map(stat => (
-            <div key={stat.label} style={{ border: '2px solid #111', background: '#fff', padding: '20px', boxShadow: '4px 4px 0 #111', textAlign: 'center' }}>
-              <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '32px', color: stat.color, lineHeight: 1 }}>{stat.value}</div>
-              <div style={{ fontSize: '12px', color: '#888', marginTop: '6px', fontWeight: 600 }}>{stat.label}</div>
+            <div key={stat.label} style={{ border: '1px solid #E8E5E0', background: '#fff', padding: '20px', borderRadius: '12px', boxShadow: '0 1px 3px rgba(0,0,0,0.06)', textAlign: 'center' }}>
+              <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '30px', color: '#1A1A1A', lineHeight: 1 }}>{stat.value}</div>
+              <div style={{ fontSize: '12px', color: '#9A9590', marginTop: '5px', fontWeight: 600, fontFamily: '"Plus Jakarta Sans", sans-serif' }}>{stat.label}</div>
             </div>
           ))}
         </div>
@@ -127,7 +127,7 @@ export default function MyListingsPage() {
               </div>
 
               {/* Views bar chart */}
-              <div style={{ border: '2px solid #111', background: '#fff', padding: '16px', boxShadow: '4px 4px 0 #111' }}>
+              <div style={{ border: '1px solid #E8E5E0', background: '#fff', padding: '16px', borderRadius: '12px', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
                 <div style={{ fontSize: '10px', fontWeight: 800, letterSpacing: '1.5px', color: '#888', marginBottom: '12px' }}>
                   VIEWS BY LISTING
                 </div>
@@ -169,23 +169,23 @@ export default function MyListingsPage() {
 
         {/* Listings */}
         {listings.length === 0 ? (
-          <div style={{ border: '2px solid #111', background: '#fff', boxShadow: '6px 6px 0 #111', padding: '60px', textAlign: 'center' }}>
-            <div style={{ marginBottom: '20px', display: 'flex', justifyContent: 'center', color: '#ddd' }}><svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"><path d="M16.5 9.4l-9-5.19M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></div>
-            <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '24px', marginBottom: '12px' }}>No listings yet</div>
-            <p style={{ color: '#888', marginBottom: '28px' }}>List your first item and start connecting with fellow students.</p>
-            <Link href="/sell" style={{ display: 'inline-block', padding: '14px 32px', background: '#1B5E20', color: '#fff', fontFamily: '"Syne", sans-serif', fontSize: '14px', textDecoration: 'none', border: '2px solid #111', boxShadow: '4px 4px 0 #111' }}>
-              LIST YOUR FIRST ITEM →
+          <div style={{ border: '1px solid #E8E5E0', background: '#fff', borderRadius: '16px', padding: '60px', textAlign: 'center', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+            <div style={{ marginBottom: '20px', display: 'flex', justifyContent: 'center', color: '#D1CEC8' }}><svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"><path d="M16.5 9.4l-9-5.19M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></div>
+            <div style={{ fontFamily: '"Syne", sans-serif', fontSize: '22px', marginBottom: '10px', color: '#1A1A1A' }}>No listings yet</div>
+            <p style={{ color: '#9A9590', marginBottom: '24px', fontFamily: '"Plus Jakarta Sans", sans-serif', fontSize: '14px' }}>List your first item and start connecting with fellow students.</p>
+            <Link href="/sell" style={{ display: 'inline-block', padding: '12px 28px', background: '#1B5E20', color: '#fff', fontFamily: '"Plus Jakarta Sans", sans-serif', fontWeight: 700, fontSize: '14px', textDecoration: 'none', borderRadius: '10px', boxShadow: '0 2px 8px rgba(27,94,32,0.25)' }}>
+              List Your First Item →
             </Link>
           </div>
         ) : (
-          <div style={{ border: '2px solid #111', background: '#fff', boxShadow: '6px 6px 0 #111', overflow: 'hidden' }}>
+          <div style={{ border: '1px solid #E8E5E0', background: '#fff', borderRadius: '16px', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
             {/* Desktop table */}
             <div className="listings-table-wrap" style={{ overflowX: 'auto' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '700px' }}>
                 <thead>
-                  <tr style={{ background: '#111', color: '#fff' }}>
-                    {['ITEM', 'PRICE', 'CONDITION', 'VIEWS', 'STATUS', 'STOCK', 'ACTIONS'].map(h => (
-                      <th key={h} style={{ padding: '12px 14px', textAlign: 'left', fontFamily: '"Syne", sans-serif', fontSize: '11px', letterSpacing: '1px', whiteSpace: 'nowrap' }}>{h}</th>
+                  <tr style={{ background: '#FAFAF8', borderBottom: '1px solid #E8E5E0' }}>
+                    {['Item', 'Price', 'Condition', 'Views', 'Status', 'Stock', 'Actions'].map(h => (
+                      <th key={h} style={{ padding: '12px 14px', textAlign: 'left', fontFamily: '"Plus Jakarta Sans", sans-serif', fontSize: '11px', fontWeight: 700, letterSpacing: '0.5px', color: '#9A9590', whiteSpace: 'nowrap' }}>{h}</th>
                     ))}
                   </tr>
                 </thead>
