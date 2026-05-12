@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { useAuth } from '@/context/AuthContext'
 import { useRouter } from 'next/navigation'
+import SectionWrapper from '@/components/ui/SectionWrapper'
 
 const FEATURES = [
   'List unlimited goods for sale',
@@ -51,7 +52,7 @@ function SubscribePageInner() {
   const errorMsg = errorParam ? (errorMessages[errorParam] ?? 'Something went wrong. Please try again.') : ''
 
   return (
-    <div style={{ background: '#f8f8f8', minHeight: '100vh' }}>
+    <>
       {/* Header */}
       <div style={{ background: '#111', color: '#fff', padding: '48px 20px' }}>
         <div className="container" style={{ maxWidth: '800px' }}>
@@ -74,7 +75,7 @@ function SubscribePageInner() {
         </div>
       )}
 
-      <div className="container" style={{ maxWidth: '800px', paddingTop: '48px', paddingBottom: '80px' }}>
+      <SectionWrapper className="bg-[#f8f8f8]" innerClassName="max-w-[800px] mx-auto px-4">
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '32px', alignItems: 'start' }}>
 
           {/* Pricing card */}
@@ -163,14 +164,14 @@ function SubscribePageInner() {
           </div>
 
         </div>
-      </div>
+      </SectionWrapper>
 
       <style>{`
         @media (max-width: 480px) {
           .container { padding-left: 16px !important; padding-right: 16px !important; }
         }
       `}</style>
-    </div>
+    </>
   )
 }
 

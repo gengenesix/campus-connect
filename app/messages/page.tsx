@@ -7,6 +7,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { useAuth } from '@/context/AuthContext'
 import { supabase } from '@/lib/supabase'
 import { toast } from 'sonner'
+import SectionWrapper from '@/components/ui/SectionWrapper'
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -524,7 +525,7 @@ function MessagesInner() {
   )
 
   return (
-    <div style={{ background: '#f8f8f8', minHeight: '80vh' }}>
+    <>
       <style>{`
         @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
         .msg-grid { display: grid; grid-template-columns: 300px 1fr; }
@@ -545,7 +546,7 @@ function MessagesInner() {
         </div>
       </div>
 
-      <div className="container" style={{ paddingTop: '24px', paddingBottom: '60px' }}>
+      <SectionWrapper className="bg-[#f8f8f8]">
         <div
           className="msg-grid"
           style={{ border: '2px solid #111', boxShadow: '6px 6px 0 #111', background: '#fff', minHeight: '600px' }}
@@ -799,8 +800,8 @@ function MessagesInner() {
             )}
           </div>
         </div>
-      </div>
-    </div>
+      </SectionWrapper>
+    </>
   )
 }
 

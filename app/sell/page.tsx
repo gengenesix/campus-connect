@@ -6,6 +6,10 @@ import { useRouter } from 'next/navigation'
 import { useAuth } from '@/context/AuthContext'
 import { supabase } from '@/lib/supabase'
 import imageCompression from 'browser-image-compression'
+import SectionWrapper from '@/components/ui/SectionWrapper'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { ProfileIncompleteWarning, ErrorBanner, FormField, BrutalTextarea, ImageUploadZone, AdditionalPhotosGrid, GhanaPhoneInput } from '@/components/shared/FormPrimitives'
 
 async function uploadImageToR2(file: File, folder: string): Promise<string | null> {
   try {
@@ -227,13 +231,13 @@ export default function SellPage() {
   )
 
   if (subStatus === 'none') return (
-    <div style={{ background: '#f8f8f8', minHeight: '80vh' }}>
+    <>
       <div style={{ background: '#111', color: '#fff', padding: '36px 20px' }}>
         <div className="container">
           <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '36px', letterSpacing: '-1px' }}>LIST YOUR ITEM</div>
         </div>
       </div>
-      <div className="container" style={{ paddingTop: '60px', paddingBottom: '80px' }}>
+      <SectionWrapper className="bg-[#f8f8f8]">
         <div style={{ maxWidth: '520px', border: '3px solid #1B5E20', background: '#fff', boxShadow: '8px 8px 0 #1B5E20', padding: '40px' }}>
           <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'center', color: '#1B5E20' }}>
             <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
@@ -259,8 +263,8 @@ export default function SellPage() {
             </p>
           </div>
         </div>
-      </div>
-    </div>
+      </SectionWrapper>
+    </>
   )
 
   if (success) {
@@ -300,7 +304,7 @@ export default function SellPage() {
   }
 
   return (
-    <div style={{ background: '#f8f8f8', minHeight: '80vh' }}>
+    <>
       {/* Header */}
       <div style={{ background: '#111', color: '#fff', padding: '36px 20px' }}>
         <div className="container">
@@ -309,161 +313,87 @@ export default function SellPage() {
         </div>
       </div>
 
-      <div className="container" style={{ paddingTop: '40px', paddingBottom: '80px' }}>
+      <SectionWrapper className="bg-[#f8f8f8]">
         <div style={{ maxWidth: '640px' }}>
 
-          {/* Profile incomplete warning */}
-          {!profileReady && (
-            <div style={{ background: '#fff8e1', border: '2px solid #f59e0b', padding: '16px 20px', marginBottom: '24px', display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2" strokeLinecap="round" style={{ flexShrink: 0, marginTop: '2px' }}><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-              <div>
-                <div style={{ fontWeight: 700, fontSize: '14px', color: '#92400e', marginBottom: '4px' }}>Complete your profile first</div>
-                <p style={{ fontSize: '13px', color: '#78350f', margin: '0 0 10px' }}>
-                  Sellers must have a full name, phone number, and department set.
-                </p>
-                <a href="/profile" style={{ display: 'inline-block', padding: '8px 18px', background: '#f59e0b', color: '#fff', fontFamily: '"Archivo Black", sans-serif', fontSize: '12px', textDecoration: 'none', border: '2px solid #111', letterSpacing: '0.5px' }}>
-                  COMPLETE PROFILE →
-                </a>
-              </div>
-            </div>
-          )}
-
-          {error && (
-            <div style={{ background: '#fee2e2', border: '2px solid #ef4444', padding: '12px 16px', marginBottom: '24px', fontSize: '14px', color: '#dc2626', fontWeight: 600, display: 'flex', gap: '8px' }}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#dc2626" strokeWidth="2" strokeLinecap="round" style={{ flexShrink: 0 }}><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><span>{error}</span>
-            </div>
-          )}
+          {!profileReady && <ProfileIncompleteWarning message="Sellers must have a full name, phone number, and department set." />}
+          <ErrorBanner error={error} />
 
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
 
             {/* Image Upload */}
-            <div>
-              <label style={{ display: 'block', fontWeight: 700, fontSize: '12px', letterSpacing: '1.5px', marginBottom: '10px' }}>ITEM PHOTO</label>
-              <div
-                onClick={() => fileInputRef.current?.click()}
-                style={{
-                  border: `2px dashed ${imagePreview ? '#1B5E20' : '#111'}`,
-                  padding: '24px', cursor: 'pointer', textAlign: 'center', transition: 'all 0.2s',
-                  background: imagePreview ? '#f0fdf4' : '#fff', position: 'relative', minHeight: '160px',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                }}
-              >
-                {imagePreview ? (
-                  <div style={{ position: 'relative' }}>
-                    <img src={imagePreview} alt="Preview" style={{ maxHeight: '200px', maxWidth: '100%', objectFit: 'contain', display: 'block' }} />
-                    <button
-                      type="button"
-                      onClick={e => { e.stopPropagation(); setImageFile(null); setImagePreview(null) }}
-                      style={{ position: 'absolute', top: '-8px', right: '-8px', width: '24px', height: '24px', background: '#dc2626', color: '#fff', border: 'none', borderRadius: '50%', cursor: 'pointer', fontWeight: 700, fontSize: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                    >✕</button>
-                  </div>
-                ) : (
-                  <div>
-                    <div style={{ marginBottom: '8px', display: 'flex', justifyContent: 'center', color: '#888' }}>
-                      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-                    </div>
-                    <div style={{ fontWeight: 700, fontSize: '14px', marginBottom: '4px' }}>Click to upload a photo</div>
-                    <div style={{ color: '#888', fontSize: '12px' }}>JPG, PNG or WebP · Max 5MB</div>
-                  </div>
-                )}
-                <input ref={fileInputRef} type="file" accept="image/jpeg,image/png,image/webp" onChange={handleImageChange} style={{ display: 'none' }} />
-              </div>
-            </div>
+            <FormField label="ITEM PHOTO" labelSpacing="10px">
+              <ImageUploadZone
+                preview={imagePreview}
+                fileRef={fileInputRef}
+                onClear={() => { setImageFile(null); setImagePreview(null) }}
+                onChange={handleImageChange}
+              />
+            </FormField>
 
             {/* Additional Photos */}
             {imagePreview && (
-              <div>
-                <label style={{ display: 'block', fontWeight: 700, fontSize: '12px', letterSpacing: '1.5px', marginBottom: '10px' }}>
-                  ADDITIONAL PHOTOS <span style={{ fontWeight: 400, color: '#888' }}>(optional, up to 4 more)</span>
-                </label>
-                <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-                  {additionalPreviews.map((preview, idx) => (
-                    <div key={idx} style={{ position: 'relative', width: '80px', height: '80px', flexShrink: 0 }}>
-                      <img src={preview} alt={`Additional ${idx + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover', border: '2px solid #111', display: 'block' }} />
-                      <button
-                        type="button"
-                        onClick={() => { setAdditionalFiles(p => p.filter((_, i) => i !== idx)); setAdditionalPreviews(p => p.filter((_, i) => i !== idx)) }}
-                        style={{ position: 'absolute', top: '-6px', right: '-6px', width: '20px', height: '20px', background: '#dc2626', color: '#fff', border: 'none', borderRadius: '50%', cursor: 'pointer', fontSize: '11px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}
-                      >✕</button>
-                    </div>
-                  ))}
-                  {additionalPreviews.length < 4 && (
-                    <button
-                      type="button"
-                      onClick={() => additionalFileInputRef.current?.click()}
-                      style={{ width: '80px', height: '80px', border: '2px dashed #ddd', background: '#fff', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '4px', color: '#888', flexShrink: 0 }}
-                    >
-                      <span style={{ fontSize: '20px', lineHeight: 1 }}>+</span>
-                      <span style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.5px' }}>ADD</span>
-                    </button>
-                  )}
-                  <input ref={additionalFileInputRef} type="file" accept="image/jpeg,image/png,image/webp" multiple onChange={handleAdditionalImagesChange} style={{ display: 'none' }} />
-                </div>
-              </div>
+              <FormField label="ADDITIONAL PHOTOS" hint="(optional, up to 4 more)" labelSpacing="10px">
+                <AdditionalPhotosGrid
+                  previews={additionalPreviews}
+                  onRemove={idx => { setAdditionalFiles(p => p.filter((_, i) => i !== idx)); setAdditionalPreviews(p => p.filter((_, i) => i !== idx)) }}
+                  onAddClick={() => additionalFileInputRef.current?.click()}
+                  fileRef={additionalFileInputRef}
+                  onChange={handleAdditionalImagesChange}
+                />
+              </FormField>
             )}
 
             {/* Item Name */}
-            <div>
-              <label style={{ display: 'block', fontWeight: 700, fontSize: '12px', letterSpacing: '1.5px', marginBottom: '8px' }}>ITEM NAME *</label>
-              <input
+            <FormField label="ITEM NAME *">
+              <Input
                 type="text" value={form.name} onChange={e => update('name', e.target.value)}
                 placeholder="e.g., Dell Laptop XPS 13, Casio Calculator" required
-                style={{ width: '100%', padding: '13px 16px', border: '2px solid #111', fontFamily: '"Space Grotesk", sans-serif', fontSize: '15px', outline: 'none', boxSizing: 'border-box' }}
-                onFocus={e => (e.currentTarget.style.borderColor = '#1B5E20')}
-                onBlur={e => (e.currentTarget.style.borderColor = '#111')}
+                className="text-[15px] focus-visible:border-[#1B5E20]"
               />
-            </div>
+            </FormField>
 
             {/* Category + Condition */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-              <div>
-                <label style={{ display: 'block', fontWeight: 700, fontSize: '12px', letterSpacing: '1.5px', marginBottom: '8px' }}>CATEGORY *</label>
+              <FormField label="CATEGORY *">
                 <select value={form.category} onChange={e => update('category', e.target.value)} required
                   style={{ width: '100%', padding: '13px 16px', border: '2px solid #111', fontFamily: '"Space Grotesk", sans-serif', fontSize: '14px', background: '#fff', boxSizing: 'border-box', outline: 'none' }}>
                   <option value="">Select category</option>
                   {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
                 </select>
-              </div>
-              <div>
-                <label style={{ display: 'block', fontWeight: 700, fontSize: '12px', letterSpacing: '1.5px', marginBottom: '8px' }}>CONDITION *</label>
+              </FormField>
+              <FormField label="CONDITION *">
                 <select value={form.condition} onChange={e => update('condition', e.target.value)} required
                   style={{ width: '100%', padding: '13px 16px', border: '2px solid #111', fontFamily: '"Space Grotesk", sans-serif', fontSize: '14px', background: '#fff', boxSizing: 'border-box', outline: 'none' }}>
                   <option value="">Select condition</option>
                   {CONDITIONS.map(c => <option key={c} value={c}>{c}</option>)}
                 </select>
-              </div>
+              </FormField>
             </div>
 
             {/* Price */}
-            <div>
-              <label style={{ display: 'block', fontWeight: 700, fontSize: '12px', letterSpacing: '1.5px', marginBottom: '8px' }}>PRICE (GHS) *</label>
+            <FormField label="PRICE (GHS) *">
               <div style={{ position: 'relative' }}>
                 <span style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', fontWeight: 700, fontSize: '15px', color: '#888' }}>₵</span>
-                <input
+                <Input
                   type="number" value={form.price} onChange={e => update('price', e.target.value)}
                   placeholder="0" required min="1" step="1"
-                  style={{ width: '100%', padding: '13px 16px 13px 36px', border: '2px solid #111', fontFamily: '"Space Grotesk", sans-serif', fontSize: '15px', fontWeight: 700, outline: 'none', boxSizing: 'border-box' }}
-                  onFocus={e => (e.currentTarget.style.borderColor = '#1B5E20')}
-                  onBlur={e => (e.currentTarget.style.borderColor = '#111')}
+                  className="pl-9 text-[15px] font-bold focus-visible:border-[#1B5E20]"
                 />
               </div>
-            </div>
+            </FormField>
 
             {/* Description */}
-            <div>
-              <label style={{ display: 'block', fontWeight: 700, fontSize: '12px', letterSpacing: '1.5px', marginBottom: '8px' }}>DESCRIPTION *</label>
-              <textarea
+            <FormField label="DESCRIPTION *">
+              <BrutalTextarea
                 value={form.description} onChange={e => update('description', e.target.value)}
                 placeholder="Describe your item — specs, condition details, what's included, why you're selling." required rows={5}
-                style={{ width: '100%', padding: '13px 16px', border: '2px solid #111', fontFamily: '"Space Grotesk", sans-serif', fontSize: '15px', outline: 'none', boxSizing: 'border-box', resize: 'vertical' }}
-                onFocus={e => (e.currentTarget.style.borderColor = '#1B5E20')}
-                onBlur={e => (e.currentTarget.style.borderColor = '#111')}
+                focusColor="#1B5E20"
               />
-            </div>
+            </FormField>
 
             {/* In Stock toggle */}
-            <div>
-              <label style={{ display: 'block', fontWeight: 700, fontSize: '12px', letterSpacing: '1.5px', marginBottom: '8px' }}>STOCK STATUS</label>
+            <FormField label="STOCK STATUS">
               <div style={{ display: 'flex', gap: '10px' }}>
                 {[true, false].map(val => (
                   <button
@@ -484,32 +414,16 @@ export default function SellPage() {
                   </button>
                 ))}
               </div>
-            </div>
+            </FormField>
 
             {/* WhatsApp */}
-            <div>
-              <label style={{ display: 'block', fontWeight: 700, fontSize: '12px', letterSpacing: '1.5px', marginBottom: '8px' }}>
-                WHATSAPP NUMBER (OPTIONAL)
-              </label>
-              <div style={{ position: 'relative' }}>
-                <span style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', fontSize: '13px', color: '#888', fontWeight: 700, pointerEvents: 'none' }}>
-                  +233
-                </span>
-                <input
-                  type="tel"
-                  value={form.phone}
-                  onChange={e => update('phone', e.target.value.replace(/\D/g, ''))}
-                  placeholder={profile?.phone ? profile.phone.replace(/^\+?233|^0/, '') : '241234567'}
-                  maxLength={9}
-                  style={{ width: '100%', padding: '13px 16px 13px 56px', border: '2px solid #ddd', fontFamily: '"Space Grotesk", sans-serif', fontSize: '15px', outline: 'none', boxSizing: 'border-box' }}
-                  onFocus={e => (e.currentTarget.style.borderColor = '#25D366')}
-                  onBlur={e => (e.currentTarget.style.borderColor = '#ddd')}
-                />
-              </div>
-              <p style={{ marginTop: '6px', fontSize: '12px', color: '#888' }}>
-                Ghana number — buyers can message you on WhatsApp. Leave blank to use your profile number.
-              </p>
-            </div>
+            <FormField label="WHATSAPP NUMBER (OPTIONAL)" hint="Ghana number — buyers can message you on WhatsApp. Leave blank to use your profile number.">
+              <GhanaPhoneInput
+                value={form.phone}
+                onChange={e => update('phone', e.target.value.replace(/\D/g, ''))}
+                placeholder={profile?.phone ? profile.phone.replace(/^\+?233|^0/, '') : '241234567'}
+              />
+            </FormField>
 
             {/* Seller Preview */}
             <div style={{ padding: '16px', background: '#f0f0f0', border: '2px solid #ddd', display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -526,21 +440,14 @@ export default function SellPage() {
               </div>
             </div>
 
-            <button
+            <Button
               type="submit"
+              variant="brutal-green"
               disabled={loading || !profileReady}
-              style={{
-                width: '100%', padding: '18px',
-                background: (loading || !profileReady) ? '#888' : '#1B5E20',
-                color: '#fff', fontFamily: '"Archivo Black", sans-serif', fontSize: '16px',
-                border: '2px solid #111', cursor: (loading || !profileReady) ? 'not-allowed' : 'pointer',
-                boxSizing: 'border-box',
-                boxShadow: (loading || !profileReady) ? 'none' : '6px 6px 0 #111',
-                letterSpacing: '0.5px', transition: 'all 0.2s',
-              }}
+              className="w-full h-auto py-[18px] text-base"
             >
               {loading ? 'SUBMITTING FOR REVIEW...' : 'SUBMIT LISTING FOR REVIEW →'}
-            </button>
+            </Button>
 
             <p style={{ fontSize: '12px', color: '#999', textAlign: 'center' }}>
               Listings are reviewed by admin before going live. By listing, you agree to our{' '}
@@ -548,7 +455,7 @@ export default function SellPage() {
             </p>
           </form>
         </div>
-      </div>
-    </div>
+      </SectionWrapper>
+    </>
   )
 }

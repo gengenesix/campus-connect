@@ -6,6 +6,7 @@ import GoodsCard from '@/components/GoodsCard'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/context/AuthContext'
 import { timeAgo } from '@/lib/utils'
+import SectionWrapper from '@/components/ui/SectionWrapper'
 
 interface Product {
   id: string
@@ -206,7 +207,7 @@ export default function GoodsPageClient({
       </div>
 
       {/* Results */}
-      <div className="container" style={{ paddingTop: '28px', paddingBottom: '60px' }}>
+      <SectionWrapper className="bg-[#f8f8f8]">
         {products.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '80px 20px' }}>
             <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: 'clamp(22px, 5vw, 28px)', marginBottom: '10px' }}>
@@ -262,7 +263,7 @@ export default function GoodsPageClient({
             )}
           </>
         )}
-      </div>
+      </SectionWrapper>
     </div>
   )
 }

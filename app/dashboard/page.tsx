@@ -6,6 +6,7 @@ import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/context/AuthContext'
 import { supabase } from '@/lib/supabase'
+import SectionWrapper from '@/components/ui/SectionWrapper'
 
 interface Listing {
   id: string
@@ -113,7 +114,7 @@ export default function DashboardPage() {
   )
 
   return (
-    <div style={{ background: '#f8f8f8', minHeight: '80vh' }}>
+    <>
       {/* Header */}
       <div style={{ background: '#111', color: '#fff', padding: '36px 20px' }}>
         <div className="container">
@@ -142,7 +143,7 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      <div className="container" style={{ paddingTop: '32px', paddingBottom: '60px' }}>
+      <SectionWrapper className="bg-[#f8f8f8]">
 
         {/* Stats Grid */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginBottom: '36px' }}>
@@ -365,7 +366,7 @@ export default function DashboardPage() {
             </Link>
           </div>
         )}
-      </div>
-    </div>
+      </SectionWrapper>
+    </>
   )
 }

@@ -1673,3 +1673,12 @@ body {
     grid-template-columns: 1fr !important;
   }
 }
+
+/* ============================================
+   BRUTAL TYPOGRAPHY UTILITY
+   Used by shadcn <Button variant="brutal*">
+   ============================================ */
+.font-brutal {
+  font-family: "Archivo Black", sans-serif;
+  letter-spacing: 0.3px;
+}

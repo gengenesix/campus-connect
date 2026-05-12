@@ -6,6 +6,7 @@ import { createSupabaseReadClient } from '@/lib/supabase-server'
 import ServiceActionsClient from './ServiceActionsClient'
 import ImageGallery from '@/components/ImageGallery'
 import ReviewsSection from '@/components/ReviewsSection'
+import SectionWrapper from '@/components/ui/SectionWrapper'
 
 export const revalidate = 60
 
@@ -122,7 +123,7 @@ export default async function ServiceDetailPage({ params }: { params: Params }) 
     : `https://wa.me/?text=${encodeURIComponent(whatsappMsg)}`
 
   return (
-    <div style={{ background: '#f8f8f8', minHeight: '80vh' }}>
+    <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -139,7 +140,7 @@ export default async function ServiceDetailPage({ params }: { params: Params }) 
         </div>
       </div>
 
-      <div className="container" style={{ paddingTop: '40px', paddingBottom: '60px' }}>
+      <SectionWrapper className="bg-[#f8f8f8]">
         <div style={{ display: 'grid', gridTemplateColumns: '1.1fr 1fr', gap: '48px', alignItems: 'start' }}>
 
           {/* LEFT — Image + Stats */}
@@ -272,7 +273,7 @@ export default async function ServiceDetailPage({ params }: { params: Params }) 
             </div>
           </div>
         )}
-      </div>
-    </div>
+      </SectionWrapper>
+    </>
   )
 }

@@ -1,38 +1,11 @@
 "use client"
 
-import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
-import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/context/AuthContext'
-
-interface PublicProfile {
-  id: string
-  name: string | null
-  department: string | null
-  course: string | null
-  class_year: string | null
-  hostel: string | null
-  bio: string | null
-  avatar_url: string | null
-  role: string
-  rating: number
-  total_reviews: number
-  is_verified: boolean
-  created_at: string
-}
-
-interface Listing {
-  id: string
-  title?: string
-  name?: string
-  price?: number
-  rate?: string | null
-  image_url: string | null
-  category: string
-  type: 'good' | 'service'
-}
+import SectionWrapper from '@/components/ui/SectionWrapper'
+import { usePublicProfile } from '@/hooks/usePublicProfile'
 
 const ROLE_LABELS: Record<string, string> = {
   buyer: 'Buyer',
@@ -45,53 +18,7 @@ export default function PublicProfilePage() {
   const params = useParams<{ id: string }>()
   const router = useRouter()
   const { user } = useAuth()
-
-  const [profile, setProfile] = useState<PublicProfile | null>(null)
-  const [listings, setListings] = useState<Listing[]>([])
-  const [loading, setLoading] = useState(true)
-  const [notFound, setNotFound] = useState(false)
-
-  useEffect(() => {
-    if (!params.id) return
-
-    const load = async () => {
-      setLoading(true)
-
-      const { data: p, error } = await supabase
-        .from('profiles')
-        .select('id, name, department, course, class_year, hostel, bio, avatar_url, role, rating, total_reviews, is_verified, created_at')
-        .eq('id', params.id)
-        .single()
-
-      if (error || !p) { setNotFound(true); setLoading(false); return }
-      setProfile(p as PublicProfile)
-
-      // Load their active goods and services in parallel
-      const [{ data: goods }, { data: services }] = await Promise.all([
-        supabase.from('products')
-          .select('id, title, price, image_url, category')
-          .eq('seller_id', params.id)
-          .eq('status', 'active')
-          .order('created_at', { ascending: false })
-          .limit(6),
-        supabase.from('services')
-          .select('id, name, rate, image_url, category')
-          .eq('provider_id', params.id)
-          .eq('status', 'active')
-          .order('created_at', { ascending: false })
-          .limit(6),
-      ])
-
-      const allListings: Listing[] = [
-        ...((goods ?? []).map((g: any) => ({ ...g, type: 'good' as const }))),
-        ...((services ?? []).map((s: any) => ({ ...s, type: 'service' as const }))),
-      ]
-      setListings(allListings)
-      setLoading(false)
-    }
-
-    load()
-  }, [params.id])
+  const { profile, listings, loading, notFound } = usePublicProfile(params.id)
 
   if (loading) {
     return (
@@ -130,7 +57,7 @@ export default function PublicProfilePage() {
   const memberSince = new Date(profile.created_at).toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })
 
   return (
-    <div style={{ background: '#f8f8f8', minHeight: '80vh' }}>
+    <>
       {/* Breadcrumb */}
       <div style={{ background: '#111', padding: '12px 20px' }}>
         <div className="container" style={{ display: 'flex', gap: '8px', alignItems: 'center', fontSize: '13px', color: '#666' }}>
@@ -140,7 +67,7 @@ export default function PublicProfilePage() {
         </div>
       </div>
 
-      <div className="container" style={{ paddingTop: '40px', paddingBottom: '60px', maxWidth: '860px' }}>
+      <SectionWrapper className="bg-[#f8f8f8]" innerClassName="max-w-[860px] mx-auto px-4">
 
         {/* Profile Card */}
         <div style={{ border: '3px solid #111', background: '#fff', boxShadow: '8px 8px 0 #111', marginBottom: '40px' }}>
@@ -341,7 +268,7 @@ export default function PublicProfilePage() {
             ← GO BACK
           </button>
         </div>
-      </div>
-    </div>
+      </SectionWrapper>
+    </>
   )
 }

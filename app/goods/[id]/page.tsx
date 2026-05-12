@@ -7,6 +7,7 @@ import { timeAgo } from '@/lib/utils'
 import GoodsActionsClient from './GoodsActionsClient'
 import ImageGallery from '@/components/ImageGallery'
 import ReviewsSection from '@/components/ReviewsSection'
+import SectionWrapper from '@/components/ui/SectionWrapper'
 
 export const revalidate = 60
 
@@ -149,7 +150,7 @@ export default async function GoodDetailPage({ params }: { params: Params }) {
   }
 
   return (
-    <div style={{ background: '#f8f8f8', minHeight: '80vh' }}>
+    <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -174,7 +175,7 @@ export default async function GoodDetailPage({ params }: { params: Params }) {
         </div>
       </div>
 
-      <div className="container" style={{ paddingTop: '40px', paddingBottom: '60px' }}>
+      <SectionWrapper className="bg-[#f8f8f8]">
         {/* Main Grid */}
         <div style={{ display: 'grid', gridTemplateColumns: '1.1fr 1fr', gap: '48px', alignItems: 'start' }}>
 
@@ -313,7 +314,7 @@ export default async function GoodDetailPage({ params }: { params: Params }) {
             </div>
           </div>
         )}
-      </div>
-    </div>
+      </SectionWrapper>
+    </>
   )
 }

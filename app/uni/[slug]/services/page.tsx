@@ -7,6 +7,7 @@ import ServiceCard from '@/components/ServiceCard'
 import { supabase } from '@/lib/supabase'
 import { getUniversityBySlug } from '@/lib/ghana-universities'
 import { notFound } from 'next/navigation'
+import SectionWrapper from '@/components/ui/SectionWrapper'
 
 interface Service {
   id: string
@@ -118,7 +119,7 @@ export default function UniServicesPage() {
   const hasFilters = category || search
 
   return (
-    <div>
+    <>
       {/* Header */}
       <div style={{ background: '#111', color: '#fff', padding: '36px 20px' }}>
         <div className="container">
@@ -195,7 +196,7 @@ export default function UniServicesPage() {
       </div>
 
       {/* Results */}
-      <div className="container" style={{ paddingTop: '28px', paddingBottom: '60px' }}>
+      <SectionWrapper className="bg-[#f8f8f8]">
         {loading ? (
           <div className="product-grid">
             {[1,2,3,4,5,6].map(i => (
@@ -263,7 +264,7 @@ export default function UniServicesPage() {
             )}
           </>
         )}
-      </div>
-    </div>
+      </SectionWrapper>
+    </>
   )
 }

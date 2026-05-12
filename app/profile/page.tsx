@@ -28,6 +28,7 @@ async function uploadAvatarToR2(file: File): Promise<string | null> {
 }
 import { FACULTIES, CLASS_YEARS } from '@/lib/umat-data'
 import { useHostels } from '@/lib/useHostels'
+import SectionWrapper from '@/components/ui/SectionWrapper'
 import UniversityPicker from '@/components/UniversityPicker'
 import { GHANA_UNIVERSITIES, type GhanaUniversity } from '@/lib/ghana-universities'
 
@@ -355,8 +356,7 @@ export default function ProfilePage() {
 
   return (
     <>
-    <div style={{ background: '#f8f8f8', minHeight: '80vh' }}>
-      <style>{`
+    <style>{`
         .profile-layout { display: grid; grid-template-columns: 280px 1fr; gap: 32px; align-items: start; }
         @media (max-width: 768px) {
           .profile-layout { grid-template-columns: 1fr !important; gap: 20px; }
@@ -438,7 +438,7 @@ export default function ProfilePage() {
         </div>
       )}
 
-      <div className="container" style={{ paddingTop: '32px', paddingBottom: '80px' }}>
+      <SectionWrapper className="bg-[#f8f8f8]">
         <div className="profile-layout">
 
           {/* Sidebar */}
@@ -931,8 +931,7 @@ export default function ProfilePage() {
             </div>
           </div>
         </div>
-      </div>
-    </div>
+      </SectionWrapper>
 
     {/* Delete Account Modal */}
 

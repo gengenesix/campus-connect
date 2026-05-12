@@ -5,6 +5,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/context/AuthContext'
+import SectionWrapper from '@/components/ui/SectionWrapper'
 
 type BookingStatus = 'pending' | 'confirmed' | 'completed' | 'cancelled'
 
@@ -92,7 +93,7 @@ export default function BookingsPage() {
   const confirmed = bookings.filter(b => b.status === 'confirmed').length
 
   return (
-    <div style={{ background: '#f8f8f8', minHeight: '80vh' }}>
+    <>
       {/* Header */}
       <div style={{ background: '#111', color: '#fff', padding: '36px 20px' }}>
         <div className="container">
@@ -123,7 +124,7 @@ export default function BookingsPage() {
         </div>
       </div>
 
-      <div className="container" style={{ paddingTop: '32px', paddingBottom: '60px' }}>
+      <SectionWrapper className="bg-[#f8f8f8]">
 
         {/* Tabs */}
         <div style={{ display: 'flex', border: '2px solid #111', marginBottom: '28px', background: '#fff', boxShadow: '4px 4px 0 #111' }}>
@@ -353,7 +354,7 @@ export default function BookingsPage() {
             })}
           </div>
         )}
-      </div>
-    </div>
+      </SectionWrapper>
+    </>
   )
 }

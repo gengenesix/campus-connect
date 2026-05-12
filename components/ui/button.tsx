@@ -19,6 +19,19 @@ const buttonVariants = cva(
         ghost:
           'hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50',
         link: 'text-primary underline-offset-4 hover:underline',
+        // ── Neobrutalist variants ─────────────────────────────────────────
+        brutal:
+          'font-brutal rounded-none bg-[#111] text-[#ccff00] border-2 border-[#111] shadow-[4px_4px_0_#999] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0_#999] active:translate-x-0 active:translate-y-0 active:shadow-none',
+        'brutal-green':
+          'font-brutal rounded-none bg-[#1B5E20] text-white border-2 border-[#1B5E20] shadow-[4px_4px_0_#999] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0_#999] active:translate-x-0 active:translate-y-0 active:shadow-none',
+        'brutal-purple':
+          'font-brutal rounded-none bg-[#5d3fd3] text-white border-2 border-[#5d3fd3] shadow-[4px_4px_0_#999] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0_#999] active:translate-x-0 active:translate-y-0 active:shadow-none',
+        'brutal-outline':
+          'font-brutal rounded-none bg-white text-[#111] border-2 border-[#111] shadow-[4px_4px_0_#111] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0_#111] active:translate-x-0 active:translate-y-0 active:shadow-none',
+        'brutal-ghost':
+          'font-brutal rounded-none bg-transparent text-[#111] border-2 border-transparent hover:bg-[#f5f5f5] hover:border-[#e0e0e0]',
+        'brutal-danger':
+          'font-brutal rounded-none bg-[#dc2626] text-white border-2 border-[#dc2626] shadow-[4px_4px_0_#999] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0_#999] active:translate-x-0 active:translate-y-0 active:shadow-none',
       },
       size: {
         default: 'h-9 px-4 py-2 has-[>svg]:px-3',

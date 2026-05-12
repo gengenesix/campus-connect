@@ -6,6 +6,10 @@ import { useRouter } from 'next/navigation'
 import { useAuth } from '@/context/AuthContext'
 import { supabase } from '@/lib/supabase'
 import imageCompression from 'browser-image-compression'
+import SectionWrapper from '@/components/ui/SectionWrapper'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { ProfileIncompleteWarning, ErrorBanner, FormField, BrutalTextarea, ImageUploadZone, AdditionalPhotosGrid, GhanaPhoneInput } from '@/components/shared/FormPrimitives'
 
 async function uploadImageToR2(file: File, folder: string): Promise<string | null> {
   try {
@@ -211,13 +215,13 @@ export default function OfferServicePage() {
   )
 
   if (subStatus === 'none') return (
-    <div style={{ background: '#f8f8f8', minHeight: '80vh' }}>
+    <>
       <div style={{ background: '#1B5E20', color: '#fff', padding: '36px 20px' }}>
         <div className="container">
           <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '36px', letterSpacing: '-1px' }}>OFFER A SERVICE</div>
         </div>
       </div>
-      <div className="container" style={{ paddingTop: '60px', paddingBottom: '80px' }}>
+      <SectionWrapper className="bg-[#f8f8f8]">
         <div style={{ maxWidth: '520px', border: '3px solid #1B5E20', background: '#fff', boxShadow: '8px 8px 0 #1B5E20', padding: '40px' }}>
           <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'center', color: '#1B5E20' }}>
             <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
@@ -243,8 +247,8 @@ export default function OfferServicePage() {
             </p>
           </div>
         </div>
-      </div>
-    </div>
+      </SectionWrapper>
+    </>
   )
 
   if (success) {
@@ -276,7 +280,7 @@ export default function OfferServicePage() {
   }
 
   return (
-    <div style={{ background: '#f8f8f8', minHeight: '80vh' }}>
+    <>
       {/* Header */}
       <div style={{ background: '#1B5E20', color: '#fff', padding: '36px 20px' }}>
         <div className="container">
@@ -289,115 +293,56 @@ export default function OfferServicePage() {
         </div>
       </div>
 
-      <div className="container" style={{ paddingTop: '40px', paddingBottom: '80px' }}>
+      <SectionWrapper className="bg-[#f8f8f8]">
         <div style={{ maxWidth: '640px' }}>
 
-          {/* Profile incomplete warning */}
-          {!profileReady && (
-            <div style={{ background: '#fff8e1', border: '2px solid #f59e0b', padding: '16px 20px', marginBottom: '24px', display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2" strokeLinecap="round" style={{ flexShrink: 0, marginTop: '1px' }}><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-              <div>
-                <div style={{ fontWeight: 700, fontSize: '14px', color: '#92400e', marginBottom: '4px' }}>
-                  Complete your profile first
-                </div>
-                <p style={{ fontSize: '13px', color: '#78350f', margin: '0 0 10px' }}>
-                  Service providers must have a full name, phone number, and department before listing.
-                </p>
-                <a
-                  href="/profile"
-                  style={{ display: 'inline-block', padding: '8px 18px', background: '#f59e0b', color: '#fff', fontFamily: '"Archivo Black", sans-serif', fontSize: '12px', textDecoration: 'none', border: '2px solid #111', letterSpacing: '0.5px' }}
-                >
-                  COMPLETE PROFILE →
-                </a>
-              </div>
-            </div>
-          )}
-
-          {error && (
-            <div style={{ background: '#fee2e2', border: '2px solid #ef4444', padding: '12px 16px', marginBottom: '24px', fontSize: '14px', color: '#dc2626', fontWeight: 600, display: 'flex', gap: '8px' }}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#dc2626" strokeWidth="2.2" strokeLinecap="round" style={{ flexShrink: 0 }}><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><span>{error}</span>
-            </div>
-          )}
+          {!profileReady && <ProfileIncompleteWarning message="Service providers must have a full name, phone number, and department before listing." />}
+          <ErrorBanner error={error} />
 
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
 
             {/* Image */}
-            <div>
-              <label style={{ display: 'block', fontWeight: 700, fontSize: '12px', letterSpacing: '1.5px', marginBottom: '10px' }}>
-                SERVICE PHOTO (OPTIONAL)
-              </label>
-              <div
-                onClick={() => fileInputRef.current?.click()}
-                style={{ border: `2px dashed ${imagePreview ? '#1B5E20' : '#111'}`, padding: '24px', cursor: 'pointer', textAlign: 'center', background: imagePreview ? '#f0fdf4' : '#fff', minHeight: '140px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-              >
-                {imagePreview ? (
-                  <div style={{ position: 'relative' }}>
-                    <img src={imagePreview} alt="Preview" style={{ maxHeight: '180px', maxWidth: '100%', objectFit: 'contain', display: 'block' }} />
-                    <button type="button" onClick={e => { e.stopPropagation(); setImageFile(null); setImagePreview(null) }} style={{ position: 'absolute', top: '-8px', right: '-8px', width: '24px', height: '24px', background: '#dc2626', color: '#fff', border: 'none', borderRadius: '50%', cursor: 'pointer', fontWeight: 700, fontSize: '12px' }}>✕</button>
-                  </div>
-                ) : (
-                  <div>
-                    <div style={{ marginBottom: '8px', display: 'flex', justifyContent: 'center', color: '#888' }}>
-                      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-                    </div>
-                    <div style={{ fontWeight: 700, fontSize: '14px', marginBottom: '4px' }}>Add a photo of your work</div>
-                    <div style={{ color: '#888', fontSize: '12px' }}>JPG, PNG · Max 5MB</div>
-                  </div>
-                )}
-                <input ref={fileInputRef} type="file" accept="image/jpeg,image/png,image/webp" onChange={handleImageChange} style={{ display: 'none' }} />
-              </div>
-            </div>
+            <FormField label="SERVICE PHOTO (OPTIONAL)" labelSpacing="10px">
+              <ImageUploadZone
+                preview={imagePreview}
+                fileRef={fileInputRef}
+                onClear={() => { setImageFile(null); setImagePreview(null) }}
+                onChange={handleImageChange}
+                emptyLabel="Add a photo of your work"
+                emptySubtext="JPG, PNG · Max 5MB"
+                emptyIcon={<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>}
+                minHeight={140}
+                previewMaxHeight={180}
+              />
+            </FormField>
 
             {/* Additional Photos */}
             {imagePreview && (
-              <div>
-                <label style={{ display: 'block', fontWeight: 700, fontSize: '12px', letterSpacing: '1.5px', marginBottom: '10px' }}>
-                  ADDITIONAL PHOTOS <span style={{ fontWeight: 400, color: '#888' }}>(optional, up to 4 more)</span>
-                </label>
-                <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-                  {additionalPreviews.map((preview, idx) => (
-                    <div key={idx} style={{ position: 'relative', width: '80px', height: '80px', flexShrink: 0 }}>
-                      <img src={preview} alt={`Additional ${idx + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover', border: '2px solid #111', display: 'block' }} />
-                      <button
-                        type="button"
-                        onClick={() => { setAdditionalFiles(p => p.filter((_, i) => i !== idx)); setAdditionalPreviews(p => p.filter((_, i) => i !== idx)) }}
-                        style={{ position: 'absolute', top: '-6px', right: '-6px', width: '20px', height: '20px', background: '#dc2626', color: '#fff', border: 'none', borderRadius: '50%', cursor: 'pointer', fontSize: '11px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}
-                      >✕</button>
-                    </div>
-                  ))}
-                  {additionalPreviews.length < 4 && (
-                    <button
-                      type="button"
-                      onClick={() => additionalFileInputRef.current?.click()}
-                      style={{ width: '80px', height: '80px', border: '2px dashed #ddd', background: '#fff', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '4px', color: '#888', flexShrink: 0 }}
-                    >
-                      <span style={{ fontSize: '20px', lineHeight: 1 }}>+</span>
-                      <span style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.5px' }}>ADD</span>
-                    </button>
-                  )}
-                  <input ref={additionalFileInputRef} type="file" accept="image/jpeg,image/png,image/webp" multiple onChange={handleAdditionalImagesChange} style={{ display: 'none' }} />
-                </div>
-              </div>
+              <FormField label="ADDITIONAL PHOTOS" hint="(optional, up to 4 more)" labelSpacing="10px">
+                <AdditionalPhotosGrid
+                  previews={additionalPreviews}
+                  onRemove={idx => { setAdditionalFiles(p => p.filter((_, i) => i !== idx)); setAdditionalPreviews(p => p.filter((_, i) => i !== idx)) }}
+                  onAddClick={() => additionalFileInputRef.current?.click()}
+                  fileRef={additionalFileInputRef}
+                  onChange={handleAdditionalImagesChange}
+                />
+              </FormField>
             )}
 
             {/* Service Name */}
-            <div>
-              <label style={{ display: 'block', fontWeight: 700, fontSize: '12px', letterSpacing: '1.5px', marginBottom: '8px' }}>SERVICE NAME *</label>
-              <input
+            <FormField label="SERVICE NAME *">
+              <Input
                 type="text"
                 value={form.name}
                 onChange={e => update('name', e.target.value)}
                 placeholder="e.g., Professional Haircut & Styling, Mathematics Tutoring"
                 required
-                style={{ width: '100%', padding: '13px 16px', border: '2px solid #111', fontFamily: '"Space Grotesk", sans-serif', fontSize: '15px', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.15s' }}
-                onFocus={e => (e.currentTarget.style.borderColor = '#1B5E20')}
-                onBlur={e => (e.currentTarget.style.borderColor = '#111')}
+                className="text-[15px] focus-visible:border-[#1B5E20]"
               />
-            </div>
+            </FormField>
 
             {/* Category */}
-            <div>
-              <label style={{ display: 'block', fontWeight: 700, fontSize: '12px', letterSpacing: '1.5px', marginBottom: '8px' }}>CATEGORY *</label>
+            <FormField label="CATEGORY *">
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '8px' }}>
                 {SERVICE_CATEGORIES.map(cat => (
                   <button
@@ -418,101 +363,68 @@ export default function OfferServicePage() {
                   </button>
                 ))}
               </div>
-            </div>
+            </FormField>
 
             {/* Rate */}
-            <div>
-              <label style={{ display: 'block', fontWeight: 700, fontSize: '12px', letterSpacing: '1.5px', marginBottom: '8px' }}>RATE / PRICING *</label>
-              <input
+            <FormField label="RATE / PRICING *">
+              <Input
                 type="text"
                 value={form.rate}
                 onChange={e => update('rate', e.target.value)}
                 placeholder="e.g., GHS 50–80/hr · GHS 30–50 per cut · GHS 500 per event"
                 required
-                style={{ width: '100%', padding: '13px 16px', border: '2px solid #111', fontFamily: '"Space Grotesk", sans-serif', fontSize: '15px', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.15s' }}
-                onFocus={e => (e.currentTarget.style.borderColor = '#1B5E20')}
-                onBlur={e => (e.currentTarget.style.borderColor = '#111')}
+                className="text-[15px] focus-visible:border-[#1B5E20]"
               />
-            </div>
+            </FormField>
 
             {/* Availability */}
-            <div>
-              <label style={{ display: 'block', fontWeight: 700, fontSize: '12px', letterSpacing: '1.5px', marginBottom: '8px' }}>AVAILABILITY *</label>
-              <input
+            <FormField label="AVAILABILITY *">
+              <Input
                 type="text"
                 value={form.availability}
                 onChange={e => update('availability', e.target.value)}
                 placeholder="e.g., Mon–Sat 9AM–6PM · Weekends only · Book 24hrs ahead"
                 required
-                style={{ width: '100%', padding: '13px 16px', border: '2px solid #111', fontFamily: '"Space Grotesk", sans-serif', fontSize: '15px', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.15s' }}
-                onFocus={e => (e.currentTarget.style.borderColor = '#1B5E20')}
-                onBlur={e => (e.currentTarget.style.borderColor = '#111')}
+                className="text-[15px] focus-visible:border-[#1B5E20]"
               />
-            </div>
+            </FormField>
 
             {/* Description */}
-            <div>
-              <label style={{ display: 'block', fontWeight: 700, fontSize: '12px', letterSpacing: '1.5px', marginBottom: '8px' }}>DESCRIPTION *</label>
-              <textarea
+            <FormField label="DESCRIPTION *">
+              <BrutalTextarea
                 value={form.description}
                 onChange={e => update('description', e.target.value)}
                 placeholder="Describe your service — your experience, what's included, why students should choose you."
                 required
                 rows={5}
-                style={{ width: '100%', padding: '13px 16px', border: '2px solid #111', fontFamily: '"Space Grotesk", sans-serif', fontSize: '15px', outline: 'none', boxSizing: 'border-box', resize: 'vertical', transition: 'border-color 0.15s' }}
-                onFocus={e => (e.currentTarget.style.borderColor = '#1B5E20')}
-                onBlur={e => (e.currentTarget.style.borderColor = '#111')}
+                focusColor="#1B5E20"
               />
-            </div>
+            </FormField>
 
             {/* WhatsApp */}
-            <div>
-              <label style={{ display: 'block', fontWeight: 700, fontSize: '12px', letterSpacing: '1.5px', marginBottom: '8px' }}>WHATSAPP NUMBER (OPTIONAL)</label>
-              <div style={{ position: 'relative' }}>
-                <span style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', fontSize: '13px', color: '#555', fontWeight: 700, pointerEvents: 'none', userSelect: 'none' }}>
-                  +233
-                </span>
-                <input
-                  type="tel"
-                  value={form.whatsapp}
-                  onChange={e => update('whatsapp', e.target.value.replace(/\D/g, ''))}
-                  placeholder="241234567"
-                  maxLength={9}
-                  style={{ width: '100%', padding: '13px 16px 13px 58px', border: '2px solid #ddd', fontFamily: '"Space Grotesk", sans-serif', fontSize: '15px', outline: 'none', boxSizing: 'border-box' }}
-                  onFocus={e => (e.currentTarget.style.borderColor = '#1B5E20')}
-                  onBlur={e => (e.currentTarget.style.borderColor = '#ddd')}
-                />
-              </div>
-              <p style={{ marginTop: '6px', fontSize: '12px', color: '#888' }}>
-                Ghana number — buyers can contact you on WhatsApp. Leave blank to use your profile number.
-              </p>
-            </div>
+            <FormField label="WHATSAPP NUMBER (OPTIONAL)" hint="Ghana number — buyers can contact you on WhatsApp. Leave blank to use your profile number.">
+              <GhanaPhoneInput
+                value={form.whatsapp}
+                onChange={e => update('whatsapp', e.target.value.replace(/\D/g, ''))}
+                className="focus-visible:border-[#1B5E20]"
+              />
+            </FormField>
 
-            <button
+            <Button
               type="submit"
+              variant="brutal-green"
               disabled={loading}
-              style={{
-                width: '100%', padding: '18px',
-                background: loading ? '#888' : '#1B5E20',
-                color: '#fff',
-                fontFamily: '"Archivo Black", sans-serif', fontSize: '16px',
-                border: '2px solid #111',
-                cursor: loading ? 'not-allowed' : 'pointer',
-                boxSizing: 'border-box',
-                boxShadow: loading ? 'none' : '6px 6px 0 #111',
-                letterSpacing: '0.5px',
-                transition: 'all 0.2s',
-              }}
+              className="w-full h-auto py-[18px] text-base"
             >
               {loading ? 'POSTING SERVICE...' : 'POST SERVICE FOR FREE →'}
-            </button>
+            </Button>
 
             <p style={{ fontSize: '12px', color: '#999', textAlign: 'center' }}>
               By posting, you agree to our <Link href="/about" style={{ color: '#5d3fd3', fontWeight: 700 }}>community guidelines</Link>.
             </p>
           </form>
         </div>
-      </div>
-    </div>
+      </SectionWrapper>
+    </>
   )
 }

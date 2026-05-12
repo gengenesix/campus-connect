@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import ServiceCard from '@/components/ServiceCard'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/context/AuthContext'
+import SectionWrapper from '@/components/ui/SectionWrapper'
 
 interface Service {
   id: string
@@ -173,7 +174,7 @@ export default function ServicesPageClient({
       </div>
 
       {/* Results */}
-      <div className="container" style={{ paddingTop: '28px', paddingBottom: '60px' }}>
+      <SectionWrapper className="bg-[#f8f8f8]">
         {services.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '80px 20px' }}>
             <div style={{ marginBottom: '20px', display: 'flex', justifyContent: 'center' }}>
@@ -271,25 +272,23 @@ export default function ServicesPageClient({
             )}
           </>
         )}
-      </div>
+      </SectionWrapper>
 
       {/* Offer CTA */}
-      <div style={{ background: '#1B5E20', padding: '48px 20px', textAlign: 'center', color: '#fff' }}>
-        <div className="container">
-          <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '28px', marginBottom: '12px' }}>
-            OFFER YOUR SERVICES
-          </div>
-          <p style={{ color: 'rgba(255,255,255,0.8)', marginBottom: '24px', maxWidth: '440px', margin: '0 auto 24px' }}>
-            Got skills? List your service and start earning on campus.
-          </p>
-          <a
-            href="/offer-service"
-            style={{ display: 'inline-block', padding: '16px 40px', background: '#fff', color: '#1B5E20', fontFamily: '"Archivo Black", sans-serif', fontSize: '15px', textDecoration: 'none', border: '2px solid #fff', boxShadow: '4px 4px 0 rgba(0,0,0,0.3)' }}
-          >
-            + LIST YOUR SERVICE
-          </a>
+      <SectionWrapper className="bg-[#1B5E20] text-white text-center">
+        <div style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '28px', marginBottom: '12px' }}>
+          OFFER YOUR SERVICES
         </div>
-      </div>
+        <p style={{ color: 'rgba(255,255,255,0.8)', marginBottom: '24px', maxWidth: '440px', margin: '0 auto 24px' }}>
+          Got skills? List your service and start earning on campus.
+        </p>
+        <a
+          href="/offer-service"
+          style={{ display: 'inline-block', padding: '16px 40px', background: '#fff', color: '#1B5E20', fontFamily: '"Archivo Black", sans-serif', fontSize: '15px', textDecoration: 'none', border: '2px solid #fff', boxShadow: '4px 4px 0 rgba(0,0,0,0.3)' }}
+        >
+          + LIST YOUR SERVICE
+        </a>
+      </SectionWrapper>
     </div>
   )
 }

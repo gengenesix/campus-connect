@@ -17,3 +17,40 @@ if (!supabaseUrl || !supabaseAnonKey) {
 export const supabase = createBrowserClient(supabaseUrl, supabaseAnonKey)
 
 export type { User } from '@supabase/supabase-js'
+
+/** Card display type for goods/products — mapped from Supabase products table */
+export interface Good {
+  id: string
+  name: string
+  price: number
+  condition: string
+  category: string
+  seller: string
+  sellerId?: string
+  sellerImage: string
+  sellerRating: number
+  sellerVerified?: boolean
+  image: string
+  description: string
+  createdAt: string
+  views: number
+  inStock?: boolean
+}
+
+/** Card display type for services — mapped from Supabase services table */
+export interface Service {
+  id: string
+  name: string
+  provider: string
+  providerId?: string
+  providerImage: string
+  providerRating: number
+  providerVerified?: boolean
+  category: string
+  rate: string
+  description: string
+  availability: string
+  image: string
+  responseTime: string
+  bookings: number
+}

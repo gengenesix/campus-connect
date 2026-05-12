@@ -5,6 +5,8 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/context/AuthContext'
 import { supabase } from '@/lib/supabase'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import { FACULTIES, CLASS_YEARS } from '@/lib/umat-data'
 import { useHostels } from '@/lib/useHostels'
 import UniversityPicker from '@/components/UniversityPicker'
@@ -190,19 +192,11 @@ export default function RegisterPage() {
             {/* Google Sign Up — step 1 only */}
             {step === 1 && (
               <>
-                <button
+                <Button
                   type="button"
+                  variant="brutal-outline"
                   onClick={signInWithGoogle}
-                  style={{
-                    width: '100%', padding: '14px 16px', marginBottom: '16px',
-                    background: '#fff', color: '#111',
-                    fontFamily: '"Space Grotesk", sans-serif', fontSize: '14px', fontWeight: 700,
-                    border: '2px solid #111', cursor: 'pointer',
-                    boxSizing: 'border-box', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px',
-                    transition: 'background 0.2s',
-                  }}
-                  onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = '#f8f8f8'}
-                  onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = '#fff'}
+                  className="w-full h-auto py-3.5 mb-4 text-sm"
                 >
                   <svg width="18" height="18" viewBox="0 0 24 24">
                     <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -211,7 +205,7 @@ export default function RegisterPage() {
                     <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
                   </svg>
                   SIGN UP WITH GOOGLE
-                </button>
+                </Button>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
                   <div style={{ flex: 1, height: '1px', background: '#ddd' }} />
                   <span style={{ fontSize: '11px', fontWeight: 700, color: '#888', letterSpacing: '1px' }}>OR WITH EMAIL</span>
@@ -232,35 +226,20 @@ export default function RegisterPage() {
                     <label style={{ display: 'block', fontWeight: 700, fontSize: '12px', letterSpacing: '1.5px', marginBottom: '8px' }}>
                       {field.label}
                     </label>
-                    <input
+                    <Input
                       type={field.type}
                       value={(form as any)[field.key]}
                       onChange={e => update(field.key, e.target.value)}
                       placeholder={field.placeholder}
                       autoComplete={field.autoComplete}
                       required
-                      style={{
-                        width: '100%', padding: '13px 16px', border: '2px solid #111',
-                        fontFamily: '"Space Grotesk", sans-serif', fontSize: '15px',
-                        outline: 'none', boxSizing: 'border-box',
-                      }}
-                      onFocus={e => (e.currentTarget.style.borderColor = '#1B5E20')}
-                      onBlur={e => (e.currentTarget.style.borderColor = '#111')}
+                      className="text-[15px] focus-visible:border-[#1B5E20]"
                     />
                   </div>
                 ))}
-                <button
-                  type="submit"
-                  style={{
-                    marginTop: '8px', width: '100%', padding: '16px',
-                    background: '#111', color: '#fff',
-                    fontFamily: '"Archivo Black", sans-serif', fontSize: '15px',
-                    border: '2px solid #111', cursor: 'pointer', boxSizing: 'border-box',
-                    letterSpacing: '0.5px',
-                  }}
-                >
+                <Button type="submit" variant="brutal" className="w-full h-auto py-4 mt-2 text-[15px]">
                   CONTINUE →
-                </button>
+                </Button>
               </form>
             ) : (
               <form onSubmit={handleSubmit}>
@@ -354,12 +333,12 @@ export default function RegisterPage() {
                       ))}
                     </select>
                   ) : (
-                    <input
+                    <Input
                       type="text"
                       value={form.department}
                       onChange={e => update('department', e.target.value)}
                       placeholder="e.g. BSc Computer Science"
-                      style={{ width: '100%', padding: '13px 16px', border: '2px solid #111', fontFamily: '"Space Grotesk", sans-serif', fontSize: '14px', outline: 'none', boxSizing: 'border-box' }}
+                      className="focus-visible:border-[#1B5E20]"
                     />
                   )}
                 </div>
@@ -402,12 +381,12 @@ export default function RegisterPage() {
                       </optgroup>
                     </select>
                   ) : (
-                    <input
+                    <Input
                       type="text"
                       value={form.hostel}
                       onChange={e => update('hostel', e.target.value)}
                       placeholder={selectedUni ? `Hostel or area near ${selectedUni.shortName}` : 'Hostel or residential area'}
-                      style={{ width: '100%', padding: '13px 16px', border: '2px solid #ddd', fontFamily: '"Space Grotesk", sans-serif', fontSize: '14px', outline: 'none', boxSizing: 'border-box' }}
+                      className="border-[#ddd] focus-visible:border-[#1B5E20]"
                     />
                   )}
                 </div>
@@ -421,18 +400,13 @@ export default function RegisterPage() {
                     <span style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', fontSize: '13px', color: '#555', fontWeight: 700, pointerEvents: 'none', userSelect: 'none' }}>
                       +233
                     </span>
-                    <input
+                    <Input
                       type="tel"
                       value={form.phone}
                       onChange={e => update('phone', e.target.value.replace(/\D/g, ''))}
                       placeholder="241234567"
                       maxLength={9}
-                      style={{
-                        width: '100%', padding: '13px 16px 13px 58px',
-                        border: `2px solid ${isSeller && !form.phone ? '#f59e0b' : '#ddd'}`,
-                        fontFamily: '"Space Grotesk", sans-serif', fontSize: '15px',
-                        outline: 'none', boxSizing: 'border-box',
-                      }}
+                      className={`pl-[58px] text-[15px] focus-visible:border-[#1B5E20] ${isSeller && !form.phone ? 'border-[#f59e0b]' : 'border-[#ddd]'}`}
                     />
                   </div>
                   <p style={{ marginTop: '4px', fontSize: '11px', color: '#888' }}>
@@ -440,27 +414,23 @@ export default function RegisterPage() {
                   </p>
                 </div>
 
-                <button
+                <Button
                   type="submit"
+                  variant="brutal-green"
                   disabled={loading}
-                  style={{
-                    width: '100%', padding: '16px', background: loading ? '#888' : '#1B5E20',
-                    color: '#fff', fontFamily: '"Archivo Black", sans-serif', fontSize: '15px',
-                    border: '2px solid #111', cursor: loading ? 'not-allowed' : 'pointer',
-                    boxSizing: 'border-box', boxShadow: loading ? 'none' : '4px 4px 0 #111',
-                    letterSpacing: '0.5px', transition: 'all 0.2s',
-                  }}
+                  className="w-full h-auto py-4 text-[15px]"
                 >
                   {loading ? 'CREATING ACCOUNT...' : 'CREATE FREE ACCOUNT →'}
-                </button>
+                </Button>
 
-                <button
+                <Button
                   type="button"
+                  variant="brutal-ghost"
                   onClick={() => setStep(1)}
-                  style={{ marginTop: '10px', width: '100%', padding: '12px', background: '#fff', color: '#666', fontWeight: 600, fontSize: '14px', border: '1px solid #eee', cursor: 'pointer', boxSizing: 'border-box' }}
+                  className="w-full h-auto py-3 mt-2 text-sm font-semibold"
                 >
                   ← Back
-                </button>
+                </Button>
               </form>
             )}
 

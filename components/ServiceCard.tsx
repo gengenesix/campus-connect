@@ -4,7 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useAuth } from '@/context/AuthContext'
-import type { Service } from '@/lib/mockData'
+import type { Service } from '@/lib/supabase'
 import WishlistButton from '@/components/WishlistButton'
 
 const categoryAccent: Record<string, string> = {

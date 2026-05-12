@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { useParams } from 'next/navigation'
 import { getUniversityBySlug } from '@/lib/ghana-universities'
+import SectionWrapper from '@/components/ui/SectionWrapper'
 
 export default function UniHomePage() {
   const params = useParams<{ slug: string }>()
@@ -11,7 +12,7 @@ export default function UniHomePage() {
   if (!uni) notFound()
 
   return (
-    <div style={{ background: '#f8f8f8', minHeight: '80vh' }}>
+    <>
       {/* Hero */}
       <div style={{ background: '#111', color: '#fff', padding: '48px 20px' }}>
         <div className="container">
@@ -46,7 +47,7 @@ export default function UniHomePage() {
       </div>
 
       {/* Nav cards */}
-      <div className="container" style={{ paddingTop: '40px', paddingBottom: '60px' }}>
+      <SectionWrapper className="bg-[#f8f8f8]">
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '20px' }}>
           {[
             {
@@ -114,7 +115,7 @@ export default function UniHomePage() {
             </Link>
           ))}
         </div>
-      </div>
-    </div>
+      </SectionWrapper>
+    </>
   )
 }

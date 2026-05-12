@@ -4,7 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useAuth } from '@/context/AuthContext'
-import type { Good } from '@/lib/mockData'
+import type { Good } from '@/lib/supabase'
 import WishlistButton from '@/components/WishlistButton'
 
 const conditionMeta: Record<string, { bg: string; text: string }> = {

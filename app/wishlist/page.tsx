@@ -6,6 +6,7 @@ import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/context/AuthContext'
 import WishlistButton from '@/components/WishlistButton'
+import SectionWrapper from '@/components/ui/SectionWrapper'
 
 interface SavedItem {
   id: string
@@ -66,7 +67,7 @@ export default function WishlistPage() {
   }
 
   return (
-    <div style={{ background: '#f8f8f8', minHeight: '80vh' }}>
+    <>
       {/* Header */}
       <div style={{ background: '#111', color: '#fff', padding: '36px 20px' }}>
         <div className="container">
@@ -79,7 +80,7 @@ export default function WishlistPage() {
         </div>
       </div>
 
-      <div className="container" style={{ paddingTop: '32px', paddingBottom: '80px' }}>
+      <SectionWrapper className="bg-[#f8f8f8]">
 
         {/* Tabs */}
         <div style={{ display: 'flex', gap: '4px', marginBottom: '32px', borderBottom: '3px solid #111' }}>
@@ -140,8 +141,8 @@ export default function WishlistPage() {
             ) : null)}
           </div>
         )}
-      </div>
-    </div>
+      </SectionWrapper>
+    </>
   )
 }
 

@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
+import SectionWrapper from '@/components/ui/SectionWrapper'
 
 export const metadata: Metadata = {
   title: 'Terms of Service — Campus Connect',
@@ -8,7 +9,7 @@ export const metadata: Metadata = {
 
 export default function TermsPage() {
   return (
-    <main style={{ background: '#f8f8f8', minHeight: '80vh' }}>
+    <>
       {/* Header strip */}
       <div style={{ background: '#111', padding: '12px 20px' }}>
         <div style={{ maxWidth: '860px', margin: '0 auto', display: 'flex', gap: '8px', alignItems: 'center', fontSize: '13px', color: '#666' }}>
@@ -18,7 +19,7 @@ export default function TermsPage() {
         </div>
       </div>
 
-      <div style={{ maxWidth: '860px', margin: '0 auto', padding: '60px 20px' }}>
+      <SectionWrapper className="bg-[#f8f8f8]" innerClassName="max-w-[860px] mx-auto px-4">
         {/* Title */}
         <div style={{ marginBottom: '48px' }}>
           <h1 style={{ fontFamily: '"Archivo Black", sans-serif', fontSize: '52px', lineHeight: '1.1', color: '#111', marginBottom: '16px' }}>
@@ -234,7 +235,7 @@ We aim to respond within 48 hours on business days.`,
             ABOUT CAMPUS CONNECT
           </Link>
         </div>
-      </div>
-    </main>
+      </SectionWrapper>
+    </>
   )
 }

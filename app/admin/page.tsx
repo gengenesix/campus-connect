@@ -6,6 +6,7 @@ import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/context/AuthContext'
 import { supabase } from '@/lib/supabase'
+import SectionWrapper from '@/components/ui/SectionWrapper'
 
 interface AdminUser {
   id: string
@@ -314,7 +315,7 @@ export default function AdminDashboard() {
   ]
 
   return (
-    <div style={{ background: '#f8f8f8', minHeight: '100vh' }}>
+    <>
 
       {/* Header */}
       <div style={{ background: '#111', color: '#fff', padding: '28px 20px' }}>
@@ -359,7 +360,7 @@ export default function AdminDashboard() {
         }}>{toast}</div>
       )}
 
-      <div className="container" style={{ paddingTop: '28px', paddingBottom: '60px' }}>
+      <SectionWrapper className="bg-[#f8f8f8]">
 
         {/* Stats grid */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(110px, 1fr))', gap: '16px', marginBottom: '32px' }}>
@@ -731,7 +732,7 @@ export default function AdminDashboard() {
             )}
           </>
         )}
-      </div>
-    </div>
+      </SectionWrapper>
+    </>
   )
 }

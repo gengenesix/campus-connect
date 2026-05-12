@@ -1,8 +1,9 @@
 import Link from "next/link"
+import SectionWrapper from '@/components/ui/SectionWrapper'
 
 export default function AboutPage() {
   return (
-    <main style={{ maxWidth: "900px", margin: "0 auto", padding: "60px 20px" }}>
+    <SectionWrapper innerClassName="max-w-[900px] mx-auto px-4">
       <h1 style={{ fontSize: "56px", fontFamily: '"Archivo Black"', marginBottom: "24px", color: "#111", lineHeight: "1.1" }}>
         About Campus <span style={{ color: "#1B5E20" }}>Connect</span>
       </h1>
@@ -108,6 +109,6 @@ export default function AboutPage() {
           </Link>
         </div>
       </section>
-    </main>
+    </SectionWrapper>
   )
 }
